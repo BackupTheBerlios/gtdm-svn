@@ -1,4 +1,4 @@
-package gtdmanagercore;
+package gtdmanager.core;
 
 import java.util.*;
 
@@ -21,7 +21,9 @@ public class JActivity {
     Calendar startDate, endDate;
     int color;
     ArrayList dependencies;
-    // hier fehlen noch weitere Unteraktivitäten !!!
+    ArrayList activities = new ArrayList();
+
+    
 
     public JActivity() {
         color = 0;
@@ -71,7 +73,7 @@ public class JActivity {
         return false;
     }
 
-    String getName() {
+    public String getName() {
         return this.name;
     }
 
@@ -110,5 +112,67 @@ public class JActivity {
     void setColor(int col) {
         this.color = col;
     }
+
+
+    // private function returns the next higher id after the last activity
+    private int getNextActivityId() {
+        if (this.activities.size() <= 0) {
+            return 0; // no existing activity given
+        } else {
+            return ((JActivity)this.activities.get(this.activities.size()-1)).id + 1;
+        } // returns id + 1 of the last existing activity
+    }
+
+    int newActivity() {
+
+        JActivity act = new JActivity();
+        act.id = getNextActivityId(); // gets the next higher id
+
+        activities.add(act);  // adds the new activity to the arraylist
+
+        return act.id;  // return id of the new activity
+    }
+
+    int newActivity(String strName, String strShortName, Calendar calStart, Calendar calEnd, int color) {
+
+        JActivity act = new JActivity();
+        act.id = getNextActivityId(); // gets the next higher id
+
+        act.setName(strName);
+        act.setShortName(strShortName);
+        act.setStartDate(calStart);
+        act.setEndDate(calEnd);
+        act.setColor(color);
+
+        activities.add(act);  // adds the new activity to the arraylist
+
+        return act.id;  // return id of the new activity
+    }
+
+
+    public ArrayList getActivities() {
+	    return activities;
+    }
+    
+    JActivity getActivity(int id) {
+        for (int i=0; i<this.activities.size(); i++) {
+            JActivity act = (JActivity)this.activities.get(i);
+            if (act.id == id) {
+                return act;
+            }
+        }
+        return null;
+    }
+
+    boolean deleteActivity(int id) {
+
+        JActivity act = getActivity(id);
+        if (act != null) {
+            return this.activities.remove(act);
+        }
+        return false;
+    }
+
+
 
 }

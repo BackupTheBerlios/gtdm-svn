@@ -1,4 +1,4 @@
-package gtdmanagercore;
+package gtdmanager.core;
 
 import java.util.*;
 
@@ -77,6 +77,11 @@ public class JInstance {
         return act.id;  // return id of the new activity
     }
 
+
+    public ArrayList getActivities() {
+	    return activities;
+    }
+    
     JActivity getActivity(int id) {
         for (int i=0; i<this.activities.size(); i++) {
             JActivity act = (JActivity)this.activities.get(i);
@@ -100,7 +105,7 @@ public class JInstance {
         this.name = strName;
     }
 
-    String getName() {
+    public String getName() {
         return this.name;
     }
 

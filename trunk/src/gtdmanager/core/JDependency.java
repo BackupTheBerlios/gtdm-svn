@@ -1,4 +1,4 @@
-package gtdmanagercore;
+package gtdmanager.core;
 
 /**
  * <p>Title: JDependency class</p>

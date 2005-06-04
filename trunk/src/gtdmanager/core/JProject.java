@@ -1,4 +1,4 @@
-package gtdmanagercore;
+package gtdmanager.core;
 
 import java.util.*;
 
@@ -24,19 +24,19 @@ public class JProject {
         this.instances = new ArrayList();
     }
 
-    String getName() {
+    public String getName() {
         return this.name;
     }
 
-    void setName(String strName) {
+    public void setName(String strName) {
         this.name = strName;
     }
 
-    String getVersion() {
+    public String getVersion() {
         return this.version;
     }
 
-    void setVersion(String strVersion) {
+    public void setVersion(String strVersion) {
         this.version = strVersion;
     }
 
@@ -49,7 +49,7 @@ public class JProject {
         } // returns id + 1 of the last existing instance
     }
 
-    int newInstance() {
+    public int newInstance() {
 
         JInstance inst = new JInstance();
         inst.id = getNextId(); // gets the next higher id
@@ -59,7 +59,7 @@ public class JProject {
         return inst.id;  // return id of the new instance
     }
 
-    int newInstance(String strName, Calendar calCreate, Calendar calStart, Calendar calEnd, boolean active) {
+    public int newInstance(String strName, Calendar calCreate, Calendar calStart, Calendar calEnd, boolean active) {
 
         JInstance inst = new JInstance();
         inst.id = getNextId(); // gets the next higher id
@@ -75,7 +75,11 @@ public class JProject {
         return inst.id;  // return id of the new instance
     }
 
-    JInstance getInstance(int id) {
+    public ArrayList getInstances() {
+	    return instances;
+    }
+
+    public JInstance getInstance(int id) {
 
         for (int i=0; i<this.instances.size(); i++) {
             JInstance inst = (JInstance)this.instances.get(i);
@@ -86,7 +90,7 @@ public class JProject {
         return null;
     }
 
-    void deleteInstance(int id) {
+    public void deleteInstance(int id) {
 
         JInstance inst = getInstance(id);
         if (inst != null) {

@@ -1,4 +1,4 @@
-package gtdmanagercore;
+package gtdmanager.core;
 
 import java.util.*;
 
@@ -27,37 +27,37 @@ public class JManager {
         fileName = "";
     }
 
-    int getFontSize() {
+    public int getFontSize() {
         return this.fontSize;
     }
 
-    void setFontSize(int size) {
+    public void setFontSize(int size) {
         this.fontSize = size;
     }
 
-    JProject getProject() {
+    public JProject getProject() {
         return this.project;
     }
 
-    void loadProject(String fileName) {
+    public void loadProject(String fileName) {
         // loads project from xml-file
     }
 
-    void saveProject(String fileName) {
+    public void saveProject(String fileName) {
         // saves project in xml-file
     }
 
-    void newProject() {
+    public void newProject() {
         this.project = new JProject();
     }
 
-    void newProject(String strName, String strVersion) {
+    public void newProject(String strName, String strVersion) {
         this.project = new JProject();
         this.project.setName(strName);
         this.project.setVersion(strVersion);
     }
 
-    void generateSampleProject() {
+    public void generateSampleProject() {
 
         newProject("Testprojekt", "1.0.0.0");
 
@@ -76,13 +76,16 @@ public class JManager {
         calStart.set(2005, 5, 4);
         calEnd.set(2005, 5, 20);
 
-        int actId1 = inst.newActivity("Aktivität1", "Akt1", calStart, calEnd, 0);
+        int actId1 = inst.newActivity("Aktivität1","Akt1", calStart, calEnd, 0);
+	
         JActivity act1 = inst.getActivity(actId1);
 
         calStart = Calendar.getInstance();
         calEnd = Calendar.getInstance();
         calStart.set(2005, 5, 22);
         calEnd.set(2005, 6, 3);
+
+	act1.newActivity("Akt11: und noch tiefer","Akt11", calStart, calEnd, 0);
 
         int actId2 = inst.newActivity("Aktivität2", "Akt2", calStart, calEnd, 0);
         JActivity act2 = inst.getActivity(actId2);
