@@ -9,7 +9,7 @@ AUTHOR		= Tomislav Viljetić
 MODULE		= GTDManager
 
 SRCDIR		= src
-CLASSPATH	= $(SRCDIR)
+CLASSPATH	= $(SRCDIR):freehep-base.jar:freehep-graphics2d.jar:freehep-graphicsip.jar
 
 CORENAME	= gtdmanager/core
 CORESOURCES	= $(wildcard $(SRCDIR)/$(CORENAME)/*.java)
@@ -61,4 +61,4 @@ ctags: ${CORECLASSES}
 
 clean: .
 	@echo === make clean
-	@rm -vf *.manifest *.jar $(SRCDIR)/*/*/*.class
+	@rm -vf GTDM*.manifest GTDM*.jar $(SRCDIR)/*/*/*.class

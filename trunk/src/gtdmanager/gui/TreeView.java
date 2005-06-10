@@ -7,8 +7,7 @@ package gtdmanager.gui;
 import gtdmanager.core.*;
 import javax.swing.JTree;
 import javax.swing.JComponent;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
+import javax.swing.tree.*;
 import java.util.*;
 
 /* }}} */
@@ -24,11 +23,13 @@ import java.util.*;
  * {{{ TreeView */
 public class TreeView extends JTree implements View {
 
-    static DefaultMutableTreeNode top = new DefaultMutableTreeNode();
+    DefaultMutableTreeNode top;
 
-    TreeView() {
-        super(top);//new DefaultMutableTreeNode());
+    TreeView(DefaultMutableTreeNode t) {
+//        DefaultMutableTreeNode t = new DefaultMutableTreeNode();
+        super(t);//new DefaultMutableTreeNode());
         //parent = window;
+        top = t;
     }
 
     public void update(JProject project) {
