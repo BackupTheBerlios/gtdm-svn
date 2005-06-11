@@ -28,18 +28,12 @@ public class MainWindow {
     // gui
     JFrame frame = new JFrame();
     JPanel panel = new JPanel(new BorderLayout(), true);
-//    JPanel panelForViews = new JPanel(new GridBagLayout(), true);
     JMenuBar menuBar = new JMenuBar();
 
+    // list of all views
     ArrayList views = new ArrayList();
 
     MainWindow() {
-        // initialize gui
-        //fileMenu.setMnemonic(KeyEvent.VK_D);
-        /*GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.anchor = GridBagConstraints.NORTHWEST;*/
-
         // create menu
         menuBar.add(new FileMenu(this));
         menuBar.add(new ProjectMenu());
@@ -66,10 +60,6 @@ public class MainWindow {
         frame.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        MainWindow window = new MainWindow();
-    }
-
     public JManager getManager() {
         return manager;
     }
@@ -80,6 +70,10 @@ public class MainWindow {
             View v = (View)i.next();
             v.update(manager.getProject());
         }
+    }
+
+    public static void main(String[] args) {
+        MainWindow window = new MainWindow();
     }
 }
 

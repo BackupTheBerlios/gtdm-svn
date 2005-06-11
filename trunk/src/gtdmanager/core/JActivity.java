@@ -32,6 +32,10 @@ public class JActivity {
         endDate = Calendar.getInstance();
     }
 
+    public int getId() {
+	return id;
+    }
+
     // private function returns the next higher id after the last dependency
     private int getNextId() {
         if (this.dependencies.size() <= 0) {
@@ -81,7 +85,7 @@ public class JActivity {
         this.name = strName;
     }
 
-    String getShortName() {
+    public String getShortName() {
         return this.shortName;
     }
 
@@ -93,7 +97,7 @@ public class JActivity {
         this.startDate = calStartDate;
     }
 
-    Calendar getStartDate() {
+    public Calendar getStartDate() {
         return this.startDate;
     }
 
@@ -101,7 +105,7 @@ public class JActivity {
         this.endDate = calEndDate;
     }
 
-    Calendar getEndDate() {
+    public Calendar getEndDate() {
         return this.endDate;
     }
 

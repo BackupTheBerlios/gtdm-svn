@@ -42,6 +42,10 @@ public class JInstance {
     //??? wird dies benötigt?
          } */
 
+    public int getId() {
+	return id;
+    }
+
     // private function returns the next higher id after the last activity
     private int getNextId() {
         if (this.activities.size() <= 0) {

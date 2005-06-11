@@ -76,7 +76,8 @@ public class JManager {
         calStart.set(2005, 5, 4);
         calEnd.set(2005, 5, 20);
 
-        int actId1 = inst.newActivity("Aktivität1","Akt1", calStart, calEnd, 0);
+        int actId1 = inst.newActivity("Aktivitaet1",
+			"Akt1", calStart, calEnd, 0);
 	
         JActivity act1 = inst.getActivity(actId1);
 
@@ -87,7 +88,9 @@ public class JManager {
 
 	act1.newActivity("Akt11: und noch tiefer","Akt11", calStart, calEnd, 0);
 
-        int actId2 = inst.newActivity("Aktivität2", "Akt2", calStart, calEnd, 0);
+        int actId2 = inst.newActivity("Aktivitaet2",
+			"Akt2", calStart, calEnd, 0);
+
         JActivity act2 = inst.getActivity(actId2);
 
         int depId = act1.newDependency(actId2, 2);

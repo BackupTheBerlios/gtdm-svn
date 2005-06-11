@@ -24,7 +24,13 @@ import org.freehep.graphics2d.VectorGraphics;
  * {{{ DiagramView */
 public class DiagramView extends JComponent implements View {
 
-    JInstance instance;
+    JProject project = null;
+
+    static int padding = 16;
+    static int barwidth = 32;
+
+    // offset of the bars (only changed by getActivit*)
+    private int xoffset = 0, yoffset = 0;
 
     DiagramView() {
         super();
@@ -32,12 +38,10 @@ public class DiagramView extends JComponent implements View {
     }
 
     public void update(JProject project) {
-
-        instance = project.getInstance(0);
-
         System.out.println("update DiagramView: " + project.getName());
-        
-        updateUI();
+
+        this.project = project;
+        repaint();
     }
 
     /*    public void updateActivity(DefaultMutableTreeNode top, JActivity act) {
@@ -52,19 +56,43 @@ public class DiagramView extends JComponent implements View {
     }*/
 
     public void paint(Graphics g) {
-        //paintActivities(g, instance.getActivities());
+        if (project != null) {
+            ArrayList a = project.getInstances();
+            JInstance i = (JInstance)a.get(a.size() - 1);
+            if (i != null) {
+                System.out.println("paint instance " + i.getId() + " of "
+                        + project.getName());
+
+                xoffset = yoffset = padding;
+                paintActivities(g, i.getActivities());
+            }
+        }
+        updateUI();
     }
 
     private void paintActivities(Graphics g, ArrayList a) {
-        if (a != null) {
-            ListIterator i = a.listIterator();
-            while (i.hasNext()) paintActivity(g, (JActivity)i.next());
-        }
+        ListIterator i = a.listIterator();
+        while (i.hasNext()) paintActivity(g, (JActivity)i.next());
     }
 
     
     private void paintActivity(Graphics g, JActivity a) {
-        g.drawString(" Hello, Pink Panther! ", 30,30);
+        if (a == null) return; // nothing to do
+
+        // calculate bargeometry for activity
+        int w = barwidth;
+        int h = 200;
+        int x = xoffset;
+        int y = yoffset + w;
+        yoffset += w + padding;
+
+        System.out.println("paint activity " + a.getId());
+        g.fillRect(x, y, h, w);
+
+        g.drawString(" act " + a.getName() + " (" + a.getShortName() + ")",
+            x, y);
+
+        paintActivities(g, a.getActivities());
     }
 
 }
