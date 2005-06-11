@@ -68,7 +68,8 @@ public class JManager {
         calStart.set(2005, 5, 1);
         calEnd.set(2005, 6, 30);
 
-        int newInstId = getProject().newInstance("Instanz1", calCreate, calStart, calEnd, true);
+        int newInstId = getProject().newInstance("Instanz1",
+		calCreate, calStart, calEnd, true);
         JInstance inst = getProject().getInstance(newInstId);
 
         calStart = Calendar.getInstance();
