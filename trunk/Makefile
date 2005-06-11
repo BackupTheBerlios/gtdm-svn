@@ -37,27 +37,21 @@ all:
 
 $(MODULE).jar: $(MODULE).manifest $(CLASSES)
 	@echo === JAR $@
-	jar cvfm $@ $< $(subst $(SRCDIR)/,-C $(SRCDIR) ,$(wildcard $(SRCDIR)/*/*/*.class))
+	jar cvfm $@ $< \
+	    $(subst $(SRCDIR)/,-C $(SRCDIR) ,$(wildcard $(SRCDIR)/*/*/*.class))
 
-jar-test: clean $(MODULE).jar
+jar-test: $(MODULE).jar
 	#clean $(MODULE).jar
 	@echo === JAVA $(MODULE).jar
 	@LC_ALL=C java -jar $(MODULE).jar
 
 
-
-corejar: $(CORENAME).jar
-
-test: $(CORECLASSES)
-	@echo === make test
-	@LC_ALL=C java -cp $(CLASSPATH) $(CORENAME).RunClass
-
-test-jar: ${CORENAME}.jar
-	@echo === JAVA $<
-	@LC_ALL=C java -jar $<
-
-ctags: ${CORECLASSES}
-	ctags -R -f tags $^
+#test: $(CORECLASSES)
+#	@echo === make test
+#	@LC_ALL=C java -cp $(CLASSPATH) $(CORENAME).RunClass
+#
+#ctags: ${CORECLASSES}
+#	ctags -R -f tags $^
 
 clean: .
 	@echo === make clean

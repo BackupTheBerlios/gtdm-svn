@@ -27,9 +27,8 @@ public class MainWindow {
 
     // gui
     JFrame frame = new JFrame();
-    JPanel panel = new JPanel(new GridBagLayout(), true);
-    JPanel panelForViews = new JPanel(new GridBagLayout(), true);
-
+    JPanel panel = new JPanel(new BorderLayout(), true);
+//    JPanel panelForViews = new JPanel(new GridBagLayout(), true);
     JMenuBar menuBar = new JMenuBar();
 
     ArrayList views = new ArrayList();
@@ -37,35 +36,30 @@ public class MainWindow {
     MainWindow() {
         // initialize gui
         //fileMenu.setMnemonic(KeyEvent.VK_D);
-        GridBagConstraints c = new GridBagConstraints();
+        /*GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
-        c.anchor = GridBagConstraints.NORTHWEST;
+        c.anchor = GridBagConstraints.NORTHWEST;*/
 
+        // create menu
         menuBar.add(new FileMenu(this));
         menuBar.add(new ProjectMenu());
         menuBar.add(new DiagramMenu());
         menuBar.add(new HelpMenu());
-        
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        c.weightx = 1.0;
-        c.gridheight = 1;
-        panel.add(menuBar, c);
+        panel.add(menuBar, BorderLayout.NORTH);
 
+        // add views to array
         views.add(new TreeView(new javax.swing.tree.DefaultMutableTreeNode()));
         views.add(new DiagramView());
-      //views.add(new TreeView(new javax.swing.tree.DefaultMutableTreeNode()));
-        ListIterator it = views.listIterator();
-        c.weighty = 1.0;
-        c.gridheight = GridBagConstraints.REMAINDER;
-        c.gridwidth = 1;
-        float i = 0.1f;
-        while (it.hasNext()) {
-            c.weightx = i; i += 0.9f;
-            JComponent jc = (JComponent)it.next();
-            panelForViews.add(jc, c); //, -1);//, BorderLayout.WEST);
-        }
-        panel.add(panelForViews, c);
 
+        // add the two views to the frame via splitpane
+        JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                (Component)views.get(0),
+                (Component)views.get(1)
+        );
+        sp.setDividerLocation(150);
+        panel.add(sp, BorderLayout.CENTER);
+
+        // setup the mainwindow frame
         frame.getContentPane().add(panel);
         frame.setSize(640, 480);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
