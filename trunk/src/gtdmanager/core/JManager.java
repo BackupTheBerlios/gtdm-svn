@@ -84,13 +84,16 @@ public class JManager {
 
         calStart = Calendar.getInstance();
         calEnd = Calendar.getInstance();
+        calStart.set(2005, 5, 17);
+        calEnd.set(2005, 5, 30);
+
+	act1.newActivity("Akt11","Akt11", calStart, calEnd, 0);
+
+        calStart = Calendar.getInstance();
+        calEnd = Calendar.getInstance();
         calStart.set(2005, 5, 22);
         calEnd.set(2005, 6, 3);
-
-	act1.newActivity("Akt11: und noch tiefer","Akt11", calStart, calEnd, 0);
-
-        int actId2 = inst.newActivity("Aktivitaet2",
-			"Akt2", calStart, calEnd, 0);
+        int actId2 = inst.newActivity("Akti2", "Akt2", calStart, calEnd, 0);
 
         JActivity act2 = inst.getActivity(actId2);
 

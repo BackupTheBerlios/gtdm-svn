@@ -8,6 +8,7 @@ import gtdmanager.core.*;
 
 import java.util.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import javax.swing.*;
 import org.freehep.graphics2d.VectorGraphics;
 
@@ -29,11 +30,18 @@ public class DiagramView extends JComponent implements View {
     private static int padding = 16;
 
     // this is the default width of an activitybar
-    private static int barwidth = 32;
+    private static int barWidth = 32;
 
     // diagramview offset in days since epoche
     // (the value is the 3rd may 2005 and only for testing purposes)
-    private int offset = 129384;
+    private int startDate = 12935;
+    private int endDate = 12975;
+
+    // geometry of the diagramgrid and spefwidth
+    private int gridX, gridY, gridW, gridH, gridStep;
+
+    // font metrics
+    private int advance, ascent; //, descent;
 
     // offset of the bars (x is for padding only and y is for vertical
     // positioning); initialize with padding before use!
@@ -70,8 +78,63 @@ public class DiagramView extends JComponent implements View {
         //  3. paint the dependencies
         //
         // for now we only paint the activities here
+
+        advance = g.getFontMetrics().getMaxAdvance();
+        ascent = g.getFontMetrics().getMaxAscent();
+        //descent = g.getFontMetrics().getMaxDescent();
+
+        // init geometry
+        gridX = -1; //padding;
+        gridY = padding;
+        gridW = getWidth() + 1; //- 2 * padding;
+        gridH = getHeight() - 2 * padding;
+        gridStep = gridW / (endDate - startDate);
+
+        // set minimal width to ensure readability
+        if (gridStep < advance/2) gridStep = advance/2;
+
+//        g.drawString("geometry: " + gri + "x" + h + "+" + x + "+" + y, x, y);
+       // g.drawString(startDate + " to " + endDate, gridX, gridY);
+
+        paintGrid(g);
+
         xoffset = yoffset = padding;
         paintActivities(g, i.getActivities());
+    }
+
+    private void paintGrid(Graphics g) {
+        g.setColor(Color.gray);
+        g.drawRect(gridX, gridY, gridW, gridH);
+        
+        for (int i = 0; i < gridW; i += gridStep) {
+            Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis((startDate + i/gridStep)*24L*60L*60L*1000L);
+
+            // sunday red spans from the sunday line to the monday line
+            if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+                g.setColor(Color.red);
+
+            g.drawLine(gridX + i, gridY, gridX + i, gridY + gridH);
+
+            if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)
+            {
+                g.setColor(Color.gray); // reset sunday red
+
+                String str = ""
+                    + (cal.get(Calendar.DAY_OF_MONTH) < 10 ? "0" : "")
+                    + cal.get(Calendar.DAY_OF_MONTH)
+                    + (cal.get(Calendar.MONTH) < 10 ? ".0" : ".")
+                    + cal.get(Calendar.MONTH)
+                    + "."
+                    + cal.get(Calendar.YEAR);
+
+                for (int j = 0; j < str.length(); j++)
+                    g.drawString(str.substring(j, j + 1),
+                            gridX + i + 2,
+                            gridY + gridH + (j + 1 - 11) * ascent);
+            }
+        }
+
     }
 
     private void paintActivities(Graphics g, ArrayList a) {
@@ -87,25 +150,30 @@ public class DiagramView extends JComponent implements View {
         if (a == null) return; // nothing to do
 
         // our granularity is 1 day, offset is start of epoch (in UTC)
-        long start = a.getStartDate().getTimeInMillis()/100/60/60/24;
-        long end = a.getEndDate().getTimeInMillis()/100/60/60/24;
+        int start = (int)(a.getStartDate().getTimeInMillis()/1000L/60L/60L/24L);
+        int end = (int)(a.getEndDate().getTimeInMillis()/1000L/60L/60L/24L);
         
         // calculate bargeometry for activity
-        int w = barwidth;                   // width of this bar
-        int h = (int)(end - start);         // length (height) of bar
-        int x = xoffset + (int)(start - offset);
-        int y = yoffset + w;
-        yoffset += w + padding;
+        // length of the bar:
+        int w = gridStep * (end - start);
+        int h = barWidth;                   // width of this bar
+        int x = gridX + (start - startDate) * gridStep;
+        int y = gridY + yoffset + h;
+        yoffset += h + padding;
+
+        // clamp bars
+        //if (y + h > gridY + gridH) h -= 1;
 
         // draw the bar
-        g.fillRect(x, y, h, w);
+        g.setColor(Color.black);
+        g.fillRect(x, y, w, h);
 
         // ...and the text
-        g.drawString(" act " + a.getName()
-            + " (" + a.getShortName() + ")"
-            + start
-            , x
-            , y
+        g.setColor(Color.white);
+        g.drawString(a.getShortName()
+            + " (" + (end - start) + " days) "
+            , x + padding/2
+            , y + h/2
         );
 
         // draw all subactivities
