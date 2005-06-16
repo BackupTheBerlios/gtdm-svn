@@ -23,7 +23,7 @@ public class JDependency {
         dependencyType = -1;
     }
 
-    int getToActivityId() {
+    public int getToActivityId() {
         return this.toActivityId;
     }
 

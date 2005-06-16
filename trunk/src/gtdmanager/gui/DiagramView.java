@@ -45,7 +45,7 @@ public class DiagramView extends JComponent implements View {
 
     // offset of the bars (x is for padding only and y is for vertical
     // positioning); initialize with padding before use!
-    private int xoffset = 0, yoffset = 0;
+    private int yoffset = 0; //, xoffset = 0;
 
     // this is the project to draw
     private JProject project = null;
@@ -98,7 +98,7 @@ public class DiagramView extends JComponent implements View {
 
         paintGrid(g);
 
-        xoffset = yoffset = padding;
+        yoffset = 0 ;//padding;
         paintActivities(g, i.getActivities());
     }
 
@@ -144,7 +144,6 @@ public class DiagramView extends JComponent implements View {
         ListIterator i = a.listIterator();
         while (i.hasNext()) paintActivity(g, (JActivity)i.next());
     }
-
     
     private void paintActivity(Graphics g, JActivity a) {
         if (a == null) return; // nothing to do
@@ -170,11 +169,24 @@ public class DiagramView extends JComponent implements View {
 
         // ...and the text
         g.setColor(Color.white);
-        g.drawString(a.getShortName()
-            + " (" + (end - start) + " days) "
+        g.drawString(""
+            + "[" + a.getId() + "] "
+            + a.getShortName()
+            + " (" + (end - start) + " days)"
             , x + padding/2
             , y + h/2
         );
+
+        ListIterator i = a.getDependencies().listIterator();
+        int j = 0;
+        while (i.hasNext()) {
+            JDependency dep = (JDependency)i.next();
+
+            g.drawString("["+dep.getToActivityId()+"]",
+                    x + 2*padding + j * advance,
+                    y + h * 9/10);
+        }
+
 
         // draw all subactivities
         paintActivities(g, a.getActivities());

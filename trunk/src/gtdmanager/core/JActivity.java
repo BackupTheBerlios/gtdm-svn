@@ -68,6 +68,10 @@ public class JActivity {
         return null;
     }
 
+    public ArrayList getDependencies() {
+        return dependencies;
+    }
+
     boolean deleteDependency(int id) {
 
         JDependency dep = getDependency(id);
