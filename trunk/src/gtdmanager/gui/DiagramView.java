@@ -6,6 +6,7 @@ package gtdmanager.gui;
 
 import gtdmanager.core.*;
 
+import java.lang.Math;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -29,8 +30,7 @@ public class DiagramView extends JComponent implements View,
 
     // varios messages the dialog spits out
     private static String msgNone = "";
-    private static String msgDrag = "Drücke Maustaste und verschiebe Maus "
-        + "um Sichtbereich zu verschieben";
+    private static String msgDrag = "Mit der Maus Sichtbereich verschieben";
     // the drawn message
     private String message = msgNone;
 
@@ -43,8 +43,8 @@ public class DiagramView extends JComponent implements View,
 
     // diagramview offset in days since epoche
     // (the value is the 3rd may 2005 and only for testing purposes)
-    private int startDate = 12935;
-    private int endDate = 12975;
+    private int startDate = 0; //12935;
+    private int endDate = 0; //2975;
 
     // geometry of the diagramgrid and spefwidth
 //    private int gridX, gridY, gridW, gridH, 
@@ -87,8 +87,8 @@ public class DiagramView extends JComponent implements View,
     public void mouseDragged (MouseEvent e) {
         int xstep = (e.getX() - mouseLastX)/gridStep;
         if (xstep != 0) {
-            startDate += xstep;
-            endDate += xstep;
+            startDate -= xstep;
+            endDate -= xstep;
             repaint();
 
             mouseLastX = e.getX();
@@ -123,10 +123,18 @@ public class DiagramView extends JComponent implements View,
         this.project = project;
         this.instance = project.getInstance(0);
 
+        // calculate initial diagram frame
+        if (startDate == 0 && endDate == 0) {
+            startDate = (int)(instance.getStartDate().getTimeInMillis()
+                    /1000L/60L/60L/24L);
+            // TODO: this one should be configurable
+            endDate = startDate + 40;
+        }
+
         repaint();
     }
 
-    public void paint(Graphics g) {
+    public void paint(Graphics not2Dg) {
         if (project == null) return;
 
         // if project is set, get the last instance here. there should be
@@ -134,6 +142,8 @@ public class DiagramView extends JComponent implements View,
         ArrayList a = project.getInstances();
         JInstance i = (JInstance)a.get(a.size() - 1);
         if (i == null) return;
+
+        Graphics2D g = (Graphics2D)not2Dg;
 
         // TODO: we have to paint in (at least) 3 phases:
         //  1. paint frame/grid and dates (at the bottom)
@@ -164,7 +174,7 @@ public class DiagramView extends JComponent implements View,
                 + gridRect.height + ascent);
         
         // set clip rect, so that nothing is drawn outside
-        ((Graphics2D)g).clip(gridRect);
+        g.clip(gridRect);
 
         paintGrid(g);
 
@@ -177,7 +187,7 @@ public class DiagramView extends JComponent implements View,
         paintDependencies(g, instance.getActivities());
     }
 
-    private void paintGrid(Graphics g) {
+    private void paintGrid(Graphics2D g) {
         g.setColor(Color.gray);
         g.drawRect(gridRect.x, gridRect.y, gridRect.width, gridRect.height - 1);
         
@@ -214,7 +224,7 @@ public class DiagramView extends JComponent implements View,
 
     }
 
-    private void paintActivities(Graphics g, ArrayList a) {
+    private void paintActivities(Graphics2D g, ArrayList a) {
         // iterate through all activities.
         // this method is meant to be called recursive
         // TODO: the core needs: getAllActivities(PREORDER|POSTORDER|INORDER)
@@ -222,7 +232,7 @@ public class DiagramView extends JComponent implements View,
         while (i.hasNext()) paintActivity(g, (JActivity)i.next());
     }
 
-    private Rectangle paintActivity(Graphics g, JActivity a) {
+    private Rectangle paintActivity(Graphics2D g, JActivity a) {
         // check if there a is an activity, else we have nothing to do here..
         if (a == null) return null;
 
@@ -248,16 +258,14 @@ public class DiagramView extends JComponent implements View,
         if (gridRect.intersects(r)) {
             // draw the bar
             g.setColor(Color.black);
-            g.fillRect(r.x, r.y, r.width, r.height);
+            g.fill(r);  //Rect(r.x, r.y, r.width, r.height);
 
             // ...and the text
             g.setColor(Color.white);
             g.drawString(""
-                + "[" + a.getId() + "] "
                 + a.getShortName()
-                + " (" + (end - start) + " days)"
-                , r.x + padding/2
-                , r.y + barWidth/2
+                , r.x + (r.width - a.getShortName().length() * advance / 2) / 2
+                , r.y + (barWidth + ascent) / 2
             );
         }
 
@@ -268,7 +276,7 @@ public class DiagramView extends JComponent implements View,
     }
 
     
-    private void paintDependencies(Graphics g, ArrayList a) {
+    private void paintDependencies(Graphics2D g, ArrayList a) {
         // iterate through all activities.
         // this method is meant to be called recursive
         // TODO: the core needs: getAllActivities(PREORDER|POSTORDER|INORDER)
@@ -276,11 +284,10 @@ public class DiagramView extends JComponent implements View,
         while (i.hasNext()) paintDependencies(g, (JActivity)i.next());
     }
     
-    private void paintDependencies(Graphics g, JActivity from) {
+    private void paintDependencies(Graphics2D g, JActivity from) {
         Rectangle fromRect = (Rectangle)actRects.get(from);
 
-        // just debungging stuff
-        g.setColor(Color.red);
+        g.setColor(Color.darkGray);
         g.drawRect(fromRect.x, fromRect.y, fromRect.width, fromRect.height);
 
         ListIterator i = from.getDependencies().listIterator();
@@ -289,24 +296,54 @@ public class DiagramView extends JComponent implements View,
             JActivity to = instance.getActivity(d.getToActivityId());
             Rectangle toRect = (Rectangle)actRects.get(to);
 
-            g.drawString(""
-                    + "("
-                    + d.getId()
-                    + " to "
-                    + "["
-                    + d.getToActivityId()
-                    + ":"
-                    + to.getShortName()
-                    + "]"
-                    + ")"
-                    , fromRect.x + 2*padding + d.getId() * advance
-                    , fromRect.y + fromRect.height * 9/10
-            );
+            int lineWidth = 5;
 
-            switch (d.getDependencyType()) {
-                default:
-                    g.setColor(Color.yellow);
-                    g.drawLine(fromRect.x, fromRect.y, toRect.x, toRect.y);
+            // TODO: right now we make straight lines, but they should not
+            // intercept with activities..
+
+            int lineHalfWidth = (int)Math.floor((double)Math.abs(lineWidth)/2);
+            if (d.getDependencyType() == JDependency.BEGINBEGIN)
+                for (int j = -lineHalfWidth; j <= lineHalfWidth; j++)
+                    g.drawLine(
+                        fromRect.x - 1,
+                        fromRect.y + fromRect.height / 2 + j,
+                        toRect.x - 1,
+                        toRect.y + toRect.height / 2 + j
+                    );
+            else if (d.getDependencyType() == JDependency.BEGINEND)
+                for (int j = -lineHalfWidth; j <= lineHalfWidth; j++)
+                    g.drawLine(
+                        fromRect.x - 1,
+                        fromRect.y + fromRect.height / 2 + j,
+                        toRect.x + toRect.width + 1,
+                        toRect.y + toRect.height / 2 + j
+                    );
+            else if (d.getDependencyType() == JDependency.ENDBEGIN)
+                for (int j = -lineHalfWidth; j <= lineHalfWidth; j++)
+                    g.drawLine(
+                        fromRect.x + fromRect.width + 1,
+                        fromRect.y + fromRect.height / 2 + j,
+                        toRect.x - 1,
+                        toRect.y + toRect.height / 2 + j
+                    );
+            else if (d.getDependencyType() == JDependency.ENDEND)
+                for (int j = -lineHalfWidth; j <= lineHalfWidth; j++)
+                    g.drawLine(
+                        fromRect.x + fromRect.width + 1,
+                        fromRect.y + fromRect.height / 2 + j,
+                        toRect.x + toRect.width + 1,
+                        toRect.y + toRect.height / 2 + j
+                    );
+            else {
+                g.setColor(Color.red);
+                g.drawString("ungültige Abhängigkeit"
+                    + " " + d.getId()
+                    + " (type=" + d.getDependencyType() + ")"
+                    + " zu "
+                    + to.getShortName()
+                    , fromRect.x
+                    , fromRect.y + fromRect.height + (d.getId()+1) * ascent
+                );
             }
 
         }
