@@ -8,6 +8,7 @@ import gtdmanager.core.*;
 
 import java.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import javax.swing.*;
 import org.freehep.graphics2d.VectorGraphics;
@@ -23,7 +24,15 @@ import org.freehep.graphics2d.VectorGraphics;
  * @author Tomislav Viljetić
  * @version 1.0
  * {{{ DiagramView */
-public class DiagramView extends JComponent implements View {
+public class DiagramView extends JComponent implements View,
+        MouseListener, MouseMotionListener {
+
+    // varios messages the dialog spits out
+    private static String msgNone = "";
+    private static String msgDrag = "Drücke Maustaste und verschiebe Maus "
+        + "um Sichtbereich zu verschieben";
+    // the drawn message
+    private String message = msgNone;
 
     // this is the default gap between componentborder and the drawings
     // (and the gap between two drawings (ie. activitybars))
@@ -38,21 +47,72 @@ public class DiagramView extends JComponent implements View {
     private int endDate = 12975;
 
     // geometry of the diagramgrid and spefwidth
-    private int gridX, gridY, gridW, gridH, gridStep;
+//    private int gridX, gridY, gridW, gridH, 
+    private int gridStep;
+    private Rectangle gridRect = null;
 
     // font metrics
     private int advance, ascent; //, descent;
 
     // offset of the bars (x is for padding only and y is for vertical
     // positioning); initialize with padding before use!
-    private int yoffset = 0; //, xoffset = 0;
+    private int yOffset = 0; //, xoffset = 0;
+    private int yActOffset = 0; //, xoffset = 0;
+
+    // mouse position
+    static int mouseLastX = 0;
+    static int mouseLastY = 0;
 
     // this is the project to draw
     private JProject project = null;
 
+    // table of all geometries of drawn activities for drawong dependencies.
+    // The keys are the activities themself and the value is the activities'
+    // geometry (as Rectangle)
+    private HashMap actRects = new HashMap();
+
     DiagramView() {
         super();
+        addMouseListener(this);
+        addMouseMotionListener(this);
     }
+
+    /* MouseListener/MouseMotionListener implementation {{{ */
+    public void mouseMoved (MouseEvent e) {
+        mouseLastX = e.getX();
+        mouseLastY = e.getY();
+    }
+
+    public void mouseDragged (MouseEvent e) {
+        int xstep = (e.getX() - mouseLastX)/gridStep;
+        if (xstep != 0) {
+            startDate += xstep;
+            endDate += xstep;
+            repaint();
+
+            mouseLastX = e.getX();
+        }
+    }
+
+    public void mousePressed (MouseEvent e) {
+    }
+
+    public void mouseReleased (MouseEvent e) {
+    }
+
+    public void mouseEntered (MouseEvent e) {
+        message = msgDrag;
+        repaint();
+    }
+
+    public void mouseExited (MouseEvent e) {
+        message = msgNone;
+        repaint();
+    }
+
+    public void mouseClicked (MouseEvent e) {
+    }
+    /* }}} */
 
     public void update(JProject project) {
         // as we "update" this component every paint() there is no explicit
@@ -60,6 +120,7 @@ public class DiagramView extends JComponent implements View {
         // correct project and do an explicit repaint in order to show changes
         // instantly..
         this.project = project;
+
         repaint();
     }
 
@@ -84,29 +145,41 @@ public class DiagramView extends JComponent implements View {
         //descent = g.getFontMetrics().getMaxDescent();
 
         // init geometry
-        gridX = -1; //padding;
-        gridY = padding;
-        gridW = getWidth() + 1; //- 2 * padding;
-        gridH = getHeight() - 2 * padding;
-        gridStep = gridW / (endDate - startDate);
+        gridRect = new Rectangle(
+            -1,
+            padding,
+            getWidth() + 1,
+            getHeight() - 2 * padding
+        );
+        gridStep = gridRect.width / (endDate - startDate);
 
         // set minimal width to ensure readability
         if (gridStep < advance/2) gridStep = advance/2;
 
-//        g.drawString("geometry: " + gri + "x" + h + "+" + x + "+" + y, x, y);
-       // g.drawString(startDate + " to " + endDate, gridX, gridY);
+        // draw message
+        g.setColor(Color.gray);
+        g.drawString(message, gridRect.x + padding, gridRect.y
+                + gridRect.height + ascent);
+        
+        // set clip rect, so that nothing is drawn outside
+        ((Graphics2D)g).clip(gridRect);
 
         paintGrid(g);
 
-        yoffset = 0 ;//padding;
-        paintActivities(g, i.getActivities());
+        // set initial y position
+        yActOffset = gridRect.y + padding;
+
+        actRects.clear();
+        paintActivities(g, project.getInstance(0).getActivities());
+
+        paintDependencies(g, project.getInstance(0).getActivities());
     }
 
     private void paintGrid(Graphics g) {
         g.setColor(Color.gray);
-        g.drawRect(gridX, gridY, gridW, gridH);
+        g.drawRect(gridRect.x, gridRect.y, gridRect.width, gridRect.height - 1);
         
-        for (int i = 0; i < gridW; i += gridStep) {
+        for (int i = 0; i < gridRect.width; i += gridStep) {
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis((startDate + i/gridStep)*24L*60L*60L*1000L);
 
@@ -114,7 +187,8 @@ public class DiagramView extends JComponent implements View {
             if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
                 g.setColor(Color.red);
 
-            g.drawLine(gridX + i, gridY, gridX + i, gridY + gridH);
+            g.drawLine(gridRect.x + i, gridRect.y, gridRect.x + i,
+                    gridRect.y + gridRect.height);
 
             if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)
             {
@@ -130,8 +204,9 @@ public class DiagramView extends JComponent implements View {
 
                 for (int j = 0; j < str.length(); j++)
                     g.drawString(str.substring(j, j + 1),
-                            gridX + i + 2,
-                            gridY + gridH + (j + 1 - 11) * ascent);
+                            gridRect.x + i + 2,
+                            gridRect.y + gridRect.height
+                                + (j + 1 - 11) * ascent);
             }
         }
 
@@ -144,54 +219,81 @@ public class DiagramView extends JComponent implements View {
         ListIterator i = a.listIterator();
         while (i.hasNext()) paintActivity(g, (JActivity)i.next());
     }
-    
-    private void paintActivity(Graphics g, JActivity a) {
-        if (a == null) return; // nothing to do
+
+    private Rectangle paintActivity(Graphics g, JActivity a) {
+        // check if there a is an activity, else we have nothing to do here..
+        if (a == null) return null;
 
         // our granularity is 1 day, offset is start of epoch (in UTC)
         int start = (int)(a.getStartDate().getTimeInMillis()/1000L/60L/60L/24L);
         int end = (int)(a.getEndDate().getTimeInMillis()/1000L/60L/60L/24L);
         
-        // calculate bargeometry for activity
-        // length of the bar:
-        int w = gridStep * (end - start);
-        int h = barWidth;                   // width of this bar
-        int x = gridX + (start - startDate) * gridStep;
-        int y = gridY + yoffset + h;
-        yoffset += h + padding;
-
-        // clamp bars
-        //if (y + h > gridY + gridH) h -= 1;
-
-        // draw the bar
-        g.setColor(Color.black);
-        g.fillRect(x, y, w, h);
-
-        // ...and the text
-        g.setColor(Color.white);
-        g.drawString(""
-            + "[" + a.getId() + "] "
-            + a.getShortName()
-            + " (" + (end - start) + " days)"
-            , x + padding/2
-            , y + h/2
+        // calculate geometry for activity bar
+        Rectangle r = new Rectangle(
+            gridRect.x + (start - startDate) * gridStep,
+            yActOffset,
+            gridStep * (end - start),               // length
+            barWidth
         );
+
+        // store geometry
+        actRects.put(a, r);
+
+        // set y position for next activity
+        yActOffset = r.y + r.height + padding;
+
+        // draw activity if visible
+        if (gridRect.intersects(r)) {
+            // draw the bar
+            g.setColor(Color.black);
+            g.fillRect(r.x, r.y, r.width, r.height);
+
+            // ...and the text
+            g.setColor(Color.white);
+            g.drawString(""
+                + "[" + a.getId() + "] "
+                + a.getShortName()
+                + " (" + (end - start) + " days)"
+                , r.x + padding/2
+                , r.y + barWidth/2
+            );
+        }
+
+        // draw all subactivities
+        paintActivities(g, a.getActivities());
+
+        return r;
+    }
+
+    
+    private void paintDependencies(Graphics g, ArrayList a) {
+        // iterate through all activities.
+        // this method is meant to be called recursive
+        // TODO: the core needs: getAllActivities(PREORDER|POSTORDER|INORDER)
+        ListIterator i = a.listIterator();
+        while (i.hasNext()) paintDependencies(g, (JActivity)i.next());
+    }
+    
+    private void paintDependencies(Graphics g, JActivity a) {
+        // get geometry
+        Rectangle r = (Rectangle)actRects.get(a);
+
+        // check if geometry exists, else nothing to do
+        //if (r == null) return;
+
+        g.setColor(Color.red);
+        g.drawRect(r.x, r.y, r.width, r.height);
 
         ListIterator i = a.getDependencies().listIterator();
         int j = 0;
         while (i.hasNext()) {
-            JDependency dep = (JDependency)i.next();
+            JDependency d = (JDependency)i.next();
 
-            g.drawString("["+dep.getToActivityId()+"]",
-                    x + 2*padding + j * advance,
-                    y + h * 9/10);
+            g.drawString("["+d.getToActivityId()+"]",
+                    r.x + 2*padding + j * advance,
+                    r.y + r.height * 9/10);
         }
-
-
-        // draw all subactivities
-        paintActivities(g, a.getActivities());
     }
-
 }
 
 /* }}}
