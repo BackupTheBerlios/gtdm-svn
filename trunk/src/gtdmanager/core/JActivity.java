@@ -23,7 +23,7 @@ public class JActivity {
     ArrayList dependencies;
     ArrayList activities = new ArrayList();
 
-    
+
 
     public JActivity() {
         color = 0;
@@ -45,7 +45,7 @@ public class JActivity {
         } // returns id + 1 of the last existing dependency
     }
 
-    int newDependency(int toActivityId, int dependencyType) {
+    public int newDependency(int toActivityId, int dependencyType) {
 
         JDependency dep = new JDependency();
         dep.id = getNextId(); // gets the next higher id
@@ -57,7 +57,7 @@ public class JActivity {
         return dep.id;  // return id of the new dependency
     }
 
-    JDependency getDependency(int id) {
+    public JDependency getDependency(int id) {
 
         for (int i=0; i<this.dependencies.size(); i++) {
             JDependency dep = (JDependency)this.dependencies.get(i);
@@ -72,7 +72,7 @@ public class JActivity {
         return dependencies;
     }
 
-    boolean deleteDependency(int id) {
+    public boolean deleteDependency(int id) {
 
         JDependency dep = getDependency(id);
         if (dep != null) {
@@ -85,7 +85,7 @@ public class JActivity {
         return this.name;
     }
 
-    void setName(String strName) {
+    public void setName(String strName) {
         this.name = strName;
     }
 
@@ -93,11 +93,11 @@ public class JActivity {
         return this.shortName;
     }
 
-    void setShortName(String strShortName) {
+    public void setShortName(String strShortName) {
         this.shortName = strShortName;
     }
 
-    void setStartDate(Calendar calStartDate) {
+    public void setStartDate(Calendar calStartDate) {
         this.startDate = calStartDate;
     }
 
@@ -105,7 +105,7 @@ public class JActivity {
         return this.startDate;
     }
 
-    void setEndDate(Calendar calEndDate) {
+    public void setEndDate(Calendar calEndDate) {
         this.endDate = calEndDate;
     }
 
@@ -113,15 +113,15 @@ public class JActivity {
         return this.endDate;
     }
 
-    int getColor() {
+    public int getColor() {
         return this.color;
     }
 
-    void setColor(int col) {
+    public void setColor(int col) {
         this.color = col;
     }
 
-
+/*
     // private function returns the next higher id after the last activity
     private int getNextActivityId() {
         if (this.activities.size() <= 0) {
@@ -131,6 +131,7 @@ public class JActivity {
         } // returns id + 1 of the last existing activity
     }
 
+// nicht erlaubt, da newActivity aus der Instanz aufgerufen werden muss (unter Angabe der ArrayList, zu welcher hinzugefügt werden soll)
     int newActivity() {
 
         JActivity act = new JActivity();
@@ -156,23 +157,30 @@ public class JActivity {
 
         return act.id;  // return id of the new activity
     }
-
+*/
 
     public ArrayList getActivities() {
 	    return activities;
     }
-    
-    JActivity getActivity(int id) {
+
+    public JActivity getActivity(int id) {
+
         for (int i=0; i<this.activities.size(); i++) {
             JActivity act = (JActivity)this.activities.get(i);
             if (act.id == id) {
                 return act;
+            } else {
+                act = act.getActivity(id);
+                if (act != null) {
+                    return act;
+                }
             }
         }
         return null;
     }
-
-    boolean deleteActivity(int id) {
+/*
+// wird ebenfalls aus der Instanz aufgerufen
+    public boolean deleteActivity(int id) {
 
         JActivity act = getActivity(id);
         if (act != null) {
@@ -180,7 +188,7 @@ public class JActivity {
         }
         return false;
     }
-
+*/
 
 
 }

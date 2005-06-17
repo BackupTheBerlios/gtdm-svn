@@ -46,29 +46,51 @@ public class JInstance {
 	return id;
     }
 
-    // private function returns the next higher id after the last activity
-    private int getNextId() {
-        if (this.activities.size() <= 0) {
-            return 0; // no existing activity given
-        } else {
-            return ((JActivity)this.activities.get(this.activities.size()-1)).id + 1;
-        } // returns id + 1 of the last existing activity
+    // private function returns the next higher id after all activities
+    private int getNextId(ArrayList actList, int beginId) {
+
+        int retId = beginId;
+
+        if (actList.size() > 0) {
+            //return ((JActivity)this.activities.get(this.activities.size()-1)).id + 1;
+
+            for (int actIdx = 0; actIdx < actList.size(); actIdx++) {
+
+                JActivity act = (JActivity)actList.get(actIdx);
+                // durchsucht alle in actList gegebenen activities nach größeren ids
+                if (act.getId() >= retId) {
+                    retId = act.getId() + 1;
+                }
+
+                // durchsucht auch die kinder der in actList gegebenen activities nach größeren ids
+                retId = getNextId(act.activities, retId);
+            }
+
+        } // returns id + 1 of all activities
+        return retId;
     }
 
-    int newActivity() {
+    public int newActivity(ArrayList actList) {
 
         JActivity act = new JActivity();
-        act.id = getNextId(); // gets the next higher id
 
-        activities.add(act);  // adds the new activity to the arraylist
+        act.id = getNextId(activities, 0); // gets the next higher id
+        // hier nicht actList sondern activities, da alle activities nach der größten id durchsucht werden müssen
+
+        actList.add(act);  // adds the new activity to the arraylist
 
         return act.id;  // return id of the new activity
     }
 
-    int newActivity(String strName, String strShortName, Calendar calStart, Calendar calEnd, int color) {
+    public int newActivity() {
+        // creates an activity in this instance
+        return newActivity(activities);
+    }
+
+    public int newActivity(ArrayList actList, String strName, String strShortName, Calendar calStart, Calendar calEnd, int color) {
 
         JActivity act = new JActivity();
-        act.id = getNextId(); // gets the next higher id
+        act.id = getNextId(activities, 0); // gets the next higher id
 
         act.setName(strName);
         act.setShortName(strShortName);
@@ -76,7 +98,7 @@ public class JInstance {
         act.setEndDate(calEnd);
         act.setColor(color);
 
-        activities.add(act);  // adds the new activity to the arraylist
+        actList.add(act);  // adds the new activity to the arraylist
 
         return act.id;  // return id of the new activity
     }
@@ -85,27 +107,42 @@ public class JInstance {
     public ArrayList getActivities() {
 	    return activities;
     }
-    
-    JActivity getActivity(int id) {
+
+    public JActivity getActivity(int id) {
+
         for (int i=0; i<this.activities.size(); i++) {
             JActivity act = (JActivity)this.activities.get(i);
             if (act.id == id) {
                 return act;
+            } else {
+                act = act.getActivity(id);
+                if (act != null) {
+                    return act;
+                }
             }
         }
         return null;
     }
 
-    boolean deleteActivity(int id) {
+    private boolean deleteActivity(ArrayList actList, int id) {
 
-        JActivity act = getActivity(id);
-        if (act != null) {
-            return this.activities.remove(act);
+        for (int i = 0; i < actList.size(); i++) {
+            JActivity act = (JActivity)actList.get(i);
+            if (act.getId() == id) {
+                actList.remove(i);
+                return true;
+            } else {
+                return deleteActivity(act.activities, id);
+            }
         }
         return false;
     }
 
-    void setName(String strName) {
+    public boolean deleteActivity(int id) {
+        return deleteActivity(activities, id);
+    }
+
+    public void setName(String strName) {
         this.name = strName;
     }
 
@@ -113,27 +150,27 @@ public class JInstance {
         return this.name;
     }
 
-    void setCreationDate(Calendar calCreationDate) {
+    public void setCreationDate(Calendar calCreationDate) {
         this.creationDate = calCreationDate;
     }
 
-    Calendar getCreationDate() {
+    public Calendar getCreationDate() {
         return this.creationDate;
     }
 
-    void setStartDate(Calendar calStartDate) {
+    public void setStartDate(Calendar calStartDate) {
         this.startDate = calStartDate;
     }
 
-    Calendar getStartDate() {
+    public Calendar getStartDate() {
         return this.startDate;
     }
 
-    void setEndDate(Calendar calEndDate) {
+    public void setEndDate(Calendar calEndDate) {
         this.endDate = calEndDate;
     }
 
-    Calendar getEndDate() {
+    public Calendar getEndDate() {
         return this.endDate;
     }
 

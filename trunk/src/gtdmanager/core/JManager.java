@@ -92,8 +92,8 @@ public class JManager {
 
             }
         }
-
-/*        if (projectNode.hasChildNodes()) {
+/*
+        if (projectNode.hasChildNodes()) {
             NodeList nodeList = projectNode.getChildNodes();
             for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
 
@@ -120,6 +120,7 @@ public class JManager {
                     } else if (itemName == "value") {
                         //System.out.println(lastPropName);
                         if (lastPropName == "font-size") {
+// FEHLER: obwohl lastPropName = "font-size" ist, wird diese anweisung nicht ausgeführt
                             setFontSize(Integer.parseInt(nodeMap.item(nodeIdx).getNodeValue()));
                         } // else if (propName == "size-x") { ...
                     }
@@ -151,8 +152,7 @@ public class JManager {
         case Node.TEXT_NODE:
             //...
             String nodeValue = document.getNodeValue();
-            //if (document.getNodeValue() != null) {
-            //String s = Integer.toHexString(nodeValue.charAt(0));
+
             if (nodeValue.charAt(0) != 10) { // no carriage return and tabs
                 System.out.println("Text found: " + nodeName + " = " + document.getNodeValue());
 
@@ -262,7 +262,7 @@ public class JManager {
         calStart.set(2005, 5, 4);
         calEnd.set(2005, 5, 20);
 
-        int actId1 = inst.newActivity("Aktivitaet1",
+        int actId1 = inst.newActivity(inst.activities, "Aktivitaet1",
 			"Akt1", calStart, calEnd, 0);
 
         JActivity act1 = inst.getActivity(actId1);
@@ -272,9 +272,9 @@ public class JManager {
         calStart.set(2005, 5, 22);
         calEnd.set(2005, 6, 3);
 
-	act1.newActivity("Akt11: und noch tiefer","Akt11", calStart, calEnd, 0);
+	inst.newActivity(act1.activities, "Akt11: und noch tiefer","Akt11", calStart, calEnd, 0);
 
-        int actId2 = inst.newActivity("Aktivitaet2",
+        int actId2 = inst.newActivity(inst.activities, "Aktivitaet2",
 			"Akt2", calStart, calEnd, 0);
 
         JActivity act2 = inst.getActivity(actId2);

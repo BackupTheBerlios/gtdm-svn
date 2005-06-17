@@ -23,9 +23,12 @@ public class RunClass {
         RunClass runclass = new RunClass();
 
         man = new JManager();
+        //man.newProject();
         man.generateSampleProject();
 
-        JProject project = man.getProject();
+        //man.loadProject("c:\\example.xml");
+
+        //JProject project = man.getProject();
         System.out.println("Ende");
     }
 }
