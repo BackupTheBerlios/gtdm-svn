@@ -7,6 +7,9 @@ package gtdmanager.gui;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import gtdmanager.gui.DiagramView;
+import gtdmanager.gui.MainWindow;
 
 /* }}} */
 /**
@@ -21,15 +24,30 @@ import javax.swing.JMenu;
  * {{{ DiagramMenu */
 public class DiagramMenu extends JMenu {
 
-	DiagramMenu() {
+    MainWindow parent;
+    JMenuItem gantt, tdrift;
+    
+	DiagramMenu(MainWindow parent) {
         super();
 		setText("Diagramm");
-        add(new DiagramMenuAction(DiagramMenuAction.showGanttDiagram));
-        add(new DiagramMenuAction(DiagramMenuAction.showTermindriftDiagram));
-        add(new DiagramMenuAction(DiagramMenuAction.exportDiagram));
-        add(new DiagramMenuAction(DiagramMenuAction.diagramProperties));
-	}
+        gantt = add(new DiagramMenuAction(
+                    DiagramMenuAction.showGanttDiagram, this));
+        tdrift = add(new DiagramMenuAction(
+                    DiagramMenuAction.showTermindriftDiagram, this));
+        add(new DiagramMenuAction(DiagramMenuAction.exportDiagram, this));
+        add(new DiagramMenuAction(DiagramMenuAction.diagramProperties, this));
 
+        this.parent = parent;
+
+        update();
+    }
+
+    public void update() {
+        gantt.setEnabled(!DiagramView.showGantt);
+        tdrift.setEnabled(DiagramView.showGantt);
+
+        parent.updateViews();
+    }
 }
 
 /* }}} */
@@ -50,19 +68,29 @@ class DiagramMenuAction extends AbstractAction {
     public static String exportDiagram = "Diagram exportieren";
     public static String diagramProperties = "Diagrameigenschaften";
 
-    DiagramMenuAction(String text) {
+    private DiagramMenu parent;
+
+    DiagramMenuAction(String text, DiagramMenu parent) {
         super(text);
+        this.parent = parent;
     }
 
     public void actionPerformed(ActionEvent e) {
         String name = e.getActionCommand();
         
-        if (false) {
+        if (e.getActionCommand() == showGanttDiagram) {
+            DiagramView.showGantt = true;
+
+        }
+        else if (e.getActionCommand() == showTermindriftDiagram) {
+            DiagramView.showGantt = false;
         }
         else {
             System.out.println("DiagramMenu: unhandled Action: "
                 + e.getActionCommand());
         }
+
+        parent.update();
     }
 }
 

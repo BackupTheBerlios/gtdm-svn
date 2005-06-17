@@ -25,9 +25,10 @@ import org.freehep.graphics2d.VectorGraphics;
  * @author Tomislav Viljetić
  * @version 1.0
  * {{{ DiagramView */
-public class DiagramView extends JComponent implements View,
-        MouseListener, MouseMotionListener {
+public class DiagramView extends JComponent
+        implements View, MouseListener, MouseMotionListener {
 
+    /* Variables {{{ */
     // varios messages the dialog spits out
     private static String msgNone = "";
     private static String msgDrag = "Mit der Maus Sichtbereich verschieben";
@@ -48,7 +49,7 @@ public class DiagramView extends JComponent implements View,
 
     // geometry of the diagramgrid and spefwidth
 //    private int gridX, gridY, gridW, gridH, 
-    private int gridStep;
+    private Point gridStep = null;
     private Rectangle gridRect = null;
 
     // font metrics
@@ -65,34 +66,52 @@ public class DiagramView extends JComponent implements View,
 
     // this is the project to draw
     private JProject project = null;
-    private JInstance instance = null;
+    private JInstance initialInstance = null;
+    private JInstance currentInstance = null;
 
     // table of all geometries of drawn activities for drawong dependencies.
     // The keys are the activities themself and the value is the activities'
     // geometry (as Rectangle)
     private HashMap actRects = new HashMap();
 
+    // if this one is set to true, all DiagramViews are showing Gantt diagrams
+    // else Termindrift diagrams
+    // NOTE: this one is not optimal solved, but required for the menu and
+    //   view structure.
+    // maybe-TODO: extend the interfaces Menu and View to handle such stuff.
+    static public boolean showGantt = true;
+
+    /* Variables }}} */
+
+    /* Constructors {{{ */
     DiagramView() {
         super();
         addMouseListener(this);
         addMouseMotionListener(this);
     }
+    /* Constructors }}} */
 
-    /* MouseListener/MouseMotionListener implementation {{{ */
+    /* MouseListener/MouseMotionListener Implementation {{{ */
     public void mouseMoved (MouseEvent e) {
         mouseLastX = e.getX();
         mouseLastY = e.getY();
     }
 
     public void mouseDragged (MouseEvent e) {
-        int xstep = (e.getX() - mouseLastX)/gridStep;
-        if (xstep != 0) {
-            startDate -= xstep;
-            endDate -= xstep;
-            repaint();
+        if (project != null) {
+            if (showGantt) {
+                int xstep = (e.getX() - mouseLastX)/gridStep.x;
+                if (xstep != 0) {
+                    startDate -= xstep;
+                    endDate -= xstep;
+                    repaint();
 
-            mouseLastX = e.getX();
+                    mouseLastX = e.getX();
+                }
+            }
         }
+        // if nothing matches, handle this as a simple move
+        else mouseMoved(e);
     }
 
     public void mousePressed (MouseEvent e) {
@@ -113,35 +132,35 @@ public class DiagramView extends JComponent implements View,
 
     public void mouseClicked (MouseEvent e) {
     }
-    /* }}} */
+    /* MouseListener/MouseMotionListener Implementation }}} */
 
+    /* View Implementation {{{ */
     public void update(JProject project) {
-        // as we "update" this component every paint() there is no explicit
-        // update at this point, just keep care that we are darwing the
-        // correct project and do an explicit repaint in order to show changes
-        // instantly..
+
+        if (project == null) return; // nothing to do
+
+        // if project is set, get the first/last instance here. there should be
+        // really a method in the core for this..
         this.project = project;
-        this.instance = project.getInstance(0);
+        initialInstance = project.getInstance(0);
+        currentInstance = (JInstance)project.getInstances().get(
+                    project.getInstances().size() - 1);
 
         // calculate initial diagram frame
         if (startDate == 0 && endDate == 0) {
-            startDate = (int)(instance.getStartDate().getTimeInMillis()
+            startDate = (int)(currentInstance.getStartDate().getTimeInMillis()
                     /1000L/60L/60L/24L);
             // TODO: this one should be configurable
-            endDate = startDate + 40;
+            endDate = startDate + 35;   // show 35 days
         }
 
         repaint();
     }
+    /* View Implementation }}} */
 
+    /* JComponent Overloading (paint) {{{ */
     public void paint(Graphics not2Dg) {
         if (project == null) return;
-
-        // if project is set, get the last instance here. there should be
-        // really a method in the core for this..
-        ArrayList a = project.getInstances();
-        JInstance i = (JInstance)a.get(a.size() - 1);
-        if (i == null) return;
 
         Graphics2D g = (Graphics2D)not2Dg;
 
@@ -156,6 +175,137 @@ public class DiagramView extends JComponent implements View,
         ascent = g.getFontMetrics().getMaxAscent();
         //descent = g.getFontMetrics().getMaxDescent();
 
+        // clear all geometries
+        actRects.clear();
+
+        if (showGantt) {
+            ganttPaintGrid(g);
+        
+            // set initial y position
+            yActOffset = gridRect.y + padding;
+
+            ganttPaintActivities(g, currentInstance.getActivities());
+
+            ganttPaintDependencies(g, currentInstance.getActivities());
+        }
+        else {
+            // init geometry
+            gridRect = new Rectangle(
+                padding + ascent,
+                padding + ascent,
+                getWidth() + 1 - padding - ascent,
+                getHeight() + 1 - padding - ascent
+            );
+            gridStep = new Point(
+                gridRect.width / (endDate - startDate),
+                gridRect.height / (endDate - startDate)
+            );
+
+            // set minimal width to ensure readability
+            //if (gridStep.x < advance/2) gridStep.x = advance/2;
+
+            // draw message (outside the clipping area)
+            g.setColor(Color.gray);
+            g.drawString(message, gridRect.x + padding, gridRect.y
+                    + gridRect.height + ascent);
+            
+
+            tdriftPaintGrid(g);
+            tdriftPaintInitialActivities(g, initialInstance.getActivities());
+        }
+    }
+    /* JComponent Overloading }}} */
+
+    /* Termindrift Paint {{{ */
+
+    /* tdriftPaintGrid {{{ */
+    private void tdriftPaintGrid(Graphics2D g) {
+        // grid
+        for (int x = 0, y = 0; x < gridRect.width || y < gridRect.height;
+                x += gridStep.x, y += gridStep.y)
+        {
+            if (x == 0)
+                g.setColor(Color.gray);
+            else
+                g.setColor(Color.lightGray);
+            // vertical
+            g.drawLine(gridRect.x + x, gridRect.y + 1,
+                    gridRect.x + x, gridRect.y + gridRect.height);
+            // horozontal
+            g.drawLine(gridRect.x + 1, gridRect.y + y,
+                    gridRect.x + gridRect.width, gridRect.y + y);
+
+            // diagonal
+            g.setColor(Color.gray);
+            g.drawLine(gridRect.x + x, gridRect.y + y,
+                    gridRect.x + x + gridStep.x, gridRect.y + y + gridStep.y);
+        }
+    }
+    /* tdriftPaintGrid }}} */
+
+    /* tdriftPaintInitialActivities {{{ */
+    private void tdriftPaintInitialActivities(Graphics2D g, ArrayList a) {
+        ListIterator i = a.listIterator();
+        while (i.hasNext()) tdriftPaintInitialActivity(g, (JActivity)i.next());
+    }
+    /* tdriftPaintInitialActivities }}} */
+
+    /* tdriftPaintInitialActivitiy {{{ */
+    private void tdriftPaintInitialActivity(Graphics2D g, JActivity a) {
+        int start = (int)(a.getStartDate().getTimeInMillis()/1000L/60L/60L/24L);
+        int end = (int)(a.getEndDate().getTimeInMillis()/1000L/60L/60L/24L);
+        
+        // calculate geometry for activity
+        Point p = new Point(
+            gridRect.x + (end - startDate) * gridStep.x,
+            gridRect.y - ascent
+        );
+
+        // store "geometry"
+        actRects.put(a, p);
+
+        g.setColor(Color.black);
+        g.drawString(a.getShortName(), p.x, p.y);
+        g.setColor(Color.gray);
+        g.drawLine(p.x, p.y, p.x, gridRect.y);
+
+        // NOTE: we don't go deeper than one level
+    }
+    /* tdriftPaintInitialActivitiy }}} */
+
+    /* tdriftPaintCurrentActivities {{{ */
+    private void tdriftPaintCurrentActivities(Graphics2D g, ArrayList a) {
+        ListIterator i = a.listIterator();
+        while (i.hasNext()) tdriftPaintCurrentActivity(g, (JActivity)i.next());
+    }
+    /* tdriftPaintCurrentActivities }}} */
+
+    /* tdriftPaintCurrentActivitiy {{{ */
+    private void tdriftPaintCurrentActivity(Graphics2D g, JActivity a) {
+        int start = (int)(a.getStartDate().getTimeInMillis()/1000L/60L/60L/24L);
+        int end = (int)(a.getEndDate().getTimeInMillis()/1000L/60L/60L/24L);
+        
+        // calculate geometry for activity
+        Point p = new Point(
+            gridRect.x + (end - startDate) * gridStep.x,
+            gridRect.y - ascent
+        );
+
+        // store "geometry"
+        actRects.put(a, p);
+
+        g.setColor(Color.black);
+        g.drawString(a.getShortName(), p.x, p.y);
+        g.setColor(Color.gray);
+        g.drawLine(p.x, p.y, p.x, gridRect.y);
+
+        // NOTE: we don't go deeper than one level
+    }
+    /* tdriftPaintCurrentActivitiy }}} */
+    /* Termindrift Paint }}} */
+
+    /* Gantt Paint Routines {{{ */
+    private void ganttPaintGrid(Graphics2D g) {
         // init geometry
         gridRect = new Rectangle(
             -1,
@@ -163,37 +313,29 @@ public class DiagramView extends JComponent implements View,
             getWidth() + 1,
             getHeight() - 2 * padding
         );
-        gridStep = gridRect.width / (endDate - startDate);
+        gridStep = new Point(
+            gridRect.width / (endDate - startDate),
+            0 // gridRect.height / (endDate - startDate)
+        );
 
         // set minimal width to ensure readability
-        if (gridStep < advance/2) gridStep = advance/2;
-
-        // draw message
+        if (gridStep.x < advance/2) gridStep.x = advance/2;
+        // draw message (outside the clipping area)
         g.setColor(Color.gray);
         g.drawString(message, gridRect.x + padding, gridRect.y
                 + gridRect.height + ascent);
         
-        // set clip rect, so that nothing is drawn outside
+        // set clip rect, so that nothing can be drawn outside
         g.clip(gridRect);
-
-        paintGrid(g);
-
-        // set initial y position
-        yActOffset = gridRect.y + padding;
-
-        actRects.clear();
-        paintActivities(g, instance.getActivities());
-
-        paintDependencies(g, instance.getActivities());
-    }
-
-    private void paintGrid(Graphics2D g) {
+        
+        // grid borders
         g.setColor(Color.gray);
         g.drawRect(gridRect.x, gridRect.y, gridRect.width, gridRect.height - 1);
         
-        for (int i = 0; i < gridRect.width; i += gridStep) {
+        // day grid
+        for (int i = 0; i < gridRect.width; i += gridStep.x) {
             Calendar cal = new GregorianCalendar();
-            cal.setTimeInMillis((startDate + i/gridStep)*24L*60L*60L*1000L);
+            cal.setTimeInMillis((startDate + i/gridStep.x)*24L*60L*60L*1000L);
 
             // sunday red spans from the sunday line to the monday line
             if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
@@ -224,15 +366,15 @@ public class DiagramView extends JComponent implements View,
 
     }
 
-    private void paintActivities(Graphics2D g, ArrayList a) {
+    private void ganttPaintActivities(Graphics2D g, ArrayList a) {
         // iterate through all activities.
         // this method is meant to be called recursive
         // TODO: the core needs: getAllActivities(PREORDER|POSTORDER|INORDER)
         ListIterator i = a.listIterator();
-        while (i.hasNext()) paintActivity(g, (JActivity)i.next());
+        while (i.hasNext()) ganttPaintActivity(g, (JActivity)i.next());
     }
 
-    private Rectangle paintActivity(Graphics2D g, JActivity a) {
+    private Rectangle ganttPaintActivity(Graphics2D g, JActivity a) {
         // check if there a is an activity, else we have nothing to do here..
         if (a == null) return null;
 
@@ -242,9 +384,9 @@ public class DiagramView extends JComponent implements View,
         
         // calculate geometry for activity bar
         Rectangle r = new Rectangle(
-            gridRect.x + (start - startDate) * gridStep,
+            gridRect.x + (start - startDate) * gridStep.x,
             yActOffset,
-            gridStep * (end - start),               // length
+            gridStep.x * (end - start),               // length
             barWidth
         );
 
@@ -270,21 +412,21 @@ public class DiagramView extends JComponent implements View,
         }
 
         // draw all subactivities
-        paintActivities(g, a.getActivities());
+        ganttPaintActivities(g, a.getActivities());
 
         return r;
     }
 
     
-    private void paintDependencies(Graphics2D g, ArrayList a) {
+    private void ganttPaintDependencies(Graphics2D g, ArrayList a) {
         // iterate through all activities.
         // this method is meant to be called recursive
         // TODO: the core needs: getAllActivities(PREORDER|POSTORDER|INORDER)
         ListIterator i = a.listIterator();
-        while (i.hasNext()) paintDependencies(g, (JActivity)i.next());
+        while (i.hasNext()) ganttPaintDependencies(g, (JActivity)i.next());
     }
     
-    private void paintDependencies(Graphics2D g, JActivity from) {
+    private void ganttPaintDependencies(Graphics2D g, JActivity from) {
         Rectangle fromRect = (Rectangle)actRects.get(from);
 
         g.setColor(Color.darkGray);
@@ -293,7 +435,7 @@ public class DiagramView extends JComponent implements View,
         ListIterator i = from.getDependencies().listIterator();
         while (i.hasNext()) {
             JDependency d = (JDependency)i.next();
-            JActivity to = instance.getActivity(d.getToActivityId());
+            JActivity to = currentInstance.getActivity(d.getToActivityId());
             Rectangle toRect = (Rectangle)actRects.get(to);
 
             int lineWidth = 5;
@@ -348,6 +490,8 @@ public class DiagramView extends JComponent implements View,
 
         }
     }
+    /* Gantt Paint Routines }}} */
+
 }
 
 /* }}}

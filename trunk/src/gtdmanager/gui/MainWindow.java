@@ -37,7 +37,7 @@ public class MainWindow {
         // create menu
         menuBar.add(new FileMenu(this));
         menuBar.add(new ProjectMenu());
-        menuBar.add(new DiagramMenu());
+        menuBar.add(new DiagramMenu(this));
         menuBar.add(new HelpMenu());
         panel.add(menuBar, BorderLayout.NORTH);
 

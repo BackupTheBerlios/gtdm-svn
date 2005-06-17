@@ -25,6 +25,9 @@ public class TreeView extends JTree implements View {
 
     DefaultMutableTreeNode top;
 
+//    JProject project = null;
+//    JInstance instance = null;
+
     TreeView(DefaultMutableTreeNode t) {
 //        DefaultMutableTreeNode t = new DefaultMutableTreeNode();
         super(t);//new DefaultMutableTreeNode());
@@ -33,7 +36,11 @@ public class TreeView extends JTree implements View {
     }
 
     public void update(JProject project) {
-        System.out.println("update TreeView: " + project.getName());
+
+        if (project == null) return; // nothing to do
+
+        top.removeAllChildren();
+
         top.setUserObject(project.getName());
 
         ListIterator l = project.getInstances().listIterator();;
@@ -45,7 +52,7 @@ public class TreeView extends JTree implements View {
             ListIterator m = i.getActivities().listIterator();
             while (m.hasNext()) updateActivity(n, (JActivity)m.next());
         }
-        
+
         updateUI();
     }
 
