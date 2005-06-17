@@ -243,43 +243,42 @@ public class JManager {
     }
 
     public void generateSampleProject() {
-
         newProject("Testprojekt", "1.0.0.0");
 
-        Calendar calCreate = Calendar.getInstance();
-        Calendar calStart = Calendar.getInstance();
-        Calendar calEnd = Calendar.getInstance();
-        calCreate.set(2005, 5, 1);
-        calStart.set(2005, 5, 1);
-        calEnd.set(2005, 6, 30);
+	JInstance i;
+	JActivity a1, a2, a3, a4, a5, a6, a7, a8, a9;
 
-        int newInstId = getProject().newInstance("Instanz1",
-		calCreate, calStart, calEnd, true);
-        JInstance inst = getProject().getInstance(newInstId);
+	i	= getProject().getInstance(getProject().newInstance(
+		"Instanz1",
+		new GregorianCalendar(2005, 5, 1),
+		new GregorianCalendar(2005, 5, 1),
+		new GregorianCalendar(2005, 6, 30), true));
 
-        calStart = Calendar.getInstance();
-        calEnd = Calendar.getInstance();
-        calStart.set(2005, 5, 4);
-        calEnd.set(2005, 5, 20);
+        a1	= i.getActivity(i.newActivity(i.activities,
+		"Aktivi1", "Akt1",
+		new GregorianCalendar(2005, 5, 4),
+		new GregorianCalendar(2005, 5, 12), 0));
 
-        int actId1 = inst.newActivity(inst.activities, "Aktivitaet1",
-			"Akt1", calStart, calEnd, 0);
+        a2	= i.getActivity(i.newActivity(i.activities,
+		"Aktivi2", "Akt2",
+		new GregorianCalendar(2005, 5, 14),
+		new GregorianCalendar(2005, 5, 20), 0));
 
-        JActivity act1 = inst.getActivity(actId1);
+        a3	= i.getActivity(i.newActivity(i.activities,
+		"Aktivi3", "Akt3",
+		new GregorianCalendar(2005, 5, 14),
+		new GregorianCalendar(2005, 5, 19), 0));
 
-        calStart = Calendar.getInstance();
-        calEnd = Calendar.getInstance();
-        calStart.set(2005, 5, 22);
-        calEnd.set(2005, 6, 3);
+        a1.newDependency(a2.getId(), JDependency.ENDBEGIN);
 
-	inst.newActivity(act1.activities, "Akt11: und noch tiefer","Akt11", calStart, calEnd, 0);
+//	i	= getProject().getInstance(getProject().newInstance(
+//		"Instanz2",
+//		new GregorianCalendar(2005, 5, 12),
+//		new GregorianCalendar(2005, 5, 1),
+//		new GregorianCalendar(2005, 6, 30), true));
 
-        int actId2 = inst.newActivity(inst.activities, "Aktivitaet2",
-			"Akt2", calStart, calEnd, 0);
-
-        JActivity act2 = inst.getActivity(actId2);
-
-        int depId = act1.newDependency(actId2, 2);
+     //i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005, 5, 17));
+     //i.getActivity(a2.getId()).setEndDate(new GregorianCalendar(2005, 5, 21));
     }
 
     private void jbInit() throws Exception {

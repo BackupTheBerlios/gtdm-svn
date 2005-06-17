@@ -52,6 +52,9 @@ public class DiagramView extends JComponent
     private Point gridStep = null;
     private Rectangle gridRect = null;
 
+    // line thickness for various (non-grid) lines
+    private int lineWidth = 5;
+
     // font metrics
     private int advance, ascent; //, descent;
 
@@ -191,9 +194,9 @@ public class DiagramView extends JComponent
         else {
             // init geometry
             gridRect = new Rectangle(
+                padding + 2 * advance,
                 padding + ascent,
-                padding + ascent,
-                getWidth() + 1 - padding - ascent,
+                getWidth() + 1 - padding - 2 * advance,
                 getHeight() + 1 - padding - ascent
             );
             gridStep = new Point(
@@ -212,6 +215,19 @@ public class DiagramView extends JComponent
 
             tdriftPaintGrid(g);
             tdriftPaintInitialActivities(g, initialInstance.getActivities());
+            tdriftPaintCurrentActivities(g, currentInstance.getActivities());
+        
+            // todayline
+            int today = (int)((new Date()).getTime()/1000L/60L/60L/24L);
+            g.setColor(Color.cyan);
+            int lineHalfWidth = (int)Math.floor((double)Math.abs(lineWidth)/2);
+            for (int i = -lineHalfWidth; i < lineHalfWidth; i++)
+                g.drawLine(
+                    gridRect.x + (today - startDate) * gridStep.x + i,
+                    gridRect.y,
+                    gridRect.x + (today - startDate) * gridStep.x + i,
+                    gridRect.y + gridRect.height
+                );
         }
     }
     /* JComponent Overloading }}} */
@@ -252,7 +268,6 @@ public class DiagramView extends JComponent
 
     /* tdriftPaintInitialActivitiy {{{ */
     private void tdriftPaintInitialActivity(Graphics2D g, JActivity a) {
-        int start = (int)(a.getStartDate().getTimeInMillis()/1000L/60L/60L/24L);
         int end = (int)(a.getEndDate().getTimeInMillis()/1000L/60L/60L/24L);
         
         // calculate geometry for activity
@@ -262,7 +277,7 @@ public class DiagramView extends JComponent
         );
 
         // store "geometry"
-        actRects.put(a, p);
+        //actRects.put(a, p);
 
         g.setColor(Color.black);
         g.drawString(a.getShortName(), p.x, p.y);
@@ -282,22 +297,24 @@ public class DiagramView extends JComponent
 
     /* tdriftPaintCurrentActivitiy {{{ */
     private void tdriftPaintCurrentActivity(Graphics2D g, JActivity a) {
-        int start = (int)(a.getStartDate().getTimeInMillis()/1000L/60L/60L/24L);
         int end = (int)(a.getEndDate().getTimeInMillis()/1000L/60L/60L/24L);
+        int today = (int)((new Date()).getTime()/1000L/60L/60L/24L);
         
         // calculate geometry for activity
-        Point p = new Point(
-            gridRect.x + (end - startDate) * gridStep.x,
-            gridRect.y - ascent
+        Rectangle r = new Rectangle(
+            gridRect.x - a.getShortName().length() * advance / 2,
+            gridRect.y + (end - startDate) * gridStep.y,
+            gridRect.x + ((today > end ? end : today) - startDate) * gridStep.x,
+            0
         );
 
         // store "geometry"
-        actRects.put(a, p);
+        //actRects.put(a, p);
 
         g.setColor(Color.black);
-        g.drawString(a.getShortName(), p.x, p.y);
+        g.drawString(a.getShortName(), r.x, r.y);
         g.setColor(Color.gray);
-        g.drawLine(p.x, p.y, p.x, gridRect.y);
+        g.drawLine(r.x, r.y, r.width, r.y);
 
         // NOTE: we don't go deeper than one level
     }
@@ -437,8 +454,6 @@ public class DiagramView extends JComponent
             JDependency d = (JDependency)i.next();
             JActivity to = currentInstance.getActivity(d.getToActivityId());
             Rectangle toRect = (Rectangle)actRects.get(to);
-
-            int lineWidth = 5;
 
             // TODO: right now we make straight lines, but they should not
             // intercept with activities..
