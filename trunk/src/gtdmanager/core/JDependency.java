@@ -14,13 +14,23 @@ package gtdmanager.core;
  */
 public class JDependency {
 
+    // dependenciy types
+    public static int BEGINBEGIN = 0;
+    public static int BEGINEND = 1;
+    public static int ENDBEGIN = 2;
+    public static int ENDEND = 3;
+
     int id;
     int toActivityId;
-    int dependencyType; // 0=Begin-Begin, 1=Begin-End, 2=End-Begin, 3=End-End
+    int dependencyType;
 
     public JDependency() {
         toActivityId = -1;
         dependencyType = -1;
+    }
+
+    public int getId() {
+	    return id;
     }
 
     public int getToActivityId() {
@@ -31,7 +41,7 @@ public class JDependency {
         this.toActivityId = toId;
     }
 
-    int getDependencyType() {
+    public int getDependencyType() {
         return this.dependencyType;
     }
 

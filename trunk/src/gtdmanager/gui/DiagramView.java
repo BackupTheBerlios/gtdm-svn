@@ -65,6 +65,7 @@ public class DiagramView extends JComponent implements View,
 
     // this is the project to draw
     private JProject project = null;
+    private JInstance instance = null;
 
     // table of all geometries of drawn activities for drawong dependencies.
     // The keys are the activities themself and the value is the activities'
@@ -120,6 +121,7 @@ public class DiagramView extends JComponent implements View,
         // correct project and do an explicit repaint in order to show changes
         // instantly..
         this.project = project;
+        this.instance = project.getInstance(0);
 
         repaint();
     }
@@ -170,9 +172,9 @@ public class DiagramView extends JComponent implements View,
         yActOffset = gridRect.y + padding;
 
         actRects.clear();
-        paintActivities(g, project.getInstance(0).getActivities());
+        paintActivities(g, instance.getActivities());
 
-        paintDependencies(g, project.getInstance(0).getActivities());
+        paintDependencies(g, instance.getActivities());
     }
 
     private void paintGrid(Graphics g) {
@@ -274,24 +276,39 @@ public class DiagramView extends JComponent implements View,
         while (i.hasNext()) paintDependencies(g, (JActivity)i.next());
     }
     
-    private void paintDependencies(Graphics g, JActivity a) {
-        // get geometry
-        Rectangle r = (Rectangle)actRects.get(a);
+    private void paintDependencies(Graphics g, JActivity from) {
+        Rectangle fromRect = (Rectangle)actRects.get(from);
 
-        // check if geometry exists, else nothing to do
-        //if (r == null) return;
-
+        // just debungging stuff
         g.setColor(Color.red);
-        g.drawRect(r.x, r.y, r.width, r.height);
+        g.drawRect(fromRect.x, fromRect.y, fromRect.width, fromRect.height);
 
-        ListIterator i = a.getDependencies().listIterator();
-        int j = 0;
+        ListIterator i = from.getDependencies().listIterator();
         while (i.hasNext()) {
             JDependency d = (JDependency)i.next();
+            JActivity to = instance.getActivity(d.getToActivityId());
+            Rectangle toRect = (Rectangle)actRects.get(to);
 
-            g.drawString("["+d.getToActivityId()+"]",
-                    r.x + 2*padding + j * advance,
-                    r.y + r.height * 9/10);
+            g.drawString(""
+                    + "("
+                    + d.getId()
+                    + " to "
+                    + "["
+                    + d.getToActivityId()
+                    + ":"
+                    + to.getShortName()
+                    + "]"
+                    + ")"
+                    , fromRect.x + 2*padding + d.getId() * advance
+                    , fromRect.y + fromRect.height * 9/10
+            );
+
+            switch (d.getDependencyType()) {
+                default:
+                    g.setColor(Color.yellow);
+                    g.drawLine(fromRect.x, fromRect.y, toRect.x, toRect.y);
+            }
+
         }
     }
 }
