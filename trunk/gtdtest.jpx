@@ -56,4 +56,7 @@
   <property category="sys" name="Version" value="1.0"/>
   <property category="sys" name="VersionLabel" value="@version"/>
   <property category="sys" name="WorkingDirectory" value="."/>
+  <file path="freehep-base.jar"/>
+  <file path="freehep-graphics2d.jar"/>
+  <file path="freehep-graphicsio.jar"/>
 </project>

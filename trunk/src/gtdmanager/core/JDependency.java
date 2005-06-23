@@ -45,6 +45,21 @@ public class JDependency {
         return this.dependencyType;
     }
 
+    public String getDependencyTypeStr() {
+        int dt = getDependencyType();
+        if (dt == BEGINBEGIN) {
+            return "Begin-Begin";
+        } else if (dt == BEGINEND) {
+            return "Begin-End";
+        } else if (dt == ENDBEGIN) {
+            return "End-Begin";
+        } else if (dt == ENDEND) {
+            return "End-End";
+        } else {
+            return "Unknown";
+        }
+    }
+
     void setDependencyType(int depType) {
         this.dependencyType = depType;
     }

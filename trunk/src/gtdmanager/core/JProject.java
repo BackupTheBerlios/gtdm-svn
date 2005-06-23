@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class JProject {
 
-    String name;
+    String name, author;
     String version;
     ArrayList instances;
 
@@ -30,6 +30,14 @@ public class JProject {
 
     public void setName(String strName) {
         this.name = strName;
+    }
+
+    public String getAuthor() {
+        return this.author;
+    }
+
+    public void setAuthor(String strAuthor) {
+        this.author = strAuthor;
     }
 
     public String getVersion() {
@@ -54,23 +62,37 @@ public class JProject {
         JInstance inst = new JInstance();
         inst.id = getNextId(); // gets the next higher id
 
+        if (this.instances.size() > 0) {
+            JInstance lastInst = (JInstance)this.instances.get(this.instances.size()-1);
+
+            inst.setName(lastInst.getName());
+            inst.setCreationDate(lastInst.getCreationDate());
+            inst.setStartDate(lastInst.getStartDate());
+            inst.setEndDate(lastInst.getEndDate());
+
+            // Fehler: clone() erstellt kein neues Objekt
+            inst.activities = new ArrayList((ArrayList)lastInst.getActivities().clone());
+
+        }
+
         instances.add(inst);  // adds the new instance to the arraylist
+
+        inst.setActive(true);
 
         return inst.id;  // return id of the new instance
     }
 
     public int newInstance(String strName, Calendar calCreate, Calendar calStart, Calendar calEnd, boolean active) {
 
-        JInstance inst = new JInstance();
-        inst.id = getNextId(); // gets the next higher id
+        int i = newInstance(); // creates new instance (clones the last instance)
+
+        JInstance inst = getInstance(i);
 
         inst.setName(strName);
         inst.setCreationDate(calCreate);
         inst.setStartDate(calStart);
         inst.setEndDate(calEnd);
         inst.setActive(active);
-
-        instances.add(inst);  // adds the new instance to the arraylist
 
         return inst.id;  // return id of the new instance
     }
