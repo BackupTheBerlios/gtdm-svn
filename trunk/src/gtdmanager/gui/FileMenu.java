@@ -9,7 +9,7 @@ import gtdmanager.core.*;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
-import gtdmanager.gui.DialogNewProject;
+//import gtdmanager.gui.DialogNewProject;
 
 /* }}} */
 /**
@@ -75,10 +75,10 @@ class FileMenuAction extends AbstractAction {
             parent.updateViews();
         }
         else if (name == newProject) {
-            DialogNewProject pDlg = new DialogNewProject(this.parent, "Neues Projekt erstellen", true);
-            pDlg.setLocationRelativeTo(null);
-            pDlg.setModal(true);
-            pDlg.show();
+            //DialogNewProject pDlg = new DialogNewProject(this.parent, "Neues Projekt erstellen", true);
+            //pDlg.setLocationRelativeTo(null);
+            //pDlg.setModal(true);
+            //pDlg.show();
         }
         else if (name == quit) {
             System.exit(0);

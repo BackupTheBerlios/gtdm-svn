@@ -32,8 +32,8 @@ CLASSES		= $(GUICLASSES) $(CORECLASSES)
 		-e "s,%Main-Class%,$*,g"\
 		-e "s/%Date%/$(shell date -R)/g" $<>$@
 
-all:
-	@echo nothing to do, please specify some target..
+all: jar-test
+#	@echo nothing to do, please specify some target..
 
 $(MODULE).jar: $(MODULE).manifest $(CLASSES)
 	@echo === JAR $@
