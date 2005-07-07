@@ -1,5 +1,6 @@
 package gtdmanager.core;
 
+import java.*;
 import java.util.*;
 
 /**
@@ -71,8 +72,15 @@ public class JProject {
             inst.setEndDate(lastInst.getEndDate());
 
             // Fehler: clone() erstellt kein neues Objekt
+
             inst.activities = new ArrayList((ArrayList)lastInst.getActivities().clone());
 
+            JActivity act1 = (JActivity)inst.getActivity(1);
+            System.out.println(act1.getName());
+            act1.setName("x1");
+
+            JActivity act2 = (JActivity)lastInst.getActivity(1);
+            System.out.println(act1.getName());
         }
 
         instances.add(inst);  // adds the new instance to the arraylist

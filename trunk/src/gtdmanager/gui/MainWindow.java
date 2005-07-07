@@ -55,8 +55,9 @@ public class MainWindow {
 
         // setup the mainwindow frame
         frame.getContentPane().add(panel);
-        frame.setSize(800, 240);
+        frame.setSize(800, 440);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 

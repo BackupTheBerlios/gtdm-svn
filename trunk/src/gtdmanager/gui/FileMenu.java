@@ -1,5 +1,5 @@
 /* gtdmanager/gui/FileMenu.java
- * 
+ *
  * {{{ package / imports */
 
 package gtdmanager.gui;
@@ -9,6 +9,7 @@ import gtdmanager.core.*;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
+import gtdmanager.gui.DialogNewProject;
 
 /* }}} */
 /**
@@ -30,7 +31,6 @@ public class FileMenu extends JMenu {
         add(new FileMenuAction(FileMenuAction.newProject, window));
         add(new FileMenuAction(FileMenuAction.openProject, window));
         add(new FileMenuAction(FileMenuAction.saveProject, window));
-        add(new FileMenuAction(FileMenuAction.deleteProject, window));
         add(new FileMenuAction(FileMenuAction.quit, window));
 	}
 
@@ -53,7 +53,6 @@ class FileMenuAction extends AbstractAction {
     public static String newProject = "Neues Projekt...";
     public static String openProject= "Öffne Projekt...";
     public static String saveProject = "Projekt Speichern...";
-    public static String deleteProject = "Lösche Projekt";
     public static String quit = "GTDManager beenden";
 
     private static MainWindow parent = null;
@@ -65,7 +64,7 @@ class FileMenuAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent e) {
         String name = e.getActionCommand();
-        
+
         if (name == generateProject) {
             parent.getManager().generateSampleProject();
             System.out.println("project: "
@@ -74,6 +73,12 @@ class FileMenuAction extends AbstractAction {
             //System.out.println("Ende");
 
             parent.updateViews();
+        }
+        else if (name == newProject) {
+            DialogNewProject pDlg = new DialogNewProject(this.parent, "Neues Projekt erstellen", true);
+            pDlg.setLocationRelativeTo(null);
+            pDlg.setModal(true);
+            pDlg.show();
         }
         else if (name == quit) {
             System.exit(0);

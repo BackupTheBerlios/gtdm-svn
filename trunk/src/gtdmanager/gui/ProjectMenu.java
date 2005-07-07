@@ -1,5 +1,5 @@
 /* gtdmanager/gui/ProjectMenu.java
- * 
+ *
  * {{{ package / imports */
 
 package gtdmanager.gui;
@@ -62,7 +62,7 @@ class ProjectMenuAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent e) {
         String name = e.getActionCommand();
-        
+
         if (false) {
         }
         else {

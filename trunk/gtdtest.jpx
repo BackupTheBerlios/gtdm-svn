@@ -27,7 +27,7 @@
   <property category="runtime.0" name="BuildTargetOnRun" value="com.borland.jbuilder.build.ProjectBuilder$ProjectBuildAction;make"/>
   <property category="runtime.0" name="ConfigurationName" value="Untitled Runtime Configuration"/>
   <property category="runtime.0" name="RunnableType" value="com.borland.jbuilder.runtime.ApplicationRunner"/>
-  <property category="runtime.0" name="application.class" value="gtdmanager.core.RunClass"/>
+  <property category="runtime.0" name="application.class" value="gtdmanager.gui.MainWindow"/>
   <property category="serverservices" name="single.server.name" value=""/>
   <property category="sys" name="AuthorLabel" value="@author"/>
   <property category="sys" name="BackupPath" value="bak"/>
@@ -46,7 +46,7 @@
   <property category="sys" name="JDK" value="java version 1.4.2_04-b05"/>
   <property category="sys" name="JvmVersion" value="1.2"/>
   <property category="sys" name="LastTag" value="0"/>
-  <property category="sys" name="Libraries" value=""/>
+  <property category="sys" name="Libraries" value="JBCL"/>
   <property category="sys" name="MakeStable" value="0"/>
   <property category="sys" name="OutPath" value="classes"/>
   <property category="sys" name="SourcePath" value="src;test"/>
@@ -56,6 +56,7 @@
   <property category="sys" name="Version" value="1.0"/>
   <property category="sys" name="VersionLabel" value="@version"/>
   <property category="sys" name="WorkingDirectory" value="."/>
+  <property category="sys" name="uidesign.size.gtdmanager.gui.DialogNewProject" value="369,166"/>
   <file path="freehep-base.jar"/>
   <file path="freehep-graphics2d.jar"/>
   <file path="freehep-graphicsio.jar"/>
