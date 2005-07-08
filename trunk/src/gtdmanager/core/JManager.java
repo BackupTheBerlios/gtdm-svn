@@ -892,6 +892,7 @@ public class JManager {
      //i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005, 5, 17));
      //i.getActivity(a2.getId()).setEndDate(new GregorianCalendar(2005, 5, 21));
 
+	newProject();
 	loadProject("test.xml");
     }
 

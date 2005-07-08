@@ -453,7 +453,7 @@ public class DiagramView extends JComponent
                     );
 
                     g.setColor(new Color(0xff0000 / (a.getId() + 1 + i.getId())));
-                    g.drawLine(x0, y0, x, y);
+                    g.drawLine(x0, y0, x, y0);
 
                     x0 = x;
                     y0 = y;
