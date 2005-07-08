@@ -7,6 +7,7 @@ package gtdmanager.gui;
 import gtdmanager.core.*;
 
 import java.lang.Math;
+import java.text.*;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -29,6 +30,7 @@ public class DiagramView extends JComponent
         implements View, MouseListener, MouseMotionListener {
 
     /* Variables {{{ */
+
     // varios messages the dialog spits out
     private static String msgNone = "";
     private static String msgDrag = "Mit der Maus Sichtbereich verschieben";
@@ -46,6 +48,11 @@ public class DiagramView extends JComponent
     // (the value is the 3rd may 2005 and only for testing purposes)
     private int startDate = 0; //12935;
     private int endDate = 0; //2975;
+    private int today;  // reset evry paint()
+
+    private int showDays = 32;
+
+    private Calendar gridStart = null;
 
     // geometry of the diagramgrid and spefwidth
 //    private int gridX, gridY, gridW, gridH, 
@@ -94,6 +101,13 @@ public class DiagramView extends JComponent
     }
     /* Constructors }}} */
 
+    private static long millidays = 1000L * 60L * 60L * 24L;
+    private int daysOfMillis(long millis) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(millis);
+        return (int)((long)((long)((long)(millis / 1000L) / 60L) / 60L) / 24L);
+    }
+    
     /* MouseListener/MouseMotionListener Implementation {{{ */
     public void mouseMoved (MouseEvent e) {
         mouseLastX = e.getX();
@@ -102,7 +116,7 @@ public class DiagramView extends JComponent
 
     public void mouseDragged (MouseEvent e) {
         if (project != null) {
-            if (showGantt) {
+            //if (showGantt) {
                 int xstep = (e.getX() - mouseLastX)/gridStep.x;
                 if (xstep != 0) {
                     startDate -= xstep;
@@ -111,7 +125,7 @@ public class DiagramView extends JComponent
 
                     mouseLastX = e.getX();
                 }
-            }
+            //}
         }
         // if nothing matches, handle this as a simple move
         else mouseMoved(e);
@@ -151,10 +165,11 @@ public class DiagramView extends JComponent
 
         // calculate initial diagram frame
         if (startDate == 0 && endDate == 0) {
-            startDate = (int)(currentInstance.getStartDate().getTimeInMillis()
-                    /1000L/60L/60L/24L);
+            startDate = daysOfMillis(
+                    currentInstance.getStartDate().getTimeInMillis());
+            gridStart = currentInstance.getStartDate();
             // TODO: this one should be configurable
-            endDate = startDate + 35;   // show 35 days
+            endDate = startDate + showDays;   // show 35 days
         }
 
         repaint();
@@ -177,6 +192,8 @@ public class DiagramView extends JComponent
         advance = g.getFontMetrics().getMaxAdvance();
         ascent = g.getFontMetrics().getMaxAscent();
         //descent = g.getFontMetrics().getMaxDescent();
+
+        today = daysOfMillis(Calendar.getInstance().getTimeInMillis());
 
         // clear all geometries
         actRects.clear();
@@ -216,22 +233,11 @@ public class DiagramView extends JComponent
             tdriftPaintGrid(g);
             tdriftPaintInitialActivities(g, initialInstance.getActivities());
             tdriftPaintCurrentActivities(g, currentInstance.getActivities());
-        
-            // todayline
-            int today = (int)((new Date()).getTime()/1000L/60L/60L/24L);
-            g.setColor(Color.cyan);
-            int lineHalfWidth = (int)Math.floor((double)Math.abs(lineWidth)/2);
-            for (int i = -lineHalfWidth; i < lineHalfWidth; i++)
-                g.drawLine(
-                    gridRect.x + (today - startDate) * gridStep.x + i,
-                    gridRect.y,
-                    gridRect.x + (today - startDate) * gridStep.x + i,
-                    gridRect.y + gridRect.height
-                );
         }
     }
     /* JComponent Overloading }}} */
 
+    // TERMINDRIFT
     /* Termindrift Paint {{{ */
 
     /* tdriftPaintGrid {{{ */
@@ -256,6 +262,18 @@ public class DiagramView extends JComponent
             g.drawLine(gridRect.x + x, gridRect.y + y,
                     gridRect.x + x + gridStep.x, gridRect.y + y + gridStep.y);
         }
+        
+        // todayline {{{
+        g.setColor(Color.cyan);
+        int lineHalfWidth = (int)Math.floor((double)Math.abs(lineWidth)/2);
+        for (int i = -lineHalfWidth; i < lineHalfWidth; i++)
+            g.drawLine(
+                gridRect.x + (today - startDate) * gridStep.x + i,
+                gridRect.y,
+                gridRect.x + (today - startDate) * gridStep.x + i,
+                gridRect.y + gridRect.height
+            );
+        // }}}
     }
     /* tdriftPaintGrid }}} */
 
@@ -268,7 +286,7 @@ public class DiagramView extends JComponent
 
     /* tdriftPaintInitialActivitiy {{{ */
     private void tdriftPaintInitialActivity(Graphics2D g, JActivity a) {
-        int end = (int)(a.getEndDate().getTimeInMillis()/1000L/60L/60L/24L);
+        int end = daysOfMillis(a.getEndDate().getTimeInMillis());
         
         // calculate geometry for activity
         Point p = new Point(
@@ -297,12 +315,12 @@ public class DiagramView extends JComponent
 
     /* tdriftPaintCurrentActivitiy {{{ */
     private void tdriftPaintCurrentActivity(Graphics2D g, JActivity a) {
-        int end = (int)(a.getEndDate().getTimeInMillis()/1000L/60L/60L/24L);
-        int today = (int)((new Date()).getTime()/1000L/60L/60L/24L);
+        int end = daysOfMillis(a.getEndDate().getTimeInMillis());
+        //int today = (int)((new Date()).getTime()/1000L/60L/60L/24L);
         
         // calculate geometry for activity
         Rectangle r = new Rectangle(
-            gridRect.x - a.getShortName().length() * advance / 2,
+            gridRect.x - a.getShortName().length() * advance / 3,
             gridRect.y + (end - startDate) * gridStep.y,
             gridRect.x + ((today > end ? end : today) - startDate) * gridStep.x,
             0
@@ -321,8 +339,37 @@ public class DiagramView extends JComponent
     /* tdriftPaintCurrentActivitiy }}} */
     /* Termindrift Paint }}} */
 
+
+    // stringify - always return correct string (TM) {{{
+    private String stringify(Calendar cal) {
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        return df.format(cal.getTime());
+    }
+    private String stringify(int days) { 
+        Calendar c = new GregorianCalendar();
+        c.setTimeInMillis(days * millidays);
+        return stringify(c);
+    }
+    //}}}
+    private void drawVert(Graphics2D g, int x, int y, String str) { //{{{
+        for (int j = 0; j < str.length(); j++) {
+            g.drawString(str.substring(j, j + 1), x, y + j * ascent);
+            g.drawString(str.substring(j, j + 1), x + 1, y + j * ascent);
+        }
+    } //}}}
+    private void drawHoriz(Graphics2D g, int x, int y, String str) { //{{{
+        g.drawString(str, x, y);
+        g.drawString(str, x + 1, y);
+    } //}}}
+
+    private int toX(Calendar c) {
+        return gridRect.x
+            + (daysOfMillis(c.getTimeInMillis()) - startDate) * gridStep.x;
+    }
+
+    // GANTT
     /* Gantt Paint Routines {{{ */
-    private void ganttPaintGrid(Graphics2D g) {
+    private void ganttPaintGrid(Graphics2D g) { //{{{
         // init geometry
         gridRect = new Rectangle(
             -1,
@@ -349,59 +396,139 @@ public class DiagramView extends JComponent
         g.setColor(Color.gray);
         g.drawRect(gridRect.x, gridRect.y, gridRect.width, gridRect.height - 1);
         
-        // day grid
+        // day grida
         for (int i = 0; i < gridRect.width; i += gridStep.x) {
-            Calendar cal = new GregorianCalendar();
-            cal.setTimeInMillis((startDate + i/gridStep.x)*24L*60L*60L*1000L);
+            int day = startDate + i/gridStep.x;
+            Date date = new Date(day * millidays);
+            GregorianCalendar cal = new GregorianCalendar();
 
-            // sunday red spans from the sunday line to the monday line
-            if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
-                g.setColor(Color.red);
+            cal.setTime(date);
 
-            g.drawLine(gridRect.x + i, gridRect.y, gridRect.x + i,
-                    gridRect.y + gridRect.height);
+            int x = gridRect.x + i;
+            int y = gridRect.y;
+            int h = gridRect.height - 2;
+            int w = gridStep.x - 1;
+            int strx = x + w / 2 - g.getFontMetrics().charWidth('0') / 2;
 
-            if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)
-            {
-                g.setColor(Color.gray); // reset sunday red
+            g.setColor(new Color(0x999999));
+            g.drawLine(x, y, x, y + h);
 
-                String str = ""
-                    + (cal.get(Calendar.DAY_OF_MONTH) < 10 ? "0" : "")
-                    + cal.get(Calendar.DAY_OF_MONTH)
-                    + (cal.get(Calendar.MONTH) < 10 ? ".0" : ".")
-                    + cal.get(Calendar.MONTH)
-                    + "."
-                    + cal.get(Calendar.YEAR);
+            boolean inProjectFrame = true;
 
-                for (int j = 0; j < str.length(); j++)
-                    g.drawString(str.substring(j, j + 1),
-                            gridRect.x + i + 2,
-                            gridRect.y + gridRect.height
-                                + (j + 1 - 11) * ascent);
+            if (cal.before(currentInstance.getStartDate())
+                    || cal.after(currentInstance.getEndDate())) {
+                g.setColor(new Color(0xaaaaaa));
+                g.fillRect(x + 1, y + 1, w, h);
+                inProjectFrame = false; // grayed out
             }
+
+            switch (cal.get(Calendar.DAY_OF_WEEK)) {
+                case Calendar.SUNDAY:
+                    if (!inProjectFrame) break;
+                    g.setColor(new Color(0xf0b0c0)); //Color.red);
+                    g.fillRect(x + 1, y + 1, w, h);
+                    break;
+
+                case Calendar.SATURDAY:
+                    if (!inProjectFrame) break;
+                    g.setColor(new Color(0xf0d0e0)); //Color.red);
+                    g.fillRect(x + 1, y + 1, w, h);
+                    break;
+
+                case Calendar.MONDAY:
+                    g.setColor(new Color(0x999999));
+                    drawVert(g, strx,(int)(y + h - h*.45), stringify(cal));
+                    break;
+                    
+                default:
+                    //g.setColor(new Color(0xc0c0c0));
+                    break;
+            }
+
+            if (day == today) {
+                g.setColor(new Color(0xb0c0f0));
+                g.fillRect(x + 1, y + 1, w, h);
+
+                g.setColor(new Color(0x7080f0));
+                drawVert(g, strx,(int)(y + h - h*.45), stringify(day));
+            }
+
+            // print date at:
+            // StartDate {{{
+            if (cal.after(currentInstance.getStartDate())) {
+                currentInstance.getStartDate().add(Calendar.DATE, 1);
+                if (cal.before(currentInstance.getStartDate())) {
+                    g.setColor(new Color(0x777777));
+                    drawVert(g, strx,(int)(y + h - h*.45), stringify(day));
+                }
+                currentInstance.getStartDate().add(Calendar.DATE, -1);
+            }
+            // }}}
+            // EndDate {{{
+            if (cal.before(currentInstance.getEndDate())) {
+                currentInstance.getEndDate().add(Calendar.DATE, -1);
+                if (cal.after(currentInstance.getEndDate())) {
+                    g.setColor(new Color(0x777777));
+                    drawVert(g, strx,(int)(y + h - h*.45), stringify(day));
+                }
+                currentInstance.getEndDate().add(Calendar.DATE, 1);
+            }
+            // }}}
+
         }
 
-    }
+        // print note:
+        // project is later {{{
+        if (daysOfMillis(currentInstance.getStartDate().getTimeInMillis())
+                > endDate) {
+                g.setColor(Color.red);
+                String s = "Projektbeginn: "
+                    + stringify(currentInstance.getStartDate())
+                    + " ->";
+                drawHoriz(g
+                    , gridRect.x + gridRect.width - s.length() * advance/3
+                    , 324
+                    , s
+                );
+        }
+        // }}}
+        // project is earlier {{{
+        if (daysOfMillis(currentInstance.getEndDate().getTimeInMillis())
+                < startDate) {
+                g.setColor(Color.red);
+                String s = "<- Projektende: "
+                    + stringify(currentInstance.getStartDate());
+                drawHoriz(g
+                    , gridRect.x + advance/3
+                    , 324
+                    , s
+                );
+        }
+        // }}}
 
-    private void ganttPaintActivities(Graphics2D g, ArrayList a) {
+    }//}}}
+
+    private void ganttPaintActivities(Graphics2D g, ArrayList a) { //{{{
         // iterate through all activities.
         // this method is meant to be called recursive
         // TODO: the core needs: getAllActivities(PREORDER|POSTORDER|INORDER)
         ListIterator i = a.listIterator();
         while (i.hasNext()) ganttPaintActivity(g, (JActivity)i.next());
-    }
+    }//}}}
 
-    private Rectangle ganttPaintActivity(Graphics2D g, JActivity a) {
+    private Rectangle ganttPaintActivity(Graphics2D g, JActivity a) {//{{{
         // check if there a is an activity, else we have nothing to do here..
         if (a == null) return null;
 
         // our granularity is 1 day, offset is start of epoch (in UTC)
-        int start = (int)(a.getStartDate().getTimeInMillis()/1000L/60L/60L/24L);
-        int end = (int)(a.getEndDate().getTimeInMillis()/1000L/60L/60L/24L);
+        int start = daysOfMillis(a.getStartDate().getTimeInMillis());
+        int end = daysOfMillis(a.getEndDate().getTimeInMillis());
         
         // calculate geometry for activity bar
+        //System.out.println(a.getShortName() + " " + (start - startDate));
         Rectangle r = new Rectangle(
-            gridRect.x + (start - startDate) * gridStep.x,
+            //gridRect.x + (start - startDate) * gridStep.x,
+            toX(a.getStartDate()),
             yActOffset,
             gridStep.x * (end - start),               // length
             barWidth
@@ -421,9 +548,11 @@ public class DiagramView extends JComponent
 
             // ...and the text
             g.setColor(Color.white);
-            g.drawString(""
+            g.drawString(" "
                 + a.getShortName()
-                , r.x + (r.width - a.getShortName().length() * advance / 2) / 2
+                + "@" +  stringify(start)
+                , r.x
+                //+(r.width - a.getShortName().length() * advance / 2) / 2
                 , r.y + (barWidth + ascent) / 2
             );
         }
@@ -432,18 +561,18 @@ public class DiagramView extends JComponent
         ganttPaintActivities(g, a.getActivities());
 
         return r;
-    }
+    }//}}}
 
     
-    private void ganttPaintDependencies(Graphics2D g, ArrayList a) {
+    private void ganttPaintDependencies(Graphics2D g, ArrayList a) {//{{{
         // iterate through all activities.
         // this method is meant to be called recursive
         // TODO: the core needs: getAllActivities(PREORDER|POSTORDER|INORDER)
         ListIterator i = a.listIterator();
         while (i.hasNext()) ganttPaintDependencies(g, (JActivity)i.next());
-    }
+    }//}}}
     
-    private void ganttPaintDependencies(Graphics2D g, JActivity from) {
+    private void ganttPaintDependencies(Graphics2D g, JActivity from) {//{{{
         Rectangle fromRect = (Rectangle)actRects.get(from);
 
         g.setColor(Color.darkGray);
@@ -504,7 +633,7 @@ public class DiagramView extends JComponent
             }
 
         }
-    }
+    }//}}}
     /* Gantt Paint Routines }}} */
 
 }

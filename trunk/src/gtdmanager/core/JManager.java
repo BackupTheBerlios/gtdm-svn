@@ -424,32 +424,40 @@ public class JManager {
 
 	i	= getProject().getInstance(getProject().newInstance(
 		"Instanz1",
-		new GregorianCalendar(2005, 5, 1),
-		new GregorianCalendar(2005, 5, 1),
+		new GregorianCalendar(2005, 0, 0),
+		new GregorianCalendar(2005, 6, 1),
 		new GregorianCalendar(2005, 6, 30), true));
 
         a1	= i.getActivity(i.newActivity(i.activities,
 		"Aktivi1", "Akt1",
-		new GregorianCalendar(2005, 5, 4),
-		new GregorianCalendar(2005, 5, 12), 0));
+		new GregorianCalendar(2005, 6, 2),
+		new GregorianCalendar(2005, 6, 6), 0));
 
         a2	= i.getActivity(i.newActivity(i.activities,
 		"Aktivi2", "Akt2",
-		new GregorianCalendar(2005, 5, 14),
-		new GregorianCalendar(2005, 5, 20), 0));
+		new GregorianCalendar(2005, 6, 7),
+		new GregorianCalendar(2005, 6, 17), 0));
 
         a3	= i.getActivity(i.newActivity(i.activities,
 		"Aktivi3", "Akt3",
-		new GregorianCalendar(2005, 5, 14),
-		new GregorianCalendar(2005, 5, 19), 0));
+		new GregorianCalendar(2005, 6, 14),
+		new GregorianCalendar(2005, 6, 29), 0));
 
         a1.newDependency(a2.getId(), JDependency.ENDBEGIN);
 
 	i	= getProject().getInstance(getProject().newInstance(
 		"Instanz2",
-		new GregorianCalendar(2005, 5, 12),
-		new GregorianCalendar(2005, 5, 1),
-		new GregorianCalendar(2005, 6, 30), true));
+		new GregorianCalendar(2005, 6, 0),
+		new GregorianCalendar(2005, 6, 0),
+		new GregorianCalendar(2005, 6, 29), true));
+
+       	i.getActivity(a1.getId()).setEndDate(
+		new GregorianCalendar(2005, 6, 11));
+
+	//i.newActivity(i.activities,
+	//	"Aktivi1", "Akt1",
+	//	new GregorianCalendar(2005, 6, 2),
+	//	new GregorianCalendar(2005, 6, 6), 0));
 
      //i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005, 5, 17));
      //i.getActivity(a2.getId()).setEndDate(new GregorianCalendar(2005, 5, 21));
