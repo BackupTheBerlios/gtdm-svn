@@ -838,14 +838,14 @@ public class JManager {
 
     public void generateSampleProject() {
 
-        newProject("Testprojekt", "1.0.0.0");
+        /*newProject("Testprojekt", "1.0.0.0");
 
 	JInstance i;
 	JActivity a1, a2, a3, a4, a5, a6, a7, a8, a9;
 
 	i	= getProject().getInstance(getProject().newInstance(
 		"Instanz1",
-		new GregorianCalendar(2005, 0, 0),
+		new GregorianCalendar(2005, 6, 1),
 		new GregorianCalendar(2005, 6, 1),
 		new GregorianCalendar(2005, 6, 30), true));
 
@@ -868,12 +868,21 @@ public class JManager {
 
 	i	= getProject().getInstance(getProject().newInstance(
 		"Instanz2",
-		new GregorianCalendar(2005, 6, 0),
-		new GregorianCalendar(2005, 6, 0),
+		new GregorianCalendar(2005, 6, 6),
+		new GregorianCalendar(2005, 6, 2),
 		new GregorianCalendar(2005, 6, 29), true));
 
        	i.getActivity(a1.getId()).setEndDate(
 		new GregorianCalendar(2005, 6, 11));
+
+	i	= getProject().getInstance(getProject().newInstance(
+		"Instanz3",
+		new GregorianCalendar(2005, 6, 18),
+		new GregorianCalendar(2005, 6, 2),
+		new GregorianCalendar(2005, 6, 34), true));
+
+       	i.getActivity(a1.getId()).setEndDate(
+		new GregorianCalendar(2005, 6, 18));*/
 
 	//i.newActivity(i.activities,
 	//	"Aktivi1", "Akt1",
@@ -882,6 +891,8 @@ public class JManager {
 
      //i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005, 5, 17));
      //i.getActivity(a2.getId()).setEndDate(new GregorianCalendar(2005, 5, 21));
+
+	loadProject("test.xml");
     }
 
     private void jbInit() throws Exception {
