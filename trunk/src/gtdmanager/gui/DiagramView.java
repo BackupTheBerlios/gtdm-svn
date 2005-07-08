@@ -243,13 +243,28 @@ public class DiagramView extends JComponent
     /* tdriftPaintGrid {{{ */
     private void tdriftPaintGrid(Graphics2D g) {
         // grid
-        for (int x = 0, y = 0; x < gridRect.width || y < gridRect.height;
+        for (int x = 0, y = 0;//-10 * gridStep.x, y = - 10 * gridStep.y;
+                x < gridRect.width || y < gridRect.height;
                 x += gridStep.x, y += gridStep.y)
         {
+            int day = startDate + x/gridStep.x;
+            Date date = new Date(day * millidays);
+            GregorianCalendar cal = new GregorianCalendar();
+            cal.setTime(date);
+
             if (x == 0)
                 g.setColor(Color.gray);
             else
                 g.setColor(Color.lightGray);
+
+            if (day > endDate)
+                g.fillRect(gridRect.x + x + 1
+                        , gridRect.y + 1
+                        , gridRect.x + x + 1
+                        , gridRect.y + gridRect.height + 1);
+
+
+
             // vertical
             g.drawLine(gridRect.x + x, gridRect.y + 1,
                     gridRect.x + x, gridRect.y + gridRect.height);
@@ -264,15 +279,17 @@ public class DiagramView extends JComponent
         }
         
         // todayline {{{
-        g.setColor(Color.cyan);
-        int lineHalfWidth = (int)Math.floor((double)Math.abs(lineWidth)/2);
-        for (int i = -lineHalfWidth; i < lineHalfWidth; i++)
-            g.drawLine(
-                gridRect.x + (today - startDate) * gridStep.x + i,
-                gridRect.y,
-                gridRect.x + (today - startDate) * gridStep.x + i,
-                gridRect.y + gridRect.height
-            );
+        if (today >= startDate) {
+            g.setColor(new Color(0xb0c0f0));
+            int lineHalfWidth = (int)Math.floor((double)Math.abs(lineWidth)/2);
+            for (int i = -lineHalfWidth; i < lineHalfWidth; i++)
+                g.drawLine(
+                    gridRect.x + (today - startDate) * gridStep.x + i,
+                    gridRect.y,
+                    gridRect.x + (today - startDate) * gridStep.x + i,
+                    gridRect.y + gridRect.height
+                );
+        }
         // }}}
     }
     /* tdriftPaintGrid }}} */
@@ -287,7 +304,9 @@ public class DiagramView extends JComponent
     /* tdriftPaintInitialActivitiy {{{ */
     private void tdriftPaintInitialActivity(Graphics2D g, JActivity a) {
         int end = daysOfMillis(a.getEndDate().getTimeInMillis());
-        
+       
+        if (end < startDate) return;
+
         // calculate geometry for activity
         Point p = new Point(
             gridRect.x + (end - startDate) * gridStep.x,
@@ -318,6 +337,8 @@ public class DiagramView extends JComponent
         int end = daysOfMillis(a.getEndDate().getTimeInMillis());
         //int today = (int)((new Date()).getTime()/1000L/60L/60L/24L);
         
+        if (end < startDate) return;
+
         // calculate geometry for activity
         Rectangle r = new Rectangle(
             gridRect.x - a.getShortName().length() * advance / 3,
@@ -331,8 +352,12 @@ public class DiagramView extends JComponent
 
         g.setColor(Color.black);
         g.drawString(a.getShortName(), r.x, r.y);
+
         g.setColor(Color.gray);
-        g.drawLine(r.x, r.y, r.width, r.y);
+        if (today >= startDate)
+            g.drawLine(r.x, r.y, r.width, r.y);
+        else
+            g.drawLine(r.x, r.y, gridRect.x, r.y);
 
         // NOTE: we don't go deeper than one level
     }
