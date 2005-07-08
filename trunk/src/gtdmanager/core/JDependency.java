@@ -14,19 +14,28 @@ package gtdmanager.core;
  */
 public class JDependency {
 
-    // dependenciy types
+    // dependency types
     public static int BEGINBEGIN = 0;
     public static int BEGINEND = 1;
     public static int ENDBEGIN = 2;
     public static int ENDEND = 3;
 
+    public static String BEGINBEGINSTR = "begin-begin";
+    public static String BEGINENDSTR   = "begin-end";
+    public static String ENDBEGINSTR   = "end-begin";
+    public static String ENDENDSTR     = "end-end";
+
     int id;
     int toActivityId;
     int dependencyType;
+    int color;
+    String line; // dotted, ... ?
 
     public JDependency() {
         toActivityId = -1;
         dependencyType = -1;
+        color = -1;
+        line = "";
     }
 
     public int getId() {
@@ -48,20 +57,36 @@ public class JDependency {
     public String getDependencyTypeStr() {
         int dt = getDependencyType();
         if (dt == BEGINBEGIN) {
-            return "Begin-Begin";
+            return BEGINBEGINSTR;
         } else if (dt == BEGINEND) {
-            return "Begin-End";
+            return BEGINENDSTR;
         } else if (dt == ENDBEGIN) {
-            return "End-Begin";
+            return ENDBEGINSTR;
         } else if (dt == ENDEND) {
-            return "End-End";
+            return ENDENDSTR;
         } else {
-            return "Unknown";
+            return "";
         }
     }
 
     void setDependencyType(int depType) {
         this.dependencyType = depType;
+    }
+
+    public int getColor() {
+        return this.color;
+    }
+
+    void setColor(int col) {
+        this.color = col;
+    }
+
+    public String getLine() {
+        return this.line;
+    }
+
+    void setLine(String lineStr) {
+        this.line = lineStr;
     }
 
 }

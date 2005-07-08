@@ -58,6 +58,52 @@ public class JProject {
         } // returns id + 1 of the last existing instance
     }
 
+    private void copyActivityValues(JActivity sourceAct, JActivity destinationAct) {
+
+        destinationAct.id = sourceAct.getId(); // same id in new instance
+        destinationAct.setName(sourceAct.getName());
+        destinationAct.setShortName(sourceAct.getShortName());
+        destinationAct.setColor(sourceAct.getColor());
+        destinationAct.setStartDate(sourceAct.getStartDate());
+        destinationAct.setEndDate(sourceAct.getEndDate());
+
+        for (int i = 0; i < sourceAct.dependencies.size(); i++) {
+            JDependency srcDep = (JDependency)sourceAct.dependencies.get(i);
+            JDependency dstDep = new JDependency();
+
+            dstDep.setToActivityId(srcDep.getToActivityId());
+            dstDep.setDependencyType(srcDep.getDependencyType());
+
+            destinationAct.dependencies.add(dstDep);
+        }
+
+    }
+
+    private void cloneActivities(ArrayList sourceActs, ArrayList destinationActs) {
+
+        if (sourceActs != null) {
+            for (int i = 0; i < sourceActs.size(); i++) {
+
+                JActivity srcAct = (JActivity)sourceActs.get(i);
+                JActivity dstAct = new JActivity(); // neue activity anlegen
+
+                copyActivityValues(srcAct, dstAct); // werte der activity mitsamt dependencies kopieren
+                cloneActivities(srcAct.activities, dstAct.activities); // activities der activity klonen
+
+                destinationActs.add(dstAct); // die neu erstellte, geklonte activity hinzufügen
+            }
+        }
+    }
+
+    public JInstance newEmptyInstance() {
+
+        JInstance inst = new JInstance();
+        inst.id = getNextId(); // gets the next higher id
+        instances.add(inst);  // adds the new instance to the arraylist
+
+        return inst;  // return the new empty instance
+    }
+
     public int newInstance() {
 
         JInstance inst = new JInstance();
@@ -71,16 +117,8 @@ public class JProject {
             inst.setStartDate(lastInst.getStartDate());
             inst.setEndDate(lastInst.getEndDate());
 
-            // Fehler: clone() erstellt kein neues Objekt
+            cloneActivities(lastInst.getActivities(), inst.getActivities());
 
-            inst.activities = new ArrayList((ArrayList)lastInst.getActivities().clone());
-
-            JActivity act1 = (JActivity)inst.getActivity(1);
-            System.out.println(act1.getName());
-            act1.setName("x1");
-
-            JActivity act2 = (JActivity)lastInst.getActivity(1);
-            System.out.println(act1.getName());
         }
 
         instances.add(inst);  // adds the new instance to the arraylist

@@ -3,6 +3,7 @@ package gtdmanager.core;
 import java.util.*;
 import java.io.*;
 import javax.xml.parsers.*;
+//import java.awt.Color;
 import org.w3c.dom.*;
 
 /**
@@ -28,8 +29,14 @@ public class JManager {
 
     private boolean projectNodeFound = false;
 
-    private String lastNameNode = "";
-    private boolean nameNodeFound = false;
+    //private String projectLastNameNode = "";
+    private boolean projectNameNodeFound = false;
+
+    //private String instLastNameNode = "";
+    private boolean instNameNodeFound = false;
+
+    private String actLastNameNode = "";
+    private boolean actNameNodeFound = false;
 
 
     public JManager() {
@@ -83,75 +90,437 @@ public class JManager {
         return this.project;
     }
 
-    private void processNode(Node document) {
 
-        short nodeType = document.getNodeType();
-        String nodeName = document.getNodeName();
+    // --------------------------------------------------------------------------------------
+
+
+    private void processDependencyPropertyNode(Node propNode, JDependency dep) {
+
+        String lastPropName = "";
+        String nodeName = propNode.getNodeName();
+
+        if (nodeName.equalsIgnoreCase("property")) {
+            if (propNode.hasAttributes()) {
+                NamedNodeMap nodeMap = propNode.getAttributes();
+                for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
+
+                    String itemName = nodeMap.item(nodeIdx).getNodeName();
+                    String itemValue = nodeMap.item(nodeIdx).getNodeValue();
+
+                    if (itemName.equalsIgnoreCase("name")) {
+                        lastPropName = itemValue;
+                    } else if (itemName.equalsIgnoreCase("value")) {
+                        if (lastPropName.equalsIgnoreCase("color")) {
+                            dep.setColor(getColorInt(itemValue));
+                        } else if (lastPropName.equalsIgnoreCase("line")) {
+                            dep.setLine(itemValue);
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    private void processDependencyNode(Node depNode, JActivity act) {
+
+        JDependency dep = new JDependency();
+
+        if (depNode.hasAttributes()) {
+
+            NamedNodeMap nodeMap = depNode.getAttributes();
+            for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
+
+                String itemName = nodeMap.item(nodeIdx).getNodeName();
+                String itemValue = nodeMap.item(nodeIdx).getNodeValue();
+
+                if (itemName.equalsIgnoreCase("type")) {
+
+                    if (itemValue.equalsIgnoreCase("begin-begin")) {
+                        dep.setDependencyType(dep.BEGINBEGIN);
+                    } else if (itemValue.equalsIgnoreCase("begin-end")) {
+                        dep.setDependencyType(dep.BEGINEND);
+                    } else if (itemValue.equalsIgnoreCase("end-begin")) {
+                        dep.setDependencyType(dep.ENDBEGIN);
+                    } else if (itemValue.equalsIgnoreCase("end-end")) {
+                        dep.setDependencyType(dep.ENDEND);
+                    }
+
+                } else if (itemName.equalsIgnoreCase("activity-id")) {
+
+                    dep.setToActivityId(Integer.parseInt(itemValue.substring(1)));
+
+                }
+            }
+        }
+
+        if (depNode.hasChildNodes()) {
+
+            NodeList nodeList = depNode.getChildNodes();
+            for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
+                processDependencyPropertyNode(nodeList.item(nodeIdx), dep);
+            }
+        }
+
+        act.dependencies.add(dep);
+    }
+
+    private void processActDateNode(Node dateNode, JActivity act) {
+
+        int dateInt = -1;
+        int monthInt = -1;
+        int yearInt = -1;
+
+        String nodeName = dateNode.getNodeName();
+        //System.out.println("       Date-Node found '" + nodeName + "'");
+
+        if (dateNode.hasAttributes()) {
+
+            NamedNodeMap nodeMap = dateNode.getAttributes();
+            for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
+                String itemName = nodeMap.item(nodeIdx).getNodeName();
+                String itemValue = nodeMap.item(nodeIdx).getNodeValue();
+                //System.out.println("    DateAttrib found: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
+                if (itemName.equalsIgnoreCase("date")) {
+                    dateInt = Integer.parseInt(itemValue);
+                } else if (itemName.equalsIgnoreCase("month")) {
+                    monthInt = Integer.parseInt(itemValue);
+                } else if (itemName.equalsIgnoreCase("year")) {
+                    yearInt = Integer.parseInt(itemValue);
+                }
+            }
+
+            if ((dateInt >= 0) && (monthInt >= 0) && (yearInt >= 0)) {
+
+                Calendar c = Calendar.getInstance();
+                c.set(yearInt, monthInt, dateInt);
+
+                if (nodeName.equalsIgnoreCase("start-date")) {
+                    act.setStartDate(c);
+                } else if (nodeName.equalsIgnoreCase("end-date")) {
+                    act.setEndDate(c);
+                } else {
+                    System.out.println("Unbekannter Datumsknoten in activity: " + nodeName);
+                }
+
+            } else { // eines oder mehrere der attribute date, month und year wurden nicht gefunden
+                System.out.println("Der Datumsknoten '" + nodeName + "' besitzt nicht genügend Attribute für ein korrektes Datum!");
+            }
+        } else {
+            System.out.println("Der Datumsknoten '" + nodeName + "' besitzt keine Attribute!");
+        }
+    }
+
+    private int getColorInt(String colorStr) {
+
+        int retColor = 0;
+
+        if (colorStr.startsWith("0x")) { // example: given as 0xFFFF0000
+            retColor = Integer.parseInt(colorStr.substring(2), 16);
+        } else if (colorStr.startsWith("#")) { // example: given as #FF0000
+            retColor = Integer.parseInt(colorStr.substring(1), 16);
+        } else if (colorStr.startsWith("0") && (colorStr.length() > 1)) {
+            retColor = Integer.parseInt(colorStr.substring(1), 8);
+        } else if (colorStr.equalsIgnoreCase("white")) {
+            retColor = Integer.parseInt("FFFFFF", 16);
+        } else if (colorStr.equalsIgnoreCase("black")) {
+            retColor = Integer.parseInt("000000", 16);
+        } else if (colorStr.equalsIgnoreCase("red")) {
+            retColor = Integer.parseInt("FF0000", 16);
+        } else if (colorStr.equalsIgnoreCase("lime")) {
+            retColor = Integer.parseInt("00FF00", 16);
+        } else if (colorStr.equalsIgnoreCase("blue")) {
+            retColor = Integer.parseInt("0000FF", 16);
+        } else if (colorStr.equalsIgnoreCase("yellow")) {
+            retColor = Integer.parseInt("FFFF00", 16);
+        } else if (colorStr.equalsIgnoreCase("fuchsia")) {
+            retColor = Integer.parseInt("FF00FF", 16);
+        } else if (colorStr.equalsIgnoreCase("silver")) {
+            retColor = Integer.parseInt("C0C0C0", 16);
+        } else if (colorStr.equalsIgnoreCase("maroon")) {
+            retColor = Integer.parseInt("800000", 16);
+        } else if (colorStr.equalsIgnoreCase("purple")) {
+            retColor = Integer.parseInt("800080", 16);
+        } else if (colorStr.equalsIgnoreCase("green")) {
+            retColor = Integer.parseInt("008000", 16);
+        } else if (colorStr.equalsIgnoreCase("olive")) {
+            retColor = Integer.parseInt("808000", 16);
+        } else if (colorStr.equalsIgnoreCase("navy")) {
+            retColor = Integer.parseInt("000080", 16);
+        } else if (colorStr.equalsIgnoreCase("teal")) {
+            retColor = Integer.parseInt("008080", 16);
+        } else if (colorStr.equalsIgnoreCase("aqua")) {
+            retColor = Integer.parseInt("00FFFF", 16);
+        } else {
+            retColor = Integer.parseInt(colorStr);
+            //System.out.println("Unbekannte Farbe gefunden: " + colorStr);
+        }
+        return retColor;
+    }
+
+    private String getColorStr(String hexStr) {
+
+        if (hexStr.equalsIgnoreCase("#FFFFFF")) {
+            return "white";
+        } else if (hexStr.equalsIgnoreCase("#000000")) {
+            return "black";
+        } else if (hexStr.equalsIgnoreCase("#FF0000")) {
+            return "red";
+        } else if (hexStr.equalsIgnoreCase("#00FF00")) {
+            return "lime";
+        } else if (hexStr.equalsIgnoreCase("#0000FF")) {
+            return "blue";
+        } else if (hexStr.equalsIgnoreCase("#FFFF00")) {
+            return "yellow";
+        } else if (hexStr.equalsIgnoreCase("#FF00FF")) {
+            return "fuchsia";
+        } else if (hexStr.equalsIgnoreCase("#C0C0C0")) {
+            return "silver";
+        } else if (hexStr.equalsIgnoreCase("#800000")) {
+            return "maroon";
+        } else if (hexStr.equalsIgnoreCase("#800080")) {
+            return "purple";
+        } else if (hexStr.equalsIgnoreCase("#008000")) {
+            return "green";
+        } else if (hexStr.equalsIgnoreCase("#808000")) {
+            return "olive";
+        } else if (hexStr.equalsIgnoreCase("#000080")) {
+            return "navy";
+        } else if (hexStr.equalsIgnoreCase("#008080")) {
+            return "teal";
+        } else if (hexStr.equalsIgnoreCase("#00FFFF")) {
+            return "aqua";
+        }
+        return hexStr;
+    }
+
+    private void processActivityPropertyNode(Node childNode, JActivity act) {
+        // Bsp: <property name="color" value="red" />
+        if (childNode.getAttributes().getLength() >= 2) {
+            if ((childNode.getAttributes().item(0).getNodeName().equalsIgnoreCase("name")) &&
+                (childNode.getAttributes().item(1).getNodeName().equalsIgnoreCase("value"))) {
+
+                String nameStr = childNode.getAttributes().item(0).getNodeValue();
+                String valueStr = childNode.getAttributes().item(1).getNodeValue();
+
+                if (nameStr.equalsIgnoreCase("color")) {
+                    act.setColor(getColorInt(valueStr)); // z.b. color "red" in int-zahl umwandeln
+                }
+            }
+        }
+    }
+
+    private void processActivityChildNode(Node childNode, JActivity act) {
+        // Kindknoten eines activity-Knotens: name, short-name, start-date, end-date, property, #text, activity*, dependency*
+
+        short nodeType = childNode.getNodeType();
+        String nodeName = childNode.getNodeName();
 
         switch (nodeType) {
         case Node.ELEMENT_NODE:
-            //...
-            System.out.println("Element found: " + document.getNodeName() + " = " + document.getNodeValue());
-            if (nodeName == "project") {
-                processProjectNode(document);
-                lastNameNode = "project";
-            } else if (nodeName == "name") {
-                nameNodeFound = true;
-            } else if (nodeName == "property") {
-                //processPropertyNode(document);
+            // Elemente des instance-Knotens: name, short-name, start-date, end-date, activity*
+            //System.out.println("ActivityElement found: " + childNode.getNodeName() + " = " + childNode.getNodeValue());
+
+            actNameNodeFound = false;
+            if ((nodeName.equalsIgnoreCase("name")) || (nodeName.equalsIgnoreCase("short-name"))) {
+                actNameNodeFound = true; // muss true sein, damit ein übergebener Text als name identifiziert werden kann
+                actLastNameNode = nodeName;
+                if (childNode.hasChildNodes()) {
+                    processActivityChildNode(childNode.getFirstChild(), act);
+                }
+            } else if (nodeName.endsWith("-date")) {
+                processActDateNode(childNode, act);
+            } else if (nodeName.equalsIgnoreCase("property")) {
+                processActivityPropertyNode(childNode, act);
+            } else if (nodeName.equalsIgnoreCase("dependency")) {
+                processDependencyNode(childNode, act);
+            } else if (nodeName.equalsIgnoreCase("activity")) {
+                processActivityNode(childNode, act.activities);
+                //System.out.println("Instanz gefunden");
+            } else {
+                System.out.println("Unbekanntes Element innerhalb eines activity-Knotens der XML-Datei: " + nodeName + " = " + childNode.getNodeValue());
             }
             break;
+
         case Node.TEXT_NODE:
-            //...
-            String nodeValue = document.getNodeValue();
+            // Text des instance-Knotens: Inhalt von name
+            String nodeValue = childNode.getNodeValue();
 
-            if (nodeValue.charAt(0) != 10) { // no carriage return and tabs
-                System.out.println("Text found: " + nodeName + " = " + document.getNodeValue());
+            // das erste Zeichen des nodeValue-Strings wird auf das Zeichen #10 (Ascii-Code 10) untersucht
+            // nicht gerade schön, Verbesserungsvorschläge erwünscht
+            if ((nodeValue.charAt(0) != 10) && (nodeValue.charAt(0) != 13)) { // no carriage return and tabs
+                //System.out.println("   Text found: " + nodeName + " = " + nodeValue);
 
-                if (nameNodeFound) {
-                    if (lastNameNode == "project") {
-                        project.setName(document.getNodeValue());
-                    } //else if (lastNameNode == "instance") { ...
-                    nameNodeFound = false;
+                if (actNameNodeFound) {
+
+                    if (actLastNameNode.equalsIgnoreCase("name")) {
+                        act.setName(childNode.getNodeValue());
+                    } else if (actLastNameNode.equalsIgnoreCase("short-name")) {
+                        act.setShortName(childNode.getNodeValue());
+                    }
+                    actNameNodeFound = false;
+                } else { // kein name-Knoten vor diesem Text gefunden
+                    System.out.println("Unbekannter Text gefunden: " + nodeName + " = " + nodeValue);
                 }
-
-                /*for (int i=0; i<nodeValue.length(); i++) {
-                    System.out.print(Integer.toHexString(nodeValue.charAt(i)));
-                }
-                System.out.print("  len: ");
-                System.out.println(nodeValue.length());*/
+                actNameNodeFound = false;
             }
+            break;
 
-            break;
-        case Node.ATTRIBUTE_NODE:
-            //...
-            System.out.println("Attribute found: " + document.getNodeName() + " = " + document.getNodeValue());
-            break;
         default:
-            //...
-            System.out.println("Other found: " + document.getNodeName() + " = " + document.getNodeValue());
+            // Unbekannter Knoten im instance-Knoten
+            System.out.println("Unbekannter Knoten in instance-Knoten gefunden: " + nodeName + " = " + childNode.getNodeValue());
             break;
         }
 
-        if (document.hasAttributes()) {
-            NamedNodeMap nodeMap = document.getAttributes();
-            for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
-                System.out.println("    Child found: " + nodeMap.item(nodeIdx).getNodeName() + " = " + nodeMap.item(nodeIdx).getNodeValue());
+    }
+
+    private void processActivityNode(Node actNode, ArrayList activities) {
+        // Parameter: actNode:    der activity-Knoten des XML-Dokuments
+        //            activities: die ArrayList, in welche diese activity eingefügt werden soll
+
+        JActivity act = new JActivity();
+
+        if (actNode.hasAttributes()) {
+            if (actNode.getAttributes().item(0).getNodeName().equalsIgnoreCase("id")) {
+                String idStr = actNode.getAttributes().item(0).getNodeValue();
+                act.id = Integer.parseInt(idStr.substring(1));
+                // das erste Zeichen des id-Strings wird ignoriert (id="A3" => id=3)
             }
         }
 
-        if (document.hasChildNodes()) {
-            NodeList nodeList = document.getChildNodes();
+        if (actNode.hasChildNodes()) {
+        // childNodes des actNode: name, short-name, start-date, end-date, #text, activity*
+
+            NodeList nodeList = actNode.getChildNodes();
             for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
-                processNode(nodeList.item(nodeIdx));
+
+                processActivityChildNode(nodeList.item(nodeIdx), act);
+
             }
         }
 
-    } // end of processNode
+        activities.add(act);
+    }
 
+    private void processInstDateNode(Node dateNode, JInstance destInst) {
 
-    // ----------------------------------------------------------------------
+        int dateInt = -1;
+        int monthInt = -1;
+        int yearInt = -1;
 
+        String nodeName = dateNode.getNodeName();
+        //System.out.println("       Date-Node found '" + nodeName + "'");
+
+        if (dateNode.hasAttributes()) {
+
+            NamedNodeMap nodeMap = dateNode.getAttributes();
+            for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
+                String itemName = nodeMap.item(nodeIdx).getNodeName();
+                String itemValue = nodeMap.item(nodeIdx).getNodeValue();
+                //System.out.println("    DateAttrib found: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
+                if (itemName.equalsIgnoreCase("date")) {
+                    dateInt = Integer.parseInt(itemValue);
+                } else if (itemName.equalsIgnoreCase("month")) {
+                    monthInt = Integer.parseInt(itemValue);
+                } else if (itemName.equalsIgnoreCase("year")) {
+                    yearInt = Integer.parseInt(itemValue);
+                }
+            }
+
+            if ((dateInt >= 0) && (monthInt >= 0) && (yearInt >= 0)) {
+
+                Calendar c = Calendar.getInstance();
+                c.set(yearInt, monthInt, dateInt);
+
+                if (nodeName.equalsIgnoreCase("creation-date")) {
+                    destInst.setCreationDate(c);
+                } else if (nodeName.equalsIgnoreCase("start-date")) {
+                    destInst.setStartDate(c);
+                } else if (nodeName.equalsIgnoreCase("end-date")) {
+                    destInst.setEndDate(c);
+                } else {
+                    System.out.println("Unbekannter Datumsknoten in instance: " + nodeName);
+                }
+
+            } else { // eines oder mehrere der attribute date, month und year wurden nicht gefunden
+                System.out.println("Der Datumsknoten '" + nodeName + "' besitzt nicht genügend Attribute für ein korrektes Datum!");
+            }
+        } else {
+            System.out.println("Der Datumsknoten '" + nodeName + "' besitzt keine Attribute!");
+        }
+    }
+
+    private void processInstanceChildNode(Node childNode, JInstance destInst) {
+        // Kindknoten des instance-Knoten: name, creation-date, start-date, end-date, #text, activity*
+
+        short nodeType = childNode.getNodeType();
+        String nodeName = childNode.getNodeName();
+        //System.out.println("instChild: " + nodeName + " = " + childNode.getNodeValue());
+
+        switch (nodeType) {
+        case Node.ELEMENT_NODE:
+            // Elemente des instance-Knotens: name, creation-date, start-date, end-date, activity*
+            //System.out.println("InstanceElement found: " + childNode.getNodeName() + " = " + childNode.getNodeValue());
+
+            instNameNodeFound = false;
+            if (nodeName.equalsIgnoreCase("name")) {
+                instNameNodeFound = true; // muss true sein, damit ein übergebener Text als name identifiziert werden kann
+                if (childNode.hasChildNodes()) {
+                    processInstanceChildNode(childNode.getFirstChild(), destInst);
+                }
+            } else if (nodeName.endsWith("-date")) {
+                processInstDateNode(childNode, destInst);
+            } else if (nodeName.equalsIgnoreCase("activity")) {
+                processActivityNode(childNode, destInst.activities);
+                //System.out.println("Instanz gefunden");
+            } else {
+                System.out.println("Unbekanntes Element innerhalb eines instance-Knotens der XML-Datei: " + nodeName + " = " + childNode.getNodeValue());
+            }
+            break;
+
+        case Node.TEXT_NODE:
+            // Text des instance-Knotens: Inhalt von name
+            String nodeValue = childNode.getNodeValue();
+
+            // das erste Zeichen des nodeValue-Strings wird auf das Zeichen #10 (Ascii-Code 10) untersucht
+            // nicht gerade schön, Verbesserungsvorschläge erwünscht
+            if ((nodeValue.charAt(0) != 10) && (nodeValue.charAt(0) != 13)) { // no carriage return and tabs
+                //System.out.println("   Text found: " + nodeName + " = " + nodeValue);
+
+                if (instNameNodeFound) {
+                    destInst.setName(nodeValue);
+                    instNameNodeFound = false;
+                } else { // kein name-Knoten vor diesem Text gefunden
+                    System.out.println("Unbekannter Text gefunden: " + nodeName + " = " + nodeValue);
+                }
+                instNameNodeFound = false;
+            }
+            break;
+
+        default:
+            // Unbekannter Knoten im instance-Knoten
+            System.out.println("Unbekannter Knoten in instance-Knoten gefunden: " + nodeName + " = " + childNode.getNodeValue());
+            break;
+        }
+    }
+
+    private void processInstanceNode(Node instNode) {
+
+        JInstance inst = project.newEmptyInstance();
+
+        if (instNode.hasChildNodes()) {
+            // childNodes des instNode: name, creation-date, start-date, end-date, #text, activity*
+
+            NodeList nodeList = instNode.getChildNodes();
+            for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
+
+                processInstanceChildNode(nodeList.item(nodeIdx), inst);
+//                System.out.println("Instanz gefunden: " + instNode.getNodeName());
+
+            }
+        }
+
+    }
 
     private void processProjectPropertyNode(Node propertyNode) {
         // durchsucht die Attribute eines property-Knoten innerhalb des project-Knotens
@@ -164,7 +533,7 @@ public class JManager {
             for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
 
                 String itemName = nodeMap.item(nodeIdx).getNodeName();
-                System.out.println("    propertyChild found: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
+                //System.out.println("    propertyChild found: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
 
                 if (itemName == "name") {
                     // gibt den Namen der Eigenschaft an, deren Wert im nächsten value-Attribut übergeben wird
@@ -210,20 +579,24 @@ public class JManager {
 
         short nodeType = childNode.getNodeType();
         String nodeName = childNode.getNodeName();
+        //System.out.println("ProjChild: " + nodeName + " = " + childNode.getNodeValue());
 
         switch (nodeType) {
         case Node.ELEMENT_NODE:
             // Elemente des project-Knotens: name, property, instance
-            System.out.println("Element found: " + childNode.getNodeName() + " = " + childNode.getNodeValue());
+            //System.out.println("Element found: " + childNode.getNodeName() + " = " + childNode.getNodeValue());
 
-            nameNodeFound = false;
+            projectNameNodeFound = false;
             if (nodeName == "name") {
-                nameNodeFound = true; // muss true sein, damit ein übergebener Text als name identifiziert werden kann
+                projectNameNodeFound = true; // muss true sein, damit ein übergebener Text als name identifiziert werden kann
+                if (childNode.hasChildNodes()) {
+                    processProjectChildNode(childNode.getFirstChild());
+                }
             } else if (nodeName == "property") {
                 processProjectPropertyNode(childNode);
             } else if (nodeName == "instance") {
-                //processInstanceNode(childNode);
-                System.out.println("Instanz gefunden");
+                processInstanceNode(childNode);
+                //System.out.println("Instanz gefunden");
             } else {
                 System.out.println("Unbekanntes Element innerhalb des project-Knotens der XML-Datei: " + nodeName + " = " + childNode.getNodeValue());
             }
@@ -235,16 +608,16 @@ public class JManager {
 
             // das erste Zeichen des nodeValue-Strings wird auf das Zeichen #10 (Ascii-Code 10) untersucht
             // nicht gerade schön, Verbesserungsvorschläge erwünscht
-            if (nodeValue.charAt(0) != 10) { // no carriage return and tabs
-                System.out.println("   Text found: " + nodeName + " = " + nodeValue);
+            if ((nodeValue.charAt(0) != 10) && (nodeValue.charAt(0) != 13)) { // no carriage return and tabs
+                //System.out.println("   Text found: " + nodeName + " = " + nodeValue);
 
-                if (nameNodeFound) {
-                    project.setName(childNode.getNodeValue());
-                    nameNodeFound = false;
+                if (projectNameNodeFound) {
+                    project.setName(nodeValue);
+                    projectNameNodeFound = false;
                 } else { // kein name-Knoten vor diesem Text gefunden
                     System.out.println("Unbekannter Text gefunden: " + nodeName + " = " + nodeValue);
                 }
-                nameNodeFound = false;
+                projectNameNodeFound = false;
             }
             break;
 
@@ -259,23 +632,6 @@ public class JManager {
             break;
         }
 
-/*        if (childNode.hasAttributes()) {
-            NamedNodeMap nodeMap = childNode.getAttributes();
-            for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
-
-                String itemName = nodeMap.item(nodeIdx).getNodeName();
-                System.out.println("    projectChild found: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
-
-                if (itemName == "name") {
-
-                    project.setName(nodeMap.item(nodeIdx).getNodeValue());
-                } else if (itemName == "version") {
-                    project.setVersion(nodeMap.item(nodeIdx).getNodeValue());
-                }
-
-            }
-        }  */
-
     }
 
     private void processProjectNode(Node projectNode) {
@@ -288,7 +644,7 @@ public class JManager {
             for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
 
                 String itemName = nodeMap.item(nodeIdx).getNodeName();
-                System.out.println("    projectChild found: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
+                //System.out.println("    projectChild found: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
 
                 if (itemName == "vendor-id") {
                     project.setAuthor(nodeMap.item(nodeIdx).getNodeValue());
@@ -326,11 +682,11 @@ public class JManager {
         if (nodeType == Node.ELEMENT_NODE) {
 
             if (nodeName == "project") {
-                System.out.println("  projectNode found: " + nodeName + " = " + docChild.getNodeValue());
+                //System.out.println("  projectNode found: " + nodeName + " = " + docChild.getNodeValue());
 
                 if (!projectNodeFound) {
                     projectNodeFound = true;
-                    lastNameNode = "project";
+                    //lastNameNode = "project";
                     processProjectNode(docChild);
                 } else {
                     System.out.println("In der XML-Datei wurden mehrere project-Knoten gefunden!");
@@ -387,6 +743,54 @@ public class JManager {
 
     }
 
+    private String getColorInXML(int color) {
+        String s = Integer.toHexString(color);
+        while (s.length() < 6) {
+            s = "0" + s;
+        }
+        return getColorStr("#"+ s);
+    }
+
+    private void writeDependency(PrintWriter pWriter, JDependency dep, String tabs) {
+        pWriter.println(tabs + "<dependency type=\"" + dep.getDependencyTypeStr() + "\" activity-id=\"A" + dep.getToActivityId() + "\">");
+        pWriter.println(tabs + "\t<property name=\"color\" value=\"" + getColorInXML(dep.getColor()) + "\" />");
+        pWriter.println(tabs + "\t<property name=\"line\" value=\"" + dep.getLine() + "\" />");
+        pWriter.println(tabs + "</dependency>");
+    }
+
+    private void writeActivity(PrintWriter pWriter, JActivity act, String tabs) {
+        pWriter.println(tabs + "<activity id=\"A" + act.getId() + "\">");
+        pWriter.println(tabs + "\t<name>" + act.getName() + "</name>");
+        pWriter.println(tabs + "\t<short-name>" + act.getShortName() + "</short-name>");
+        pWriter.println(tabs + "\t<start-date date=\"" + act.getStartDate().get(Calendar.DATE) + "\" month=\"" + act.getStartDate().get(Calendar.MONTH) + "\" year=\"" + act.getStartDate().get(Calendar.YEAR) + "\" />");
+        pWriter.println(tabs + "\t<end-date date=\"" + act.getEndDate().get(Calendar.DATE) + "\" month=\"" + act.getEndDate().get(Calendar.MONTH) + "\" year=\"" + act.getEndDate().get(Calendar.YEAR) + "\" />");
+        pWriter.println(tabs + "\t<property name=\"color\" value=\"" + getColorInXML(act.getColor()) + "\" />");
+
+        for (int i = 0; i < act.dependencies.size(); i++) {
+            writeDependency(pWriter, (JDependency)act.dependencies.get(i), tabs + "\t");
+        }
+
+        for (int i = 0; i < act.activities.size(); i++) {
+            writeActivity(pWriter, (JActivity)act.activities.get(i), tabs + "\t");
+        }
+
+        pWriter.println(tabs + "</activity>");
+    }
+
+    private void writeInstance(PrintWriter pWriter, JInstance inst) {
+        pWriter.println("\t<instance>");
+        pWriter.println("\t\t<name>" + inst.getName() + "</name>");
+        pWriter.println("\t\t<creation-date date=\"" + inst.getCreationDate().get(Calendar.DATE) + "\" month=\"" + inst.getCreationDate().get(Calendar.MONTH) + "\" year=\"" + inst.getCreationDate().get(Calendar.YEAR) + "\" />");
+        pWriter.println("\t\t<start-date date=\"" + inst.getStartDate().get(Calendar.DATE) + "\" month=\"" + inst.getStartDate().get(Calendar.MONTH) + "\" year=\"" + inst.getStartDate().get(Calendar.YEAR) + "\" />");
+        pWriter.println("\t\t<end-date date=\"" + inst.getEndDate().get(Calendar.DATE) + "\" month=\"" + inst.getEndDate().get(Calendar.MONTH) + "\" year=\"" + inst.getEndDate().get(Calendar.YEAR) + "\" />");
+
+        for (int i = 0; i < inst.activities.size(); i++) {
+            writeActivity(pWriter, (JActivity)inst.activities.get(i), "\t\t");
+        }
+
+        pWriter.println("\t</instance>");
+    }
+
     public void saveProject(String fileName) {
         // saves project in xml-file
 
@@ -395,12 +799,29 @@ public class JManager {
             File fileOut = new File(fileName);
             FileWriter fWriter = new FileWriter(fileOut);
             PrintWriter pWriter = new PrintWriter(new BufferedWriter(fWriter));
-            //pWriter.println("Protokoll von heute");
-            //pWriter.println("\tTest");
+
+            pWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            pWriter.println("<!DOCTYPE project SYSTEM \"gtdmanager.dtd\">");
+            pWriter.println("<project vendor-id=\"" + project.getAuthor() + "\" version=\"" + project.getVersion() + "\">");
+
+            pWriter.println("\t<name>" + project.getName() + "</name>");
+            pWriter.println("");
+            pWriter.println("\t<property name=\"size-x\" value=\"" + getSizeX() + "\" />");
+            pWriter.println("\t<property name=\"size-y\" value=\"" + getSizeY() + "\" />");
+            pWriter.println("\t<property name=\"unit\" value=\"" + getUnit() + "\" />");
+            pWriter.println("\t<property name=\"font-size\" value=\"" + getFontSize() + "\" />");
+            pWriter.println("");
+
+            for (int i = 0; i < project.instances.size(); i++) {
+                writeInstance(pWriter, (JInstance)project.instances.get(i));
+            }
+
+            pWriter.println("</project>");
+
             pWriter.close();
 
         } catch (IOException e) {
-            //System.out.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
 
     }
