@@ -260,12 +260,20 @@ public class DiagramView extends JComponent
             
 
             tdriftPaintGrid(g);
-            tdriftPaintInitialActivities(g, initialInstance.getActivities());
+            //tdriftPaintInitialActivities(g, initialInstance.getActivities());
+            tdriftPaintVertActivities(g, initialInstance.getActivities());
+            tdriftPaintHorizActivities(g, currentInstance.getActivities());
             //tdriftPaintCurrentActivities(g, currentInstance.getActivities());
             tdriftPaintActivities(g);
         }
     }
     /* JComponent Overloading }}} */
+
+
+
+
+
+
 
     // TERMINDRIFT
     /* Termindrift Paint {{{ */
@@ -363,124 +371,181 @@ public class DiagramView extends JComponent
     }
     /* tdriftPaintGrid }}} */
 
-    /* tdriftPaintInitialActivities {{{ */
-    private void tdriftPaintInitialActivities(Graphics2D g, ArrayList a) {
-        ListIterator i = a.listIterator();
-        while (i.hasNext()) tdriftPaintInitialActivity(g, (JActivity)i.next());
+    private void tdriftPaintHorizActivities(Graphics2D g, ArrayList aLi) //{{{
+    {
+        ListIterator aLiIt = aLi.listIterator();
+        while (aLiIt.hasNext())
+        {
+            //tdriftPaintInitialActivity(g, (JActivity)aLiIt.next());
+            JActivity a = (JActivity)aLiIt.next();
+        
+            int end = daysOfMillis(a.getEndDate().getTimeInMillis());
+           
+            if (end < startDate) return;
+
+            // horizontal
+            // calculate geometry for activity
+            Point p = new Point(
+                gridRect.x + (end - startDate) * gridStep.x,
+                gridRect.y - ascent
+            );
+
+            // draw name
+            g.setColor(Color.black);
+            g.drawString(a.getShortName(), p.x - 2 , p.y - 2);
+            // draw offset
+            g.setColor(Color.gray);
+            g.drawLine(p.x, p.y, p.x, gridRect.y);
+
+            // NOTE: we don't go deeper than one level
+        }
     }
-    /* tdriftPaintInitialActivities }}} */
+    //}}}
 
-    /* tdriftPaintInitialActivitiy {{{ */
-    private void tdriftPaintInitialActivity(Graphics2D g, JActivity a) {
-        int end = daysOfMillis(a.getEndDate().getTimeInMillis());
-       
-        if (end < startDate) return;
+    private void tdriftPaintVertActivities(Graphics2D g, ArrayList aLi) //{{{
+    {
+        ListIterator aLiIt = aLi.listIterator();
+        while (aLiIt.hasNext())
+        {
+            //tdriftPaintInitialActivity(g, (JActivity)aLiIt.next());
+            JActivity a = (JActivity)aLiIt.next();
+            
+            int end = daysOfMillis(a.getEndDate().getTimeInMillis());
+           
+            if (end < startDate) return;
 
-        // horizontal
-        // calculate geometry for activity
-        Point p = new Point(
-            gridRect.x + (end - startDate) * gridStep.x,
-            gridRect.y - ascent
-        );
+            // vertical
+            // calculate geometry for activity
+            Point p = new Point(
+                gridRect.x - a.getShortName().length() * advance / 3,
+                gridRect.y + (end - startDate) * gridStep.y
+            );
 
-        // draw name
-        g.setColor(Color.black);
-        g.drawString(a.getShortName(), p.x - 2 , p.y - 2);
-        // draw offset
-        g.setColor(Color.gray);
-        g.drawLine(p.x, p.y, p.x, gridRect.y);
+            // draw name
+            g.setColor(Color.black);
+            g.drawString(a.getShortName(), p.x - 2, p.y - 2);
+            // draw offset
+            g.setColor(Color.gray);
+            g.drawLine(p.x, p.y, gridRect.x, p.y);
 
-        // vertical
-        // calculate geometry for activity
-        p = new Point(
-            gridRect.x - a.getShortName().length() * advance / 3,
-            gridRect.y + (end - startDate) * gridStep.y
-        );
-
-        // draw name
-        g.setColor(Color.black);
-        g.drawString(a.getShortName(), p.x - 2, p.y - 2);
-        // draw offset
-        g.setColor(Color.gray);
-        g.drawLine(p.x, p.y, gridRect.x, p.y);
-
-        // NOTE: we don't go deeper than one level
+            // NOTE: we don't go deeper than one level
+        }
     }
-    /* tdriftPaintInitialActivitiy }}} */
+    //}}}
+
+
+    private int cal2day(Calendar cal)
+    {
+        return daysOfMillis(cal.getTimeInMillis());
+    }
+
 
     private void tdriftPaintActivities(Graphics2D g) //{{{
     {
+        // get interator over all current activities
+        ListIterator aIt = currentInstance.getActivities().listIterator();
+
+        while (aIt.hasNext())
         {
-            //
-            int x, y, x0, y0;
+            int aid = ((JActivity)aIt.next()).getId();
+            //JActivity a = (JActivity)aIt.next();
 
-            ListIterator ai = initialInstance.getActivities().listIterator();
-            while (ai.hasNext())
+
+            g.setColor(new Color(0xFF << 8 * (aid % 4)));
+
+            int x0 = 0, y0 = 0, x, y;
+            int iCrtDay, aEndDay = 0;
+
+            String shortName = null;
+            int shortNameX = 0, shortNameY = 0;
+
+            // get iterator over all instances
+            ListIterator iIt = project.getInstances().listIterator();
+            while (iIt.hasNext())
             {
-                JActivity a = (JActivity)ai.next();
-                JActivity na = ai.hasNext() ? (JActivity)initialInstance
-                        .getActivities().get(ai.nextIndex()) : null;
+                JInstance i = (JInstance)iIt.next();
+                JActivity a = i.getActivity(aid);
+                iCrtDay = cal2day(i.getCreationDate());
+                aEndDay = cal2day(a.getEndDate());
 
-                x0 = gridRect.x;
-                y0 = gridRect.y
-                    + (daysOfMillis(a.getEndDate().getTimeInMillis())
-                            - startDate) * gridStep.y;
-                ListIterator ii = project.getInstances().listIterator();
-                while (ii.hasNext())
+                // initialize first point, if not already done
+                if (x0 + y0 == 0)
                 {
-                    JInstance i = (JInstance)ii.next();
-                    JActivity ia = i.getActivity(a.getId());
-                    JActivity ina = na != null ?
-                        i.getActivity(na.getId()) : null;
-
-                    //int s = daysOfMillis(ia.getStartDate().getTimeInMillis());
-                    int e = daysOfMillis(ia.getEndDate().getTimeInMillis());
-                    int ne = na != null ?
-                        daysOfMillis(ia.getEndDate().getTimeInMillis()) :
-                        today;
-
-                    x = gridRect.x + (ne - startDate) * gridStep.x;
-                    y = gridRect.y + (e - startDate) * gridStep.y;
-
-                    System.out.println(""
-                        + a.getShortName()
-                        + "[" + a.getId() + "]"
-                        + "\ts " + (e - startDate)
-//                        + "\te " + (e - startDate)
-                        + "\t"
-                        + "\t"  + x0 + "x" + y0
-                        + " -> "  + x + "x" + y
-                    );
-
-                    g.setColor(new Color(0xff0000 / (a.getId() + 1 + i.getId())));
-                    g.drawLine(x0, y0, x, y0);
-
-                    x0 = x;
-                    y0 = y;
+                    x0 = gridRect.x;
+                    y0 = gridRect.y + (aEndDay - startDate) * gridStep.y;
                 }
+
+                // initialize second point
+                x = gridRect.x + (iCrtDay - startDate) * gridStep.x;
+                y = y0;
+
+                // draw horizontal line
+                if (x > gridRect.x)
+                    g.drawLine( Math.max(x0, gridRect.x),
+                                Math.max(y0, gridRect.y),
+                                Math.max(x, gridRect.x),
+                                Math.max(y, gridRect.y) );
+
+                x0 = x;
+                // y0 = y;
+
+                // x = x0;
+                y = gridRect.y + (aEndDay - startDate) * gridStep.y;
+                
+                // draw vertical line
+                if (x > gridRect.x)
+                    g.drawLine( Math.max(x0, gridRect.x),
+                                Math.max(y0, gridRect.y),
+                                Math.max(x, gridRect.x),
+                                Math.max(y, gridRect.y) );
+
+                // set first point for next line
+                // x0 = x;
+                y0 = y;
+
+                // get potential shortName offset
+                if (x <= gridRect.x || shortNameX + shortNameY == 0)
+                {
+                    shortName = a.getShortName();
+                    shortNameX = gridRect.x
+                        - g.getFontMetrics().stringWidth(shortName) - 1;
+                    shortNameY = y0 - 2;
+                }
+
             }
-        }
 
-        /*
-        ListIterator ii = project.getInstances().listIterator();
-        while (ii.hasNext())
-        {
-            JInstance i = (JInstance)ii.next();
-            JInstance ni = ii.hasNext() ?
-                (JInstance)project.getInstances().get(ii.nextIndex()) : null;
+            // the + 1 ensures, that the line is drawn if today or endDay
+            // is the left-most day in the diagram
+            x = gridRect.x
+                + (Math.min(today, aEndDay) - startDate) * gridStep.x + 1;
+            y = y0;
 
-
-            ListIterator ai = i.getActivities().listIterator();
-            while (ai.hasNext())
+            if (x > gridRect.x)
             {
-                JActivity a = (JActivity)ai.next();
-                JActivity na = ai.hasNext() ?
-                    (JActivity)i.getActivities().get(ai.nextIndex()) : null;
-                tdriftPaintActivity(g, i, ni, a, na);
+                // draw final horizontal line
+                g.drawLine( Math.max(x0, gridRect.x),
+                            Math.max(y0, gridRect.y),
+                            Math.max(x, gridRect.x),
+                            Math.max(y, gridRect.y) );
+
+                // draw shortName (if any)
+                if (shortName != null)
+                    g.drawString(shortName, shortNameX, shortNameY);
+
+                // draw "extra" line, to the shortName
+                g.drawLine(shortNameX, shortNameY + 2,
+                        shortNameX
+                            + g.getFontMetrics().stringWidth(shortName),
+                        shortNameY + 2);
             }
-        }*/
+
+        }
     }
     //}}}
+
+
+
+
     private void tdriftPaintActivity(Graphics2D g,
             JInstance i, JInstance ni,
             JActivity a, JActivity na)
@@ -594,6 +659,14 @@ public class DiagramView extends JComponent
     }
     /* tdriftPaintCurrentActivitiy }}} */
     /* Termindrift Paint }}} */
+
+
+
+
+
+
+
+
 
     // GANTT
     /* Gantt Paint Routines {{{ */

@@ -845,9 +845,9 @@ public class JManager {
 
 	i	= getProject().getInstance(getProject().newInstance(
 		"Instanz1",
-		new GregorianCalendar(2005, 6, 1),
-		new GregorianCalendar(2005, 6, 1),
-		new GregorianCalendar(2005, 6, 30), true));
+		new GregorianCalendar(2005, 6, 1),		// create
+		new GregorianCalendar(2005, 6, 1),		// start
+		new GregorianCalendar(2005, 6, 30), true));	// end
 
         a1	= i.getActivity(i.newActivity(i.activities,
 		"Aktivi1", "Akt1",
@@ -877,12 +877,13 @@ public class JManager {
 
 	i	= getProject().getInstance(getProject().newInstance(
 		"Instanz3",
-		new GregorianCalendar(2005, 6, 18),
+		new GregorianCalendar(2005, 6, 8),
 		new GregorianCalendar(2005, 6, 2),
 		new GregorianCalendar(2005, 6, 34), true));
 
-       	i.getActivity(a1.getId()).setEndDate(
-		new GregorianCalendar(2005, 6, 18));
+       	i.getActivity(a1.getId()).setEndDate(new GregorianCalendar(2005,6,18));
+       i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005,6,12));
+       	i.getActivity(a2.getId()).setEndDate(new GregorianCalendar(2005,6,24));
 
 	//i.newActivity(i.activities,
 	//	"Aktivi1", "Akt1",
