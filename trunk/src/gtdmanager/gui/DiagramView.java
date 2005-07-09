@@ -27,7 +27,10 @@ import org.freehep.graphics2d.VectorGraphics;
  * @version 1.0
  * {{{ DiagramView */
 public class DiagramView extends JComponent
-        implements View, MouseListener, MouseMotionListener {
+    implements View, MouseListener, MouseMotionListener,
+               MouseWheelListener
+                   
+{
 
     /* Variables {{{ */
 
@@ -53,7 +56,9 @@ public class DiagramView extends JComponent
     // reset every paint (days)
     private int instanceStartDate, instanceEndDate;
 
-    private int showDays = 60;
+    private int showDays = 48;
+    private int minShowDays = 2;    // sollte nicht < 2 sein
+    private int maxShowDays = 360;
 
     private Calendar gridStart = null;
 
@@ -104,6 +109,7 @@ public class DiagramView extends JComponent
         super();
         addMouseListener(this);
         addMouseMotionListener(this);
+        addMouseWheelListener(this);
     }
     /* Constructors }}} */
 
@@ -141,7 +147,7 @@ public class DiagramView extends JComponent
     }
     //}}}
     
-    /* MouseListener/MouseMotionListener Implementation {{{ */
+    // MouseListener/MouseMotionListener/MouseWheelListener Implementation {{{
     public void mouseMoved (MouseEvent e) {
         mouseLastX = e.getX();
         mouseLastY = e.getY();
@@ -182,7 +188,20 @@ public class DiagramView extends JComponent
 
     public void mouseClicked (MouseEvent e) {
     }
-    /* MouseListener/MouseMotionListener Implementation }}} */
+
+
+    public void mouseWheelMoved (MouseWheelEvent e) {
+        showDays += e.getWheelRotation();
+        if (showDays < minShowDays) showDays = minShowDays;
+        if (showDays > maxShowDays) showDays = maxShowDays;
+
+        message = "Er werden nun etwa "
+            + showDays + " Tage im Diagramm gezeigt.";
+
+        repaint();
+    }
+    
+    //}}}
 
     /* View Implementation {{{ */
     public void update(JProject project) {
@@ -221,6 +240,10 @@ public class DiagramView extends JComponent
         today = cal2day(Calendar.getInstance());
         instanceStartDate = cal2day(currentInstance.getStartDate());
         instanceEndDate = cal2day(currentInstance.getEndDate());
+
+        // update date frame
+        endDate = startDate + showDays;
+
 
         // clear all geometries
         actRects.clear();
@@ -489,7 +512,18 @@ public class DiagramView extends JComponent
         );
 
         // set minimal width to ensure readability
-        if (gridStep.x < advance/2) gridStep.x = advance/2;
+        if (gridStep.x < advance/2)
+        {
+            gridStep.x = advance/2;
+            showDays = gridRect.width / gridStep.x;
+        }
+
+        System.out.println("Drawing "
+                + (gridRect.width / gridStep.x)
+                + " of "
+                + (endDate - startDate)
+                + " days");
+
         // draw message (outside the clipping area)
         g.setColor(Color.gray);
         g.drawString(message, gridRect.x + padding, gridRect.y
