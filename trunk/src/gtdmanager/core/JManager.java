@@ -837,7 +837,7 @@ public class JManager {
     }
 
     public void generateSampleProject() {
-
+/*
         newProject("Testprojekt", "1.0.0.0");
 
 	JInstance i;
@@ -884,7 +884,7 @@ public class JManager {
        	i.getActivity(a1.getId()).setEndDate(new GregorianCalendar(2005,6,18));
        i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005,6,12));
        	i.getActivity(a2.getId()).setEndDate(new GregorianCalendar(2005,6,24));
-
+*/
 	//i.newActivity(i.activities,
 	//	"Aktivi1", "Akt1",
 	//	new GregorianCalendar(2005, 6, 2),
@@ -893,8 +893,8 @@ public class JManager {
      //i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005, 5, 17));
      //i.getActivity(a2.getId()).setEndDate(new GregorianCalendar(2005, 5, 21));
 
-	//newProject();
-	//loadProject("test.xml");
+	newProject();
+	loadProject("test.xml");
     }
 
     private void jbInit() throws Exception {

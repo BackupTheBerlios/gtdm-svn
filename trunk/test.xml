@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project SYSTEM "gtdmanager.dtd">
+<project vendor-id="Tutor" version="1.0">
+	<name>Example Project</name>
+
+	<property name="size-x" value="10" />
+	<property name="size-y" value="10" />
+	<property name="unit" value="cm" />
+	<property name="font-size" value="10" />
+
+	<instance>
+		<name>First Planing</name>
+		<creation-date date="14" month="2" year="2005" />
+		<start-date date="14" month="2" year="2005" />
+		<end-date date="16" month="2" year="2005" />
+		<activity id="A0">
+			<name>Teach Students about SoPra DTD</name>
+			<short-name>Teach</short-name>
+			<start-date date="14" month="2" year="2005" />
+			<end-date date="16" month="2" year="2005" />
+			<activity id="A1">
+				<name>Learn about DTDs</name>
+				<short-name>Learn</short-name>
+				<start-date date="14" month="2" year="2005" />
+				<end-date date="14" month="2" year="2005" />
+				<property name="color" value="blue" />
+			</activity>
+			<activity id="A2">
+				<name>Implement DTD</name>
+				<short-name>Impl</short-name>
+				<start-date date="14" month="2" year="2005" />
+				<end-date date="14" month="2" year="2005" />
+				<property name="color" value="red" />
+				<dependency type="begin-end" activity-id="A1">
+					<property name="color" value="black" />
+					<property name="line" value="dotted" />
+				</dependency>
+			</activity>
+		</activity>
+	</instance>
+	<instance>
+		<name>Second Planing</name>
+		<creation-date date="15" month="2" year="2005" />
+		<start-date date="14" month="2" year="2005" />
+		<end-date date="17" month="2" year="2005" />
+		<activity id="A0">
+			<name>Teach Students about SoPra DTD</name>
+			<short-name>Teach</short-name>
+			<start-date date="14" month="2" year="2005" />
+			<end-date date="17" month="2" year="2005" />
+			<activity id="A1">
+				<name>Learn about DTDs</name>
+				<short-name>Learn</short-name>
+				<start-date date="14" month="2" year="2005" />
+				<end-date date="14" month="2" year="2005" />
+				<property name="color" value="blue" />
+			</activity>
+			<activity id="A2">
+				<name>Implement DTD</name>
+				<short-name>Impl</short-name>
+				<start-date date="15" month="2" year="2005" />
+				<end-date date="16" month="2" year="2005" />
+				<dependency type="begin-end" activity-id="A1">
+					<property name="color" value="black" />
+					<property name="line" value="dotted" />
+				</dependency>
+			</activity>
+		</activity>
+	</instance>
+</project>

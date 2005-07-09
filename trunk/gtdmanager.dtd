@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Document Type Definition (DTD) for the Gantt-Termin-Drift Manager (gtdmanager).
+This file describes the format of the XML-Files in which project planing
+data is stored.
+
+An example for using this DTD follows:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project SYSTEM "gtdmanager.dtd">
+<project vendor-id="Tutor" version="1.0">
+	<name>Example Project</name>
+
+	<property name="size-x" value="10" />
+	<property name="size-y" value="10" />
+	<property name="unit" value="cm" />
+	<property name="font-size" value="10" />
+
+	<instance>
+		<name>First Planing</name>
+		<creation-date date="14" month="2" year="2005" />
+		<start-date date="14" month="2" year="2005" />
+		<end-date date="16" month="2" year="2005" />
+		<activity id="A0">
+			<name>Teach Students about SoPra DTD</name>
+			<short-name>Teach</short-name>
+			<start-date date="14" month="2" year="2005" />
+			<end-date date="16" month="2" year="2005" />
+			<activity id="A1">
+				<name>Learn about DTDs</name>
+				<short-name>Learn</short-name>
+				<start-date date="14" month="2" year="2005" />
+				<end-date date="14" month="2" year="2005" />
+				<property name="color" value="blue" />
+			</activity>
+			<activity id="A2">
+				<name>Implement DTD</name>
+				<short-name>Impl</short-name>
+				<start-date date="14" month="2" year="2005" />
+				<end-date date="14" month="2" year="2005" />
+				<property name="color" value="red" />
+				<dependency type="begin-end" activity-id="A1">
+					<property name="color" value="black" />
+					<property name="line" value="dotted" />
+				</dependency>
+			</activity>
+		</activity>
+	</instance>
+	<instance>
+		<name>Second Planing</name>
+		<creation-date date="15" month="2" year="2005" />
+		<start-date date="14" month="2" year="2005" />
+		<end-date date="16" month="2" year="2005" />
+		<activity id="A0">
+			<name>Teach Students about SoPra DTD</name>
+			<short-name>Teach</short-name>
+			<start-date date="14" month="2" year="2005" />
+			<end-date date="16" month="2" year="2005" />
+			<activity id="A1">
+				<name>Learn about DTDs</name>
+				<short-name>Learn</short-name>
+				<start-date date="14" month="2" year="2005" />
+				<end-date date="14" month="2" year="2005" />
+				<property name="color" value="blue" />
+			</activity>
+			<activity id="A2">
+				<name>Implement DTD</name>
+				<short-name>Impl</short-name>
+				<start-date date="15" month="2" year="2005" />
+				<end-date date="15" month="2" year="2005" />
+				<dependency type="begin-end" activity-id="A1">
+					<property name="color" value="black" />
+					<property name="line" value="dotted" />
+				</dependency>
+			</activity>
+		</activity>
+	</instance>
+</project>
+
+(c) Tilmann Hampp, Markus Knauss, Stefan Opferkuch - 2005
+This file is provided as is. Usage is for free, no guarantee is given.
+
+Version: 1.3
+Modifications:
+  2005-02-17; MK; Corrections of several errors in the DTD. Credits go
+    to Sebastion Boschert (Group 23) and Andreas Haufler (Group 20) for
+    finding errors and correction the DTD.
+  2005-02-18; MK; Extension of the DTD with properties and vendor
+    identification. The extension was motivated by Andreas Haufler
+    (Group 20).
+  2005-02-18; MK; Correction of one error, that were introduced by
+    the prior extension. Changing of the type of the id attribute
+    of the activity tag to by of type CDATA instead of ID. This is 
+    caused by the fact, that in each instance are the same ids for
+    activities. Credits to Andreas Haufler for finding these two bugs.
+  2005-03-23; MK; Moved start and end date of a project to an
+    instance since it doesn't make sense to have fixed start and end
+    dates for all instances of a project. This change was motivated
+    by Daniel Thoma (Group 10).
+-->
+
+<!--
+The root element for gtdmanager files. A project is defined
+by its name. The planing of a project
+is done in instances. Attributes for a project are the vendors
+id and the software version this file was written with.
+-->
+<!ELEMENT project (name, property*, instance+)>
+<!ATTLIST project
+	vendor-id CDATA #REQUIRED
+	version CDATA #REQUIRED>
+
+<!--
+An instance is a schedule for this project. For each instance
+a name and the creation-date when this instance was created is defined.
+Additionaly the absolute start and end date is assigned to an
+instnace to get the duration of the project.
+-->
+<!ELEMENT instance (name, creation-date, start-date, end-date, property*, activity+)>
+
+<!--
+An activity is a task or phase in a project. Each activity starts and
+ends at given dates. A name and short name describes the activity.
+Acitivities can depend on each other. An activity is identified by
+an unique id. Nested activities are possible, nesting means, that
+the enclosing activity spans all enclosed activity and can serve
+therefore as a container.
+-->
+<!ELEMENT activity (name, short-name, 
+		start-date, end-date, property*, dependency*, activity*)>
+<!ATTLIST activity
+	id CDATA #REQUIRED>
+
+<!--
+It is possible to define depencies between activities. Each dependency
+refers an activities id and has a type. The type of the dependency can 
+be one of begin-end, end-end, begin-begin, and end-begin. Type is read
+as follows <this activity>-<reference activity>. For instance with
+type begin-end: The referencing activity begins as soon as the 
+referenced activity ends.
+-->
+<!ELEMENT dependency (property*)>
+<!ATTLIST dependency
+	type (begin-begin | begin-end | end-begin | end-end) #REQUIRED
+	activity-id CDATA #REQUIRED>
+
+<!--
+A name which must be specified for a project, an instance, or an 
+activity.
+-->
+<!ELEMENT name (#PCDATA)>
+
+<!--
+Short name which must be given for an activity.
+-->
+<!ELEMENT short-name (#PCDATA)>
+
+<!--
+Definition of some data tags. Each date tag contains three attributes:
+date, month, and year. The date holds the number of the day, month the
+number of the month, and year the year of the date. The ranges of the
+date entries are as follows: date := 1..31, month := 1..12, and year :=
+0..XXXX (as far as you want).
+-->
+<!ELEMENT creation-date EMPTY>
+<!ATTLIST creation-date
+	date CDATA #REQUIRED
+	month CDATA #REQUIRED
+	year CDATA #REQUIRED>
+
+<!ELEMENT start-date EMPTY>
+<!ATTLIST start-date
+	date CDATA #REQUIRED
+	month CDATA #REQUIRED
+	year CDATA #REQUIRED>
+
+<!ELEMENT end-date EMPTY>
+<!ATTLIST end-date
+	date CDATA #REQUIRED
+	month CDATA #REQUIRED
+	year CDATA #REQUIRED>
+
+<!--
+Properties are name value pairs that contain vendor specific
+information. Properties can be applied to projects, instances,
+activities, and dependencies. For parsing the settings of a
+project the properties tags need not to be evaluated since
+they are vendor specific.
+-->
+<!ELEMENT property EMPTY>
+<!ATTLIST property
+	name CDATA #REQUIRED
+	value CDATA #REQUIRED>
+

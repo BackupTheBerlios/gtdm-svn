@@ -82,6 +82,9 @@ public class DiagramView extends JComponent
     private JInstance initialInstance = null;
     private JInstance currentInstance = null;
 
+    // reset every paint
+    private Graphics2D g;
+
     // table of all geometries of drawn activities for drawong dependencies.
     // The keys are the activities themself and the value is the activities'
     // geometry (as Rectangle)
@@ -104,34 +107,39 @@ public class DiagramView extends JComponent
     }
     /* Constructors }}} */
 
-    private static long millidays = 1000L * 60L * 60L * 24L;
-    private int daysOfMillis(long millis) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(millis);
-        return (int)((long)((long)((long)(millis / 1000L) / 60L) / 60L) / 24L);
-    }
     // stringify - always return correct string (TM) {{{
     private String stringify(Calendar cal) {
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         return df.format(cal.getTime());
     }
-    private String stringify(int days) { 
-        Calendar c = new GregorianCalendar();
-        c.setTimeInMillis(days * millidays);
-        return stringify(c);
+    private String stringify(int day) { 
+        return stringify(day2cal(day));
     }
     //}}}
-    private void drawVert(Graphics2D g, int x, int y, String str) { //{{{
+    private void drawVert(int x, int y, String str) { //{{{
         for (int j = 0; j < str.length(); j++) {
             g.drawString(str.substring(j, j + 1), x, y + j * ascent);
             g.drawString(str.substring(j, j + 1), x + 1, y + j * ascent);
         }
     } //}}}
-    private void drawHoriz(Graphics2D g, int x, int y, String str) { //{{{
+    private void drawHoriz(int x, int y, String str) { //{{{
         g.drawString(str, x, y);
         g.drawString(str, x + 1, y);
     } //}}}
 
+    // day2cal/cal2day {{{
+    private Calendar day2cal(int day)
+    {
+            GregorianCalendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(day * 1000L * 60L * 60L * 24L);
+            return cal;
+    }
+
+    private int cal2day(Calendar cal)
+    {
+        return (int)(cal.getTimeInMillis() / 1000L / 60L / 60L / 24L);
+    }
+    //}}}
     
     /* MouseListener/MouseMotionListener Implementation {{{ */
     public void mouseMoved (MouseEvent e) {
@@ -190,8 +198,7 @@ public class DiagramView extends JComponent
 
         // calculate initial diagram frame
         if (startDate == 0 && endDate == 0) {
-            startDate = daysOfMillis(
-                    currentInstance.getStartDate().getTimeInMillis());
+            startDate = cal2day(currentInstance.getStartDate());
             gridStart = currentInstance.getStartDate();
             // TODO: this one should be configurable
             endDate = startDate + showDays;   // show 35 days
@@ -205,24 +212,15 @@ public class DiagramView extends JComponent
     public void paint(Graphics not2Dg) {
         if (project == null) return;
 
-        Graphics2D g = (Graphics2D)not2Dg;
-
-        // TODO: we have to paint in (at least) 3 phases:
-        //  1. paint frame/grid and dates (at the bottom)
-        //  2. paint the activities
-        //  3. paint the dependencies
-        //
-        // for now we only paint the activities here
+        g = (Graphics2D)not2Dg;
 
         advance = g.getFontMetrics().getMaxAdvance();
         ascent = g.getFontMetrics().getMaxAscent();
         //descent = g.getFontMetrics().getMaxDescent();
 
-        today = daysOfMillis(Calendar.getInstance().getTimeInMillis());
-        instanceStartDate = daysOfMillis(
-                currentInstance.getStartDate().getTimeInMillis());
-        instanceEndDate = daysOfMillis(
-                currentInstance.getEndDate().getTimeInMillis());
+        today = cal2day(Calendar.getInstance());
+        instanceStartDate = cal2day(currentInstance.getStartDate());
+        instanceEndDate = cal2day(currentInstance.getEndDate());
 
         // clear all geometries
         actRects.clear();
@@ -233,9 +231,9 @@ public class DiagramView extends JComponent
             // set initial y position
             yActOffset = gridRect.y + padding;
 
-            ganttPaintActivities(g, currentInstance.getActivities());
+            ganttPaintActivities(currentInstance.getActivities());
 
-            ganttPaintDependencies(g, currentInstance.getActivities());
+            ganttPaintDependencies(currentInstance.getActivities());
         }
         else {
             // init geometry
@@ -265,17 +263,6 @@ public class DiagramView extends JComponent
     }
     /* JComponent Overloading }}} */
 
-
-
-
-
-    private int cal2day(Calendar cal)
-    {
-        return daysOfMillis(cal.getTimeInMillis());
-    }
-
-
-
     // TERMINDRIFT
     /* Termindrift Paint {{{ */
 
@@ -286,9 +273,6 @@ public class DiagramView extends JComponent
                 x += gridStep.x, y += gridStep.y)
         {
             int day = startDate + x/gridStep.x;
-            Date date = new Date(day * millidays);
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.setTime(date);
 
             // gray out, days out of project
             if (day < instanceStartDate || day > instanceEndDate)
@@ -489,14 +473,6 @@ public class DiagramView extends JComponent
 
     /* Termindrift Paint }}} */
 
-
-
-
-
-
-
-
-
     // GANTT
     /* Gantt Paint Routines {{{ */
     private void ganttPaintGrid(Graphics2D g) { //{{{
@@ -529,10 +505,7 @@ public class DiagramView extends JComponent
         // day grid
         for (int i = 0; i < gridRect.width; i += gridStep.x) {
             int day = startDate + i/gridStep.x;
-            Date date = new Date(day * millidays);
-            GregorianCalendar cal = new GregorianCalendar();
-
-            cal.setTime(date);
+            Calendar cal = day2cal(day);
 
             int x = gridRect.x + i;
             int y = gridRect.y;
@@ -546,8 +519,8 @@ public class DiagramView extends JComponent
             boolean inProjectFrame = true;
 
             // gray out days out of project
-            if (cal.before(currentInstance.getStartDate())
-                    || cal.after(currentInstance.getEndDate())) {
+            if (day < cal2day(currentInstance.getStartDate())
+                    || day > cal2day(currentInstance.getEndDate())) {
                 g.setColor(new Color(0xaaaaaa));
                 g.fillRect(x + 1, y + 1, w, h);
                 inProjectFrame = false; // grayed out
@@ -568,7 +541,7 @@ public class DiagramView extends JComponent
 
                 case Calendar.MONDAY:
                     g.setColor(new Color(0x999999));
-                    drawVert(g, strx,(int)(y + h - h*.45), stringify(cal));
+                    drawVert(strx,(int)(y + h - h*.45), stringify(day));
                     break;
                     
                 default:
@@ -581,28 +554,29 @@ public class DiagramView extends JComponent
                 g.fillRect(x + 1, y + 1, w, h);
 
                 g.setColor(new Color(0xd08060));
-                drawVert(g, strx,(int)(y + h - h*.45), stringify(day));
+                drawVert(strx,(int)(y + h - h*.45), stringify(day));
             }
 
             // print date at:
             // StartDate {{{
-            if (cal.after(currentInstance.getStartDate())) {
-                currentInstance.getStartDate().add(Calendar.DATE, 1);
-                if (cal.before(currentInstance.getStartDate())) {
+            if (day == cal2day(currentInstance.getStartDate())) {
+                //currentInstance.getStartDate().add(Calendar.DATE, 1);
+                //if (cal.before(currentInstance.getStartDate())) {
                     g.setColor(new Color(0x777777));
-                    drawVert(g, strx,(int)(y + h - h*.45), stringify(day));
-                }
-                currentInstance.getStartDate().add(Calendar.DATE, -1);
+                    drawVert(strx,(int)(y + h - h*.45), stringify(day));
+                //}
+                //currentInstance.getStartDate().add(Calendar.DATE, -1);
             }
             // }}}
             // EndDate {{{
-            if (cal.before(currentInstance.getEndDate())) {
-                currentInstance.getEndDate().add(Calendar.DATE, -1);
-                if (cal.after(currentInstance.getEndDate())) {
+            //if (cal.before(currentInstance.getEndDate())) {
+            if (day == cal2day(currentInstance.getEndDate())) {
+                //currentInstance.getEndDate().add(Calendar.DATE, -1);
+                //if (cal.after(currentInstance.getEndDate())) {
                     g.setColor(new Color(0x777777));
-                    drawVert(g, strx,(int)(y + h - h*.45), stringify(day));
-                }
-                currentInstance.getEndDate().add(Calendar.DATE, 1);
+                    drawVert(strx,(int)(y + h - h*.45), stringify(day));
+                //}
+                //currentInstance.getEndDate().add(Calendar.DATE, 1);
             }
             // }}}
 
@@ -610,27 +584,27 @@ public class DiagramView extends JComponent
 
         // print note:
         // project is later {{{
-        if (daysOfMillis(currentInstance.getStartDate().getTimeInMillis())
+        if (cal2day(currentInstance.getStartDate())
                 > endDate) {
                 g.setColor(Color.red);
                 String s = "Projektbeginn: "
                     + stringify(currentInstance.getStartDate())
                     + " ->";
-                drawHoriz(g
-                    , gridRect.x + gridRect.width - s.length() * advance/3
+                drawHoriz(
+                    gridRect.x + gridRect.width - s.length() * advance/3
                     , 324
                     , s
                 );
         }
         // }}}
         // project is earlier {{{
-        if (daysOfMillis(currentInstance.getEndDate().getTimeInMillis())
+        if (cal2day(currentInstance.getEndDate())
                 < startDate) {
                 g.setColor(Color.red);
                 String s = "<- Projektende: "
                     + stringify(currentInstance.getStartDate());
-                drawHoriz(g
-                    , gridRect.x + advance/3
+                drawHoriz(
+                    gridRect.x + advance/3
                     , 324
                     , s
                 );
@@ -639,21 +613,21 @@ public class DiagramView extends JComponent
 
     }//}}}
 
-    private void ganttPaintActivities(Graphics2D g, ArrayList a) { //{{{
+    private void ganttPaintActivities(ArrayList a) { //{{{
         // iterate through all activities.
         // this method is meant to be called recursive
         // TODO: the core needs: getAllActivities(PREORDER|POSTORDER|INORDER)
         ListIterator i = a.listIterator();
-        while (i.hasNext()) ganttPaintActivity(g, (JActivity)i.next());
+        while (i.hasNext()) ganttPaintActivity((JActivity)i.next());
     }//}}}
 
-    private Rectangle ganttPaintActivity(Graphics2D g, JActivity a) {//{{{
+    private Rectangle ganttPaintActivity(JActivity a) {//{{{
         // check if there a is an activity, else we have nothing to do here..
         if (a == null) return null;
 
         // our granularity is 1 day, offset is start of epoch (in UTC)
-        int start = daysOfMillis(a.getStartDate().getTimeInMillis());
-        int end = daysOfMillis(a.getEndDate().getTimeInMillis());
+        int start = cal2day(a.getStartDate());
+        int end = cal2day(a.getEndDate());
         
         // calculate geometry for activity bar
         //System.out.println(a.getShortName() + " " + (start - startDate));
@@ -661,10 +635,11 @@ public class DiagramView extends JComponent
             //gridRect.x + (start - startDate) * gridStep.x,
             //toX(a.getStartDate()),
             gridRect.x
-                + (daysOfMillis(a.getStartDate().getTimeInMillis()) - startDate)
+                + (cal2day(a.getStartDate()) - startDate)
                 * gridStep.x,
             yActOffset,
-            gridStep.x * (end - start),               // length
+            // +1: end day ist inclusive:
+            gridStep.x * (end - start + 1),               // length
             barWidth
         );
 
@@ -692,21 +667,21 @@ public class DiagramView extends JComponent
         }
 
         // draw all subactivities
-        ganttPaintActivities(g, a.getActivities());
+        ganttPaintActivities(a.getActivities());
 
         return r;
     }//}}}
 
     
-    private void ganttPaintDependencies(Graphics2D g, ArrayList a) {//{{{
+    private void ganttPaintDependencies(ArrayList a) {//{{{
         // iterate through all activities.
         // this method is meant to be called recursive
         // TODO: the core needs: getAllActivities(PREORDER|POSTORDER|INORDER)
         ListIterator i = a.listIterator();
-        while (i.hasNext()) ganttPaintDependencies(g, (JActivity)i.next());
+        while (i.hasNext()) ganttPaintDependencies((JActivity)i.next());
     }//}}}
     
-    private void ganttPaintDependencies(Graphics2D g, JActivity from) {//{{{
+    private void ganttPaintDependencies(JActivity from) {//{{{
         Rectangle fromRect = (Rectangle)actRects.get(from);
 
         g.setColor(Color.darkGray);
