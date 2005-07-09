@@ -260,10 +260,6 @@ public class DiagramView extends JComponent
             
 
             tdriftPaintGrid(g);
-            //tdriftPaintInitialActivities(g, initialInstance.getActivities());
-            tdriftPaintVertActivities(g, initialInstance.getActivities());
-            tdriftPaintHorizActivities(g, currentInstance.getActivities());
-            //tdriftPaintCurrentActivities(g, currentInstance.getActivities());
             tdriftPaintActivities(g);
         }
     }
@@ -272,6 +268,11 @@ public class DiagramView extends JComponent
 
 
 
+
+    private int cal2day(Calendar cal)
+    {
+        return daysOfMillis(cal.getTimeInMillis());
+    }
 
 
 
@@ -371,75 +372,6 @@ public class DiagramView extends JComponent
     }
     /* tdriftPaintGrid }}} */
 
-    private void tdriftPaintHorizActivities(Graphics2D g, ArrayList aLi) //{{{
-    {
-        ListIterator aLiIt = aLi.listIterator();
-        while (aLiIt.hasNext())
-        {
-            //tdriftPaintInitialActivity(g, (JActivity)aLiIt.next());
-            JActivity a = (JActivity)aLiIt.next();
-        
-            int end = daysOfMillis(a.getEndDate().getTimeInMillis());
-           
-            if (end < startDate) return;
-
-            // horizontal
-            // calculate geometry for activity
-            Point p = new Point(
-                gridRect.x + (end - startDate) * gridStep.x,
-                gridRect.y - ascent
-            );
-
-            // draw name
-            g.setColor(Color.black);
-            g.drawString(a.getShortName(), p.x - 2 , p.y - 2);
-            // draw offset
-            g.setColor(Color.gray);
-            g.drawLine(p.x, p.y, p.x, gridRect.y);
-
-            // NOTE: we don't go deeper than one level
-        }
-    }
-    //}}}
-
-    private void tdriftPaintVertActivities(Graphics2D g, ArrayList aLi) //{{{
-    {
-        ListIterator aLiIt = aLi.listIterator();
-        while (aLiIt.hasNext())
-        {
-            //tdriftPaintInitialActivity(g, (JActivity)aLiIt.next());
-            JActivity a = (JActivity)aLiIt.next();
-            
-            int end = daysOfMillis(a.getEndDate().getTimeInMillis());
-           
-            if (end < startDate) return;
-
-            // vertical
-            // calculate geometry for activity
-            Point p = new Point(
-                gridRect.x - a.getShortName().length() * advance / 3,
-                gridRect.y + (end - startDate) * gridStep.y
-            );
-
-            // draw name
-            g.setColor(Color.black);
-            g.drawString(a.getShortName(), p.x - 2, p.y - 2);
-            // draw offset
-            g.setColor(Color.gray);
-            g.drawLine(p.x, p.y, gridRect.x, p.y);
-
-            // NOTE: we don't go deeper than one level
-        }
-    }
-    //}}}
-
-
-    private int cal2day(Calendar cal)
-    {
-        return daysOfMillis(cal.getTimeInMillis());
-    }
-
-
     private void tdriftPaintActivities(Graphics2D g) //{{{
     {
         // get interator over all current activities
@@ -448,10 +380,22 @@ public class DiagramView extends JComponent
         while (aIt.hasNext())
         {
             int aid = ((JActivity)aIt.next()).getId();
-            //JActivity a = (JActivity)aIt.next();
-
 
             g.setColor(new Color(0xFF << 8 * (aid % 4)));
+
+            // draw shortName at y = endDate
+            {
+                JActivity a = currentInstance.getActivity(aid);
+                int x = gridRect.x
+                    + (cal2day(a.getEndDate()) - startDate) * gridStep.x;
+                int y = gridRect.y - ascent;
+
+                if (x >= gridRect.x)
+                {
+                    g.drawString(a.getShortName(), x - 2, y);
+                    g.drawLine(x, y, x, y + ascent);
+                }
+            }
 
             int x0 = 0, y0 = 0, x, y;
             int iCrtDay, aEndDay = 0;
@@ -543,121 +487,6 @@ public class DiagramView extends JComponent
     }
     //}}}
 
-
-
-
-    private void tdriftPaintActivity(Graphics2D g,
-            JInstance i, JInstance ni,
-            JActivity a, JActivity na)
-    //{{{
-    {
-        // get activity and next activity start/end date
-        int start = daysOfMillis(a.getStartDate().getTimeInMillis());
-        int end = daysOfMillis(a.getEndDate().getTimeInMillis());
-        int nstart = na != null ?
-            daysOfMillis(na.getStartDate().getTimeInMillis()) : 0;
-        int nend = na != null ?
-            daysOfMillis(na.getEndDate().getTimeInMillis()) : 0;
-
-        // get instance and next instance creationDate
-        int ichanged = daysOfMillis(i.getCreationDate().getTimeInMillis());
-        int nichanged = ni != null ?
-            daysOfMillis(ni.getCreationDate().getTimeInMillis()) :
-                today > end ? end : today;
-
-
-        // dont draw, if not in visible area
-        if (end < startDate) return;
-
-        // calculate geometry for activity
-        Rectangle r = new Rectangle(
-            gridRect.x + (ichanged - startDate) * gridStep.x
-            //+ (end - startDate) * gridStep.x
-            ,
-            gridRect.y + (end - startDate) * gridStep.y
-            //gridRect.y + (ichanged - startDate) * gridStep.y
-            ,
-            //gridRect.x+((today > end ? end : today) - startDate) * gridStep.x
-            //((today > end ? end : today) - startDate) * gridStep.x
-            (nichanged - startDate) * gridStep.x
-            ,
-            0
-        );
-
-        g.setColor(Color.gray);
-   //     if (today >= startDate)
-        g.drawLine(r.x, r.y, r.width, r.y);
-//        else
-  //          g.drawLine(r.x, r.y, gridRect.x, r.y);
-        
-
-        g.drawLine(r.x, r.y, r.x, r.y + 3);
-
-
-
-        /*int nstart = na != null ?
-            daysOfMillis(na.getStartDate().getTimeInMillis()) : null;
-        
-        // dont draw, if not in visible area
-        if (end < startDate) return;
-
-        // calculate geometry for activity
-        Rectangle r = new Rectangle(
-            gridRect.x - a.getShortName().length() * advance / 3,
-            gridRect.y + (end - startDate) * gridStep.y,
-            gridRect.x + ((today > end ? end : today) - startDate) * gridStep.x,
-            0
-        );
-
-        g.setColor(Color.black);
-        g.drawString(a.getShortName(), r.x, r.y);
-
-        g.setColor(Color.gray);
-        if (today >= startDate)
-            g.drawLine(r.x, r.y, r.width, r.y);
-        else
-            g.drawLine(r.x, r.y, gridRect.x, r.y);
-
-        // NOTE: we don't go deeper than one level here*/
-    }
-    //}}}
-
-    /* tdriftPaintCurrentActivities {{{ */
-    private void tdriftPaintCurrentActivities(Graphics2D g, ArrayList a) {
-        ListIterator i = a.listIterator();
-        while (i.hasNext()) tdriftPaintCurrentActivity(g, (JActivity)i.next());
-    }
-    /* tdriftPaintCurrentActivities }}} */
-
-    /* tdriftPaintCurrentActivitiy {{{ */
-    private void tdriftPaintCurrentActivity(Graphics2D g, JActivity a) {
-        int end = daysOfMillis(a.getEndDate().getTimeInMillis());
-        
-        if (end < startDate) return;
-
-        // calculate geometry for activity
-        Rectangle r = new Rectangle(
-            gridRect.x - a.getShortName().length() * advance / 3,
-            gridRect.y + (end - startDate) * gridStep.y,
-            gridRect.x + ((today > end ? end : today) - startDate) * gridStep.x,
-            0
-        );
-
-        // store "geometry"
-        //actRects.put(a, p);
-
-        g.setColor(Color.black);
-        g.drawString(a.getShortName(), r.x, r.y);
-
-        g.setColor(Color.gray);
-        if (today >= startDate)
-            g.drawLine(r.x, r.y, r.width, r.y);
-        else
-            g.drawLine(r.x, r.y, gridRect.x, r.y);
-
-        // NOTE: we don't go deeper than one level
-    }
-    /* tdriftPaintCurrentActivitiy }}} */
     /* Termindrift Paint }}} */
 
 
