@@ -518,12 +518,6 @@ public class DiagramView extends JComponent
             showDays = gridRect.width / gridStep.x;
         }
 
-        System.out.println("Drawing "
-                + (gridRect.width / gridStep.x)
-                + " of "
-                + (endDate - startDate)
-                + " days");
-
         // draw message (outside the clipping area)
         g.setColor(Color.gray);
         g.drawString(message, gridRect.x + padding, gridRect.y
