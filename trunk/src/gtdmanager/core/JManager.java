@@ -864,6 +864,7 @@ public class JManager {
 		new GregorianCalendar(2005, 6, 14),
 		new GregorianCalendar(2005, 6, 29), 0));
 
+	// tv: *** WENN DASS ENABLED IST, ALLES ARSCH ***
 	/*i	= getProject().getInstance(getProject().newInstance(
 		"Instanz2",
 		new GregorianCalendar(2005, 6, 6),
