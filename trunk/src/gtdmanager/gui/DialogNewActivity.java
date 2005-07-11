@@ -157,7 +157,7 @@ public class DialogNewActivity extends JDialog {
 
     public static String getCal(Calendar c) {
         String strDay = Integer.toString(c.get(Calendar.DATE)),
-               strMonth = Integer.toString(c.get(Calendar.MONTH)),
+               strMonth = Integer.toString(c.get(Calendar.MONTH) + 1),
                strYear = Integer.toString(c.get(Calendar.YEAR));
 
         if (strDay.length() == 1) {
@@ -176,7 +176,6 @@ public class DialogNewActivity extends JDialog {
 
         try {
             sdf.parse(str);
-            sdf.getCalendar().set(Calendar.MONTH, sdf.getCalendar().get(Calendar.MONTH) + 1);
         } catch (java.text.ParseException ex) {
             java.text.ParseException exthrow = new java.text.ParseException(ex.getLocalizedMessage(),ex.getErrorOffset());
             throw exthrow;
@@ -361,6 +360,11 @@ public class DialogNewActivity extends JDialog {
             calStart = toCal(strStartDate);
             calEnd = toCal(strEndDate);
 
+            //-> debug info: has to be deleted in final release!
+            int day1 = calStart.get(Calendar.DATE);
+            int month1 = calStart.get(Calendar.MONTH);
+            //<- debug end
+
             if (calEnd.before(calStart) || calEnd.equals(calStart)) {
 
                 tabSettings.setSelectedIndex(0);
@@ -371,16 +375,20 @@ public class DialogNewActivity extends JDialog {
                 return;
             }
 
-            if (calEnd.after(currentInstance.getEndDate()) || calStart.before(currentInstance.getStartDate())) {
+            if (!(calEnd.equals(currentInstance.getEndDate()) && calStart.equals(currentInstance.getStartDate()))) {
+                if (calEnd.after(currentInstance.getEndDate()) ||
+                    calStart.before(currentInstance.getStartDate())) {
 
-                tabSettings.setSelectedIndex(0);
+                    tabSettings.setSelectedIndex(0);
 
-                javax.swing.JOptionPane.showMessageDialog(this,
-                "Der Zeitraum der neuen Aktivitaet muss im Gesamtzeitraum der letzten Instanz liegen.\nVon " + getCal(currentInstance.getStartDate()) + " bis " + getCal(currentInstance.getEndDate()) + ".",
-                "Falsche Eingabe", 2);
-                return;
+                    javax.swing.JOptionPane.showMessageDialog(this,
+                    "Der Zeitraum der neuen Aktivitaet muss im Gesamtzeitraum der letzten Instanz liegen.\nVon " +
+                    getCal(currentInstance.getStartDate()) + " bis " +
+                    getCal(currentInstance.getEndDate()) + ".",
+                    "Falsche Eingabe", 2);
+                    return;
+                }
             }
-
         } catch (java.text.ParseException ex) {
 
             tabSettings.setSelectedIndex(0);
@@ -402,7 +410,10 @@ public class DialogNewActivity extends JDialog {
     }
 
     public void this_windowOpened(WindowEvent e) {
-
+        if (currentInstance != null) {
+            txtStartDate.setText(getCal(currentInstance.getStartDate()));
+            txtEndDate.setText(getCal(currentInstance.getEndDate()));
+        }
     }
 }
 

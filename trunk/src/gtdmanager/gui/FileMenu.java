@@ -86,6 +86,7 @@ class FileMenuAction extends AbstractAction {
 
             if (nRet == JFileChooser.APPROVE_OPTION) {
                 String strFilename = parent.opendialog.getSelectedFile().toString();
+                parent.manager.newProject();
                 parent.manager.loadProject(strFilename);
                 parent.updateViews();
             }

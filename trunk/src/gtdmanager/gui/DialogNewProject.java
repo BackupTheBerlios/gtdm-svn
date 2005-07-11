@@ -155,7 +155,7 @@ public class DialogNewProject extends JDialog {
 
     public static String getCal(Calendar c) {
         String strDay = Integer.toString(c.get(Calendar.DATE)),
-               strMonth = Integer.toString(c.get(Calendar.MONTH)),
+               strMonth = Integer.toString(c.get(Calendar.MONTH) + 1),
                strYear = Integer.toString(c.get(Calendar.YEAR));
 
         if (strDay.length() == 1) {
@@ -174,7 +174,6 @@ public class DialogNewProject extends JDialog {
 
         try {
             sdf.parse(str);
-            sdf.getCalendar().set(Calendar.MONTH, sdf.getCalendar().get(Calendar.MONTH) + 1);
         } catch (java.text.ParseException ex) {
             java.text.ParseException exthrow = new java.text.ParseException(ex.getLocalizedMessage(),ex.getErrorOffset());
             throw exthrow;
