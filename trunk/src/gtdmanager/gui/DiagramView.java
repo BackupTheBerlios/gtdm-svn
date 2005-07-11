@@ -430,6 +430,8 @@ public class DiagramView extends JComponent
 
             String shortName = null;
             int shortNameX = 0, shortNameY = 0;
+            
+            //g.setColor(new Color(0xff00ff));    
 
             // get iterator over all instances
             ListIterator iIt = project.getInstances().listIterator();
@@ -440,9 +442,7 @@ public class DiagramView extends JComponent
 
                 // skip if activity is non-existent in this instance
                 if (a == null) continue;
-            
-                g.setColor(new Color(a.getColor()));
-                
+
                 iCrtDay = cal2day(i.getCreationDate());
                 aEndDay = cal2day(a.getEndDate());
 
@@ -454,7 +454,8 @@ public class DiagramView extends JComponent
                 }
 
                 // initialize second point
-                x = gridRect.x + (iCrtDay - startDate) * gridStep.x;
+                x = gridRect.x + (Math.min(iCrtDay, aEndDay) - startDate)
+                    * gridStep.x;
                 y = y0;
 
                 // draw horizontal line
@@ -464,6 +465,8 @@ public class DiagramView extends JComponent
                                 Math.max(x, gridRect.x),
                                 Math.max(y, gridRect.y) );
 
+                g.setColor(new Color(a.getColor()));
+                
                 x0 = x;
                 // y0 = y;
 

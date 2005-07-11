@@ -1,0 +1,58 @@
+Moduletest des MainWindows und der Menu Klassen
+------------------------------------------------------------------------------
+
+Autor: Tomislav Viljetić
+Tester: Tomislav Viljetić
+Datum: 11.07.2005
+
+
+Moduletest fuer Klasse gtdmanager.gui.MainWindow
+------------------------------------------------------------------------------
+
+Methode: setSelection
+Eingabe: 
+Ausgabe:
+Status: nicht getestet, nur eine Zuweisung
+
+Methode: getSelection
+Eingabe:
+Ausgabe:
+Status: nicht getestet, nur eine Rueckgabe
+
+Methode: MainWindow
+Eingabe: keine
+Ausgabe: baut Fenster auf, oben Menu, links TreeView, rechts DiagramView
+Status: bestanden
+
+Methode: getManager
+Eingabe:
+Ausgabe:
+Status: nicht getestet, nur eine Zuweisung
+
+Methode: updateViews
+Eingabe: keine
+Ausgabe: ruft bei allen im Kontruktor zugewiesenen Views die Methode update auf
+Status: nicht getestet, lediglich Iteration ueber eine ArrayLisy und Aufruf
+	einer Funktion pro Array-Element.
+
+
+Moduletest fuer die Menuklassen (Klasse private gtdmanager.gui.FileMenu)
+------------------------------------------------------------------------------
+
+Nur eine getestet, da alle gleich aufgebaut sind.
+
+Methode: actionPerformed
+ (impliziert Konstruktoren fuer FileMenu und FileMenuAction)
+Eingabe: Klick auf beliebiges Element vom "Datei" Menu
+Ausgabe: Klick Ruft die erwarewte Funktion auf oder Ausgabe im
+	Standard-Output, falls noch nicht Implementiert.
+Status: bestanden
+
+
+------------------------------------------------------------------------------
+
+Getestete Methoden: 2
+Bestandene Tests: 2
+Nicht getestete Methoden: 4
+
+------------------------------------------------------------------------------

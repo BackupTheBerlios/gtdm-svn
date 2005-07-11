@@ -1,0 +1,69 @@
+Moduletest der View Implementierungen
+------------------------------------------------------------------------------
+
+Autor: Tomislav Viljetić
+Tester: Tomislav Viljetić
+Datum: 11.07.2005
+
+
+Verwendetes Projekt: Generiertes Projekt via Datei -> Generiere Testprojekt
+
+
+Moduletest fuer Klasse gtdmanager.gui.TreeView
+------------------------------------------------------------------------------
+
+Methode: valueChanged
+Eingabe: Klick auf ein beliebiges Element im Baum
+Ausgabe: Name des Elements wird in den Standard-Output geschrieben
+Status: bestanden
+
+Methode: update
+ (impliziert updateActivity)
+Eingabe: Verwendetes Projekt
+Ausgabe: Alle Elemente des Baums werden angezeigt
+Status: bestanden
+
+
+Moduletest fuer Klasse gtdmanager.gui.DiagramView
+------------------------------------------------------------------------------
+
+Methode: mouseMoved, mouseDragged
+Eingabe: Klicken und ziehen des DiagramViews
+Ausgabe: Diagramm verschiebt sich
+Status: bestanden
+
+Methode: mouseEntered
+Eingabe: Maus verlaesst und betritt das DiagramView
+Ausgabe: Text am oberen linken Rand (nur, wenn noch nicht mouseDragged
+         ausgefuehrt wurde)
+Status: bestanden
+
+Methode: mouseWheelMoved
+Eingabe: im DiagramView am Mausraddrehen
+Ausgabe: Text mit maximaler Anzahl der angezeigten Tage erschein am o.l. Rand
+         und DiagramView zeight mehr/weniger Tage an.
+Status: bestanden
+
+Methode: update
+Eingabe: Verwendetes Projekt
+Ausgabe: Variablen werden gesetzt
+Status: nicht getestet, falls Java Variablen korrekt setzt ist diese Methode
+        ebenfall korrekt (werden spaetere Testfaelle zeigen)
+
+Methode: paint
+ (impliziert alle tdriftPaint und ganttPaint Methoden und cal2day, day2cal,
+ stringify (alle), dtawVert, drawHoriz)
+Eingabe: Verwendetes Projekt
+Ausgabe: Diagramm wird im gewaehlten Format (siehe DiagramMenu) angezeigt.
+Status: nicht bestanden, Termindrift Diagramm uebeschneiden sich die Namen
+	der Aufgaben.
+
+
+------------------------------------------------------------------------------
+
+Getestete Methoden: 6
+Bestandene Tests: 5
+Nicht getestete Methoden: 1
+
+------------------------------------------------------------------------------
+

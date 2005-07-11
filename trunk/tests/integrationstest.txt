@@ -1,0 +1,19 @@
+Integrationstest
+------------------------------------------------------------------------------
+
+Tester: Tomislav Viljetić
+
+
+Big Bang Integration: bestanden
+
+
+Anmerkung:
+1. Es wurde so Entworfen, dass es Funktioniert ;-)
+2. Wir haben ueber die ganze Implementierungsphase hinweg bereits "Integriert".
+   Da wir das Projekt Zentral mit einem Versionensystem verwalten war jedes
+   'commit' bereits ein 'Integrationstest' im Sinne von, kompilieren,
+   asufuehren und schauen ob das neue dazu passt und ob nichts offensichtlich
+   kaputt gegangen ist (liess sich nicht immer ausschliessen, dann gabs aber
+   gleich Gemecker vom Modulverwalter).
+3. Ausfuehrliche Modultests sind vorhanden.
+
