@@ -10,8 +10,6 @@ import java.util.Date;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import com.borland.jbcl.layout.XYLayout;
-import com.borland.jbcl.layout.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 
