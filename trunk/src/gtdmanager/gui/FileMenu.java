@@ -51,7 +51,7 @@ class FileMenuAction extends AbstractAction {
 
     public static String generateProject = "Generiere Testprojekt";
     public static String newProject = "Neues Projekt...";
-    public static String openProject= "Öffne Projekt...";
+    public static String openProject= "Oeffne Projekt...";
     public static String saveProject = "Projekt Speichern...";
     public static String quit = "GTDManager beenden";
 
@@ -75,10 +75,10 @@ class FileMenuAction extends AbstractAction {
             parent.updateViews();
         }
         else if (name == newProject) {
-            //DialogNewProject pDlg = new DialogNewProject(this.parent, "Neues Projekt erstellen", true);
-            //pDlg.setLocationRelativeTo(null);
-            //pDlg.setModal(true);
-            //pDlg.show();
+            DialogNewProject pDlg = new DialogNewProject(this.parent, "Neues Projekt erstellen", true);
+            pDlg.setLocationRelativeTo(null);
+            pDlg.setModal(true);
+            pDlg.show();
         }
         else if (name == quit) {
             System.exit(0);
