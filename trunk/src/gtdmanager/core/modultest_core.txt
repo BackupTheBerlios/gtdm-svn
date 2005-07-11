@@ -1,0 +1,103 @@
+Modultests des Package gtdmanager.core
+------------------------------------------------------------------------------------------------
+
+
+Modultest für Klasse JManager
+------------------------------------------------------------------------------------------------
+
+Autor: Michael Fechter
+Tester: Michael Fechter
+Datum: 11.07.2005
+
+Methode: public void newProject(String strName, String strVersion)
+Eingabe: strName = "Testname", strVersion = "1.0"
+Erwartete Ausgabe: leeres Projekt mit angegebenen Namen und Version
+Ausgabe: leeres Projekt mit angegebenen Namen und Version
+Status: bestanden
+
+Methode: public void loadProject(String fileName)
+Eingabe: fileName = "c:\\example.xml" (Beispieldatei aus dem DTD)
+Erwartete Ausgabe: Projekt aus angegebener XML-Datei geladen
+Ausgabe: korrekt aus der XML-Datei geladenes Projekt
+Status: bestanden
+
+Methode: public void saveProject(String fileName)
+Eingabe: fileName = "c:\\exam-out.xml"
+Erwartete Ausgabe: zuvor geladenes Projekt im korrekten Format in die XML-Datei geschrieben
+Ausgabe: korrekt in die XML-Datei geschriebenes Projekt
+Status: bestanden
+
+
+Modultest für Klasse JProject
+------------------------------------------------------------------------------------------------
+
+Autor: Michael Fechter
+Tester: Michael Fechter
+Datum: 11.07.2005
+
+Methode: public int newInstance(String strName, Calendar calCreate, Calendar calStart, Calendar calEnd, boolean active)
+Eingabe: strName = "Instanz1", calCreate = 1.6.2005, calStart = 1.6.2005, calEnd = 30.6.2005, active = true, keine existierende Instanz
+Erwartete Ausgabe: leere Instanz mit angegebenen Namen und Daten
+Ausgabe: leere Instanz mit angegebenen Namen und Daten
+Status: bestanden
+
+Methode: public int newInstance(String strName, Calendar calCreate, Calendar calStart, Calendar calEnd, boolean active)
+Eingabe: strName = "Instanz1", calCreate = 1.6.2005, calStart = 1.6.2005, calEnd = 30.6.2005, active = true, zuvor existierende Instanz
+Erwartete Ausgabe: geklonte existierende Instanz mit angegebenen Namen und Daten
+Ausgabe: geklonte existierende Instanz mit angegebenen Namen und Daten
+Status: bestanden
+
+Methode: public void deleteInstance(int id)
+Eingabe: id = 0 (ID der zuvor erstellten Instanz)
+Erwartete Ausgabe: leeres Projekt / Instanz wurde gelöscht
+Ausgabe: leeres Projekt / Instanz wurde gelöscht
+Status: bestanden
+
+
+Modultest für Klasse JInstance
+------------------------------------------------------------------------------------------------
+
+Autor: Michael Fechter
+Tester: Michael Fechter
+Datum: 11.07.2005
+
+Methode: public int newActivity(ArrayList actList, String strName, String strShortName, Calendar calStart, Calendar calEnd, int color)
+Eingabe: actList = instance.activities, strName = "Aktivi1", strShortName = "Akt1", calStart = 2.6.2005, calEnd = 6.6.2005, color = 0
+Erwartete Ausgabe: Instanz mit einer einzelnen Aktivität
+Ausgabe: Instanz mit einer einzelnen Aktivität
+Status: bestanden
+
+Methode: public boolean deleteActivity(int id)
+Eingabe: id = 0 (ID der zuvor erstellten Aktivität)
+Erwartete Ausgabe: leere Instanz
+Ausgabe: leere Instanz
+Status: bestanden
+
+
+Modultest für Klasse JActivity
+------------------------------------------------------------------------------------------------
+
+Autor: Michael Fechter
+Tester: Michael Fechter
+Datum: 11.07.2005
+
+Methode: public int newDependency(int toActivityId, int dependencyType)
+Eingabe: toActivityId = 0, dependencyType = BEGINBEGIN, zwei existierende Aktivitäten (IDs 0 und 1)
+Erwartete Ausgabe: erstellte Dependency einer Aktivität zur anderen Aktivität
+Ausgabe: erstellte Dependency einer Aktivität zur anderen Aktivität
+Status: bestanden
+
+Methode: public boolean deleteDependency(int id)
+Eingabe: id = 0 (ID der zuvor erstellten Dependency)
+Erwartete Ausgabe: keine Dependency in der Aktivität
+Ausgabe: keine Dependency in der Aktivität
+Status: bestanden
+
+
+------------------------------------------------------------------------------------------------
+
+Getestete Methoden: 10
+  davon bestanden: 10
+  davon nicht bestanden: 0
+
+------------------------------------------------------------------------------------------------
