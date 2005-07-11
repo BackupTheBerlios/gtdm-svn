@@ -838,7 +838,7 @@ public class JManager {
 
     public void generateSampleProject() {
 
-        /*newProject("Testprojekt", "1.0.0.0");
+        newProject("Testprojekt", "1.0.0.0");
 	
 
 	JInstance i;
@@ -867,7 +867,7 @@ public class JManager {
 
 	a1.setColor(0xff0000);
 	a2.setColor(0x00ff00);
-	a3.setColor(0x0000ff);*/
+	a3.setColor(0x0000ff);
 
 	// tv: *** WENN DASS ENABLED IST, ALLES ARSCH ***
 	/*i	= getProject().getInstance(getProject().newInstance(
@@ -885,13 +885,13 @@ public class JManager {
 		new GregorianCalendar(2005, 6, 2),
 		new GregorianCalendar(2005, 6, 34), true));*/
 
-       /*i.getActivity(a1.getId()).setStartDate(new GregorianCalendar(2005,6,9));
+       i.getActivity(a1.getId()).setStartDate(new GregorianCalendar(2005,6,9));
        	i.getActivity(a1.getId()).setEndDate(new GregorianCalendar(2005,6,18));
        i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005,6,12));
        	i.getActivity(a2.getId()).setEndDate(new GregorianCalendar(2005,6,24));
-*/
+
 	// for DiagramView testing
-/*	a9	= i.getActivity(i.newActivity(i.activities, "ENDEND1", "EE1",
+	a9	= i.getActivity(i.newActivity(i.activities, "ENDEND1", "EE1",
 	  	new GregorianCalendar(2005, 6, 3),
 	  	new GregorianCalendar(2005, 6, 7), 0));
 	a1.newDependency(a9.getId(), JDependency.BEGINBEGIN);
@@ -921,7 +921,7 @@ public class JManager {
 	  	new GregorianCalendar(2005, 6, 32), 0));
 	a2.newDependency(a9.getId(), JDependency.BEGINEND);
 	a2.newDependency(a9.getId(), JDependency.ENDBEGIN);
-*/
+
 
 
 
