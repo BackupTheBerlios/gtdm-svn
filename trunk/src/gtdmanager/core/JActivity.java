@@ -24,6 +24,9 @@ public class JActivity {
     ArrayList activities = new ArrayList();
 
 
+    public String toString() {
+	    return name;
+    }
 
     public JActivity() {
         color = 0;

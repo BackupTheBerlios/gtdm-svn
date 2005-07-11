@@ -21,6 +21,10 @@ public class JProject {
     String version;
     ArrayList instances;
 
+    public String toString() {
+	    return name;
+    }
+
     public JProject() {
         this.instances = new ArrayList();
     }

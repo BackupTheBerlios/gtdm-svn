@@ -37,8 +37,10 @@ all: jar-test
 
 $(MODULE).jar: $(MODULE).manifest $(CLASSES)
 	@echo === JAR $@
-	jar cvfm $@ $< \
-	    $(subst $(SRCDIR)/,-C $(SRCDIR) ,$(wildcard $(SRCDIR)/*/*/*.class))
+	jar cvfm $@ $< -C $(SRCDIR) gtdmanager
+#$(subst $(SRCDIR)/,-C $(SRCDIR),$(shell find $(SRCDIR) -name \*.class))
+#	jar cvfm $@ $< \
+#	    $(subst $(SRCDIR)/,-C $(SRCDIR) ,$(subst .java,.class,$(wildcard $(SRCDIR)/*/*/*.java)))
 
 jar-test: $(MODULE).jar
 	#clean $(MODULE).jar

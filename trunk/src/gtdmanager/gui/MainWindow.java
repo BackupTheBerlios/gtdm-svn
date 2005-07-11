@@ -33,6 +33,15 @@ public class MainWindow {
     // list of all views
     ArrayList views = new ArrayList();
 
+    Object selection = null;
+
+    public void setSelection(Object s) {
+        selection = s;
+    }
+    public Object getSelection() {
+        return selection;
+    }
+
     MainWindow() {
         // create menu
         menuBar.add(new FileMenu(this));
@@ -42,7 +51,8 @@ public class MainWindow {
         panel.add(menuBar, BorderLayout.NORTH);
 
         // add views to array
-        views.add(new TreeView(new javax.swing.tree.DefaultMutableTreeNode()));
+        views.add(new TreeView(new javax.swing.tree.DefaultMutableTreeNode(),
+                    this));
         views.add(new DiagramView());
 
         // add the two views to the frame via splitpane

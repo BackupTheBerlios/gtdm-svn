@@ -22,6 +22,11 @@ public class JInstance {
     ArrayList activities;
     boolean active;
 
+    public String toString() {
+	return name;
+    }
+
+
     public JInstance() {
         active = false;
         activities = new ArrayList();
