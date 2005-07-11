@@ -375,7 +375,7 @@ public class DialogNewActivity extends JDialog {
                 return;
             }
 
-            if (!(calEnd.equals(currentInstance.getEndDate()) && calStart.equals(currentInstance.getStartDate()))) {
+            /*if (!(calEnd.equals(currentInstance.getEndDate()) && calStart.equals(currentInstance.getStartDate()))) {
                 if (calEnd.after(currentInstance.getEndDate()) ||
                     calStart.before(currentInstance.getStartDate())) {
 
@@ -388,7 +388,7 @@ public class DialogNewActivity extends JDialog {
                     "Falsche Eingabe", 2);
                     return;
                 }
-            }
+            }*/
         } catch (java.text.ParseException ex) {
 
             tabSettings.setSelectedIndex(0);
