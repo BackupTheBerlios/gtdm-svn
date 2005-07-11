@@ -233,7 +233,7 @@ public class DiagramView extends JComponent
     }
     /* View Implementation }}} */
 
-    /* JComponent Overloading (paint) {{{ */
+    /* paint() (overloads JComponent) {{{ */
     public void paint(Graphics not2Dg) {
         g = (Graphics2D)not2Dg;
 
@@ -242,7 +242,7 @@ public class DiagramView extends JComponent
             g.setColor(Color.gray);
             g.drawString(msgNoProject,
                 (getWidth() - g.getFontMetrics().stringWidth(msgNoProject)) / 2,
-                (getHeight() - ascent) /2
+                (getHeight() - ascent) / 2
             );
             return;
         }
@@ -284,6 +284,13 @@ public class DiagramView extends JComponent
                 gridRect.width / (endDate - startDate),
                 gridRect.height / (endDate - startDate)
             );
+
+            if (gridStep.x < 1) gridStep.x = 1;
+            if (gridStep.y < 1) gridStep.y = 1;
+            if (gridRect.x < 1) gridRect.x = 1;
+            if (gridRect.y < 1) gridRect.y = 1;
+            if (gridRect.width < 1) gridRect.width = 1;
+            if (gridRect.height < 1) gridRect.height = 1;
 
             // set minimal width to ensure readability
             //if (gridStep.x < advance/2) gridStep.x = advance/2;

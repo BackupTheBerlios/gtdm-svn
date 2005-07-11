@@ -44,7 +44,7 @@ public class TreeView extends JTree implements View, TreeSelectionListener {
             e.getPath().getLastPathComponent();
         if (n != null)
             parent.setSelection(n.getUserObject());
-        //System.out.println("selected: " + parent.getSelection());
+        System.out.println("selected: " + parent.getSelection());
         //System.out.println("id: "+((JActivity)parent.getSelection()).getId());
     }
 
@@ -72,7 +72,7 @@ public class TreeView extends JTree implements View, TreeSelectionListener {
         //updateUI();
     }
 
-    public void updateActivity(DefaultMutableTreeNode top, JActivity act) {
+    private void updateActivity(DefaultMutableTreeNode top, JActivity act) {
         DefaultMutableTreeNode n = new DefaultMutableTreeNode(act);
         top.add(n);
 
