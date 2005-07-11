@@ -1,70 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE project SYSTEM "gtdmanager.dtd">
-<project vendor-id="Tutor" version="1.0">
-	<name>Example Project</name>
+<project vendor-id="null" version="1.0.0.0">
+	<name>Testprojekt</name>
 
-	<property name="size-x" value="10" />
-	<property name="size-y" value="10" />
-	<property name="unit" value="cm" />
-	<property name="font-size" value="10" />
+	<property name="size-x" value="8" />
+	<property name="size-y" value="8" />
+	<property name="unit" value="mm" />
+	<property name="font-size" value="8" />
 
 	<instance>
-		<name>First Planing</name>
-		<creation-date date="14" month="2" year="2005" />
-		<start-date date="14" month="2" year="2005" />
-		<end-date date="16" month="2" year="2005" />
+		<name>Instanz1</name>
+		<creation-date date="1" month="6" year="2005" />
+		<start-date date="1" month="6" year="2005" />
+		<end-date date="30" month="6" year="2005" />
 		<activity id="A0">
-			<name>Teach Students about SoPra DTD</name>
-			<short-name>Teach</short-name>
-			<start-date date="14" month="2" year="2005" />
-			<end-date date="16" month="2" year="2005" />
-			<activity id="A1">
-				<name>Learn about DTDs</name>
-				<short-name>Learn</short-name>
-				<start-date date="14" month="2" year="2005" />
-				<end-date date="14" month="2" year="2005" />
-				<property name="color" value="blue" />
-			</activity>
-			<activity id="A2">
-				<name>Implement DTD</name>
-				<short-name>Impl</short-name>
-				<start-date date="14" month="2" year="2005" />
-				<end-date date="14" month="2" year="2005" />
-				<property name="color" value="red" />
-				<dependency type="begin-end" activity-id="A1">
-					<property name="color" value="black" />
-					<property name="line" value="dotted" />
-				</dependency>
-			</activity>
+			<name>Aktivi1</name>
+			<short-name>Akt1</short-name>
+			<start-date date="9" month="6" year="2005" />
+			<end-date date="18" month="6" year="2005" />
+			<property name="color" value="red" />
+			<dependency type="begin-begin" activity-id="A3">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
+			<dependency type="end-end" activity-id="A3">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
+			<dependency type="begin-begin" activity-id="A4">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
+			<dependency type="end-end" activity-id="A4">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
+			<dependency type="begin-begin" activity-id="A5">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
+			<dependency type="end-end" activity-id="A5">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
 		</activity>
-	</instance>
-	<instance>
-		<name>Second Planing</name>
-		<creation-date date="15" month="2" year="2005" />
-		<start-date date="14" month="2" year="2005" />
-		<end-date date="17" month="2" year="2005" />
-		<activity id="A0">
-			<name>Teach Students about SoPra DTD</name>
-			<short-name>Teach</short-name>
-			<start-date date="14" month="2" year="2005" />
-			<end-date date="17" month="2" year="2005" />
-			<activity id="A1">
-				<name>Learn about DTDs</name>
-				<short-name>Learn</short-name>
-				<start-date date="14" month="2" year="2005" />
-				<end-date date="14" month="2" year="2005" />
-				<property name="color" value="blue" />
-			</activity>
-			<activity id="A2">
-				<name>Implement DTD</name>
-				<short-name>Impl</short-name>
-				<start-date date="15" month="2" year="2005" />
-				<end-date date="16" month="2" year="2005" />
-				<dependency type="begin-end" activity-id="A1">
-					<property name="color" value="black" />
-					<property name="line" value="dotted" />
-				</dependency>
-			</activity>
+		<activity id="A1">
+			<name>Aktivi2</name>
+			<short-name>Akt2</short-name>
+			<start-date date="12" month="6" year="2005" />
+			<end-date date="24" month="6" year="2005" />
+			<property name="color" value="lime" />
+			<dependency type="begin-end" activity-id="A6">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
+			<dependency type="end-begin" activity-id="A6">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
+			<dependency type="begin-end" activity-id="A7">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
+			<dependency type="end-begin" activity-id="A7">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
+			<dependency type="begin-end" activity-id="A8">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
+			<dependency type="end-begin" activity-id="A8">
+				<property name="color" value="#ffffffff" />
+				<property name="line" value="" />
+			</dependency>
+		</activity>
+		<activity id="A2">
+			<name>Aktivi3</name>
+			<short-name>Akt3</short-name>
+			<start-date date="14" month="6" year="2005" />
+			<end-date date="29" month="6" year="2005" />
+			<property name="color" value="blue" />
+		</activity>
+		<activity id="A3">
+			<name>ENDEND1</name>
+			<short-name>EE1</short-name>
+			<start-date date="3" month="6" year="2005" />
+			<end-date date="7" month="6" year="2005" />
+			<property name="color" value="black" />
+		</activity>
+		<activity id="A4">
+			<name>ENDEND2</name>
+			<short-name>EE2</short-name>
+			<start-date date="15" month="6" year="2005" />
+			<end-date date="19" month="6" year="2005" />
+			<property name="color" value="black" />
+		</activity>
+		<activity id="A5">
+			<name>ENDEND3</name>
+			<short-name>EE3</short-name>
+			<start-date date="27" month="6" year="2005" />
+			<end-date date="31" month="6" year="2005" />
+			<property name="color" value="black" />
+		</activity>
+		<activity id="A6">
+			<name>BEGINEND1</name>
+			<short-name>BE1</short-name>
+			<start-date date="4" month="6" year="2005" />
+			<end-date date="8" month="6" year="2005" />
+			<property name="color" value="black" />
+		</activity>
+		<activity id="A7">
+			<name>BEGINEND2</name>
+			<short-name>BE2</short-name>
+			<start-date date="16" month="6" year="2005" />
+			<end-date date="20" month="6" year="2005" />
+			<property name="color" value="black" />
+		</activity>
+		<activity id="A8">
+			<name>BEGINEND2</name>
+			<short-name>BE2</short-name>
+			<start-date date="28" month="6" year="2005" />
+			<end-date date="1" month="7" year="2005" />
+			<property name="color" value="black" />
 		</activity>
 	</instance>
 </project>

@@ -402,11 +402,11 @@ public class DiagramView extends JComponent
         {
             int aid = ((JActivity)aIt.next()).getId();
 
-            g.setColor(Color.black);
-
             // draw shortName at y = endDate
             {
                 JActivity a = currentInstance.getActivity(aid);
+                g.setColor(new Color(a.getColor()));
+
                 int x = gridRect.x
                     + (cal2day(a.getEndDate()) - startDate) * gridStep.x;
                 int y = gridRect.y - ascent;
@@ -555,8 +555,6 @@ public class DiagramView extends JComponent
         // day grid
         for (int i = 0; i < gridRect.width; i += gridStep.x) {
             int day = startDate + i/gridStep.x;
-            Calendar cal = day2cal(day);
-
             int x = gridRect.x + i;
             int y = gridRect.y;
             int h = gridRect.height - 2;
@@ -566,17 +564,27 @@ public class DiagramView extends JComponent
             g.setColor(new Color(0x999999));
             g.drawLine(x, y, x, y + h);
 
-            boolean inProjectFrame = true;
+            boolean inProjectFrame = true, dateDrawn = false;
 
             // gray out days out of project
-            if (day < cal2day(currentInstance.getStartDate())
+
+            if (day == cal2day(currentInstance.getStartDate())
+                    || day == cal2day(currentInstance.getEndDate()))
+            {
+                g.setColor(new Color(0x777777));
+                drawVert(strx,
+                    y + getHeight() - (stringify(day).length()+1) * ascent,
+                    stringify(day));
+                dateDrawn = true;
+            }
+            else if (day < cal2day(currentInstance.getStartDate())
                     || day > cal2day(currentInstance.getEndDate())) {
                 g.setColor(new Color(0xaaaaaa));
                 g.fillRect(x + 1, y + 1, w, h);
                 inProjectFrame = false; // grayed out
             }
 
-            switch (cal.get(Calendar.DAY_OF_WEEK)) {
+            switch (day2cal(day).get(Calendar.DAY_OF_WEEK)) {
                 case Calendar.SUNDAY:
                     if (!inProjectFrame) break;
                     g.setColor(new Color(0xf0b0c0)); //Color.red);
@@ -590,6 +598,7 @@ public class DiagramView extends JComponent
                     break;
 
                 case Calendar.MONDAY:
+                    if (dateDrawn) break;
                     g.setColor(new Color(0x999999));
                     drawVert(strx,
                         y + getHeight() - (stringify(day).length()+1) * ascent,
@@ -613,29 +622,6 @@ public class DiagramView extends JComponent
 
             // print date at:
             // StartDate {{{
-            if (day == cal2day(currentInstance.getStartDate())) {
-                //currentInstance.getStartDate().add(Calendar.DATE, 1);
-                //if (cal.before(currentInstance.getStartDate())) {
-                    g.setColor(new Color(0x777777));
-                    drawVert(strx,
-                        y + getHeight() - (stringify(day).length()+1) * ascent,
-                        stringify(day));
-                //}
-                //currentInstance.getStartDate().add(Calendar.DATE, -1);
-            }
-            // }}}
-            // EndDate {{{
-            //if (cal.before(currentInstance.getEndDate())) {
-            if (day == cal2day(currentInstance.getEndDate())) {
-                //currentInstance.getEndDate().add(Calendar.DATE, -1);
-                //if (cal.after(currentInstance.getEndDate())) {
-                    g.setColor(new Color(0x777777));
-                    drawVert(strx,
-                        y + getHeight() - (stringify(day).length()+1) * ascent,
-                        stringify(day));
-                //}
-                //currentInstance.getEndDate().add(Calendar.DATE, 1);
-            }
             // }}}
 
         }
