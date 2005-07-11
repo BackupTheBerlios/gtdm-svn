@@ -1,0 +1,162 @@
+Modultest für Klasse DialogNewProject
+------------------------------------------------------------------------------------------------
+
+Autor: Moritz Leutenecker
+Tester: Moritz Leutenecker
+Datum: 11.07.2005
+
+Methode: public void show()
+Eingabe: Keine
+Erwartete Ausgabe: Dialogfenster mit Steuerelementen zum Erstellen eines neuen Projekts und einer ersten Instanz wird angezeigt.
+Ausgabe: Dialog wird angezeigt. Felder werden gefüllt.
+Status: bestanden
+
+Methode: public void btnCreate_actionPerformed(ActionEvent e) {
+Eingabe: e = Bestätigen/Speichern-Knopf wurde gedrückt
+Erwartete Ausgabe: Überprüfung der Textfelddaten, Änderung der internen Datenstrukturen.
+Die Zeiträume werden auf Gültigkeit überprüft.
+Ein neues Projekt wird angelegt und eine erste Instanz wird erstellt und dem neuen Projekt zugeordnet.
+Danach schließt sich das Fenster und die Ansicht im Hauptfenster wird aktualisiert.
+Ausgabe: Daten werden überprüft, übergeben und die Ansichten werden aktualisiert.
+Status: bestanden
+
+
+Modultest für Klasse DialogEditProject
+------------------------------------------------------------------------------------------------
+
+Autor: Moritz Leutenecker
+Tester: Moritz Leutenecker
+Datum: 11.07.2005
+
+Methode: public void show()
+Eingabe: Keine
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum Ändern des Projektnamens wird angezeigt.
+Ausgabe: Dialog wird angezeigt. Felder werden gefüllt.
+Status: bestanden
+
+Methode: public void btnCreate_actionPerformed(ActionEvent e) {
+Eingabe: e = Bestätigen/Speichern-Knopf wurde gedrückt
+Erwartete Ausgabe: Überprüfung der Textfelddaten, Änderung der internen Datenstrukturen.
+Danach schließt sich das Fenster und die Ansicht im Hauptfenster wird aktualisiert.
+Der Projektname sollte sich ändern.
+Ausgabe: Daten werden überprüft, übergeben und die Ansichten werden aktualisiert. Projektname wurde geändert.
+Status: bestanden
+
+
+Modultest für Klasse DialogNewActivity
+------------------------------------------------------------------------------------------------
+
+Autor: Moritz Leutenecker
+Tester: Moritz Leutenecker
+Datum: 11.07.2005
+
+Methode: public void show()
+Eingabe: Keine
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum Erstellen oder Bearbeiten einer neuen/bestehenden Aufgabe wird angezeigt.
+Die Liste der Bestehnden zu verlinkenden Aufgaben wird gefüllt, und die Farbpalette initialisiert.
+Ausgabe: Dialog wird angezeigt. Liste wurde gefüllt. Felder werden gefüllt.
+Status: bestanden
+
+Methode: public void btnCreate_actionPerformed(ActionEvent e) {
+Eingabe: e = Bestätigen/Speichern-Knopf wurde gedrückt
+Erwartete Ausgabe: Überprüfung der Textfelddaten, Änderung der internen Datenstrukturen.
+Die Zeiträume werden auf Gültigkeit überprüft.
+Die einzelnen Abhängigkeiten werden überprüft und angepasst.
+Danach schließt sich das Fenster und die Ansicht im Hauptfenster wird aktualisiert.
+Ausgabe: Daten werden überprüft, übergeben und die Ansichten werden aktualisiert.
+Status: bestanden
+
+
+Modultest für Klasse DialogNewInstance
+------------------------------------------------------------------------------------------------
+
+Autor: Moritz Leutenecker
+Tester: Moritz Leutenecker
+Datum: 11.07.2005
+
+Methode: public void show()
+Eingabe: Keine
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum Erstellen einer neuen Instanz wird angezeigt.
+Ausgabe: Dialog wird angezeigt. Felder werden gefüllt.
+Status: bestanden
+
+Methode: public void btnCreate_actionPerformed(ActionEvent e) {
+Eingabe: e = Bestätigen/Speichern-Knopf wurde gedrückt
+Erwartete Ausgabe: Überprüfung der Textfelddaten, Änderung der internen Datenstrukturen.
+Die Zeiträume werden auf Gültigkeit überprüft.
+Danach schließt sich das Fenster und die Ansicht im Hauptfenster wird aktualisiert.
+Ausgabe: Daten werden überprüft, übergeben und die Ansichten werden aktualisiert.
+Status: bestanden
+
+
+Modultest für Klasse DialogEditInstance
+------------------------------------------------------------------------------------------------
+
+Autor: Moritz Leutenecker
+Tester: Moritz Leutenecker
+Datum: 11.07.2005
+
+Methode: public void show()
+Eingabe: Keine
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum Bearbeiten einer Instanz wird angezeigt.
+Ausgabe: Dialog wird angezeigt. Felder werden gefüllt.
+Status: bestanden
+
+Methode: public void btnCreate_actionPerformed(ActionEvent e) {
+Eingabe: e = Bestätigen/Speichern-Knopf wurde gedrückt
+Erwartete Ausgabe: Überprüfung der Textfelddaten, Änderung der internen Datenstrukturen.
+Die Zeiträume werden auf Gültigkeit überprüft.
+Danach schließt sich das Fenster und die Ansicht im Hauptfenster wird aktualisiert.
+Ausgabe: Daten werden überprüft, übergeben und die Ansichten werden aktualisiert.
+Status: bestanden
+
+
+Modultest für Klasse DialogViewSettings
+------------------------------------------------------------------------------------------------
+
+Autor: Moritz Leutenecker
+Tester: Moritz Leutenecker
+Datum: 11.07.2005
+
+Methode: public void show()
+Eingabe: Keine
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum Konfigurieren der Anzeige wird angezeigt.
+Ausgabe: Dialog wird angezeigt. Felder werden gefüllt.
+Status: bestanden
+
+Methode: public void btnCreate_actionPerformed(ActionEvent e) {
+Eingabe: e = Bestätigen/Speichern-Knopf wurde gedrückt
+Erwartete Ausgabe: Überprüfung der Eingabedaten, Änderung der internen Datenstrukturen.
+Die Zeiträume werden auf Gültigkeit überprüft.
+Danach schließt sich das Fenster und die Ansicht im Hauptfenster wird aktualisiert.
+Ausgabe: Daten werden überprüft, übergeben und die Ansichten werden aktualisiert.
+Status: bestanden
+
+
+Modultest für Klasse DialogExport
+------------------------------------------------------------------------------------------------
+
+Autor: Moritz Leutenecker
+Tester: Moritz Leutenecker
+Datum: 11.07.2005
+
+Methode: public void show()
+Eingabe: Keine
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum Exportieren der Diagrammanzeige in ein Bildformat wird angezeigt.
+Ausgabe: Dialog wird angezeigt. Felder werden gefüllt und initialisiert.
+Status: bestanden
+
+Methode: public void btnCreate_actionPerformed(ActionEvent e) {
+Eingabe: e = Bestätigen/Speichern-Knopf wurde gedrückt
+Erwartete Ausgabe: Überprüfung der Eingabedaten, Filtereinstellungen (JPG, PNG usw).
+Danach schließt sich das Fenster und eine Grafik mit den gewünschten Ausgabeeinstellungen wird erstellt.
+Ausgabe: Daten werden überprüft, übergeben und die Grafikdatei wird erstellt.
+Status: bestanden
+
+------------------------------------------------------------------------------------------------
+
+Getestete Methoden: 7
+  davon bestanden: 7
+  davon nicht bestanden: 0
+
+------------------------------------------------------------------------------------------------
