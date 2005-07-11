@@ -416,6 +416,10 @@ public class DiagramView extends JComponent
             {
                 JInstance i = (JInstance)iIt.next();
                 JActivity a = i.getActivity(aid);
+
+                // skip if activity is non-existent in this instance
+                if (a == null) continue;
+                
                 iCrtDay = cal2day(i.getCreationDate());
                 aEndDay = cal2day(a.getEndDate());
 
@@ -685,11 +689,9 @@ public class DiagramView extends JComponent
 
             // ...and the text
             g.setColor(Color.white);
-            g.drawString(" "
-                + a.getShortName()
-                + "@" +  stringify(start)
-                , r.x
-                //+(r.width - a.getShortName().length() * advance / 2) / 2
+            g.drawString(a.getShortName()
+                , r.x + (r.width 
+                    - g.getFontMetrics().stringWidth(a.getShortName())) / 2
                 , r.y + (barWidth + ascent) / 2
             );
         }
@@ -721,42 +723,70 @@ public class DiagramView extends JComponent
             JActivity to = currentInstance.getActivity(d.getToActivityId());
             Rectangle toRect = (Rectangle)actRects.get(to);
 
-            // TODO: right now we make straight lines, but they should not
-            // intercept with activities..
+            //int lineHalfWidth =(int)Math.floor((double)Math.abs(lineWidth)/2);
 
-            int lineHalfWidth = (int)Math.floor((double)Math.abs(lineWidth)/2);
+            // short names
+            Point f, t; // from/to point
+            int ud = 8; // unit divisor
+            int u = barWidth / ud; // unit
+            int uh = barWidth / 2; // unit height
+            
             if (d.getDependencyType() == JDependency.BEGINBEGIN)
-                for (int j = -lineHalfWidth; j <= lineHalfWidth; j++)
-                    g.drawLine(
+            {//for (int j = -lineHalfWidth; j <= lineHalfWidth; j++)
+             //       g.drawLine(
+                    f = new Point(
                         fromRect.x - 1,
-                        fromRect.y + fromRect.height / 2 + j,
+                        fromRect.y + fromRect.height / 2 );//+ j );
+                    t = new Point(
                         toRect.x - 1,
-                        toRect.y + toRect.height / 2 + j
-                    );
+                        toRect.y + toRect.height / 2 );//+ j );
+            }
             else if (d.getDependencyType() == JDependency.BEGINEND)
-                for (int j = -lineHalfWidth; j <= lineHalfWidth; j++)
-                    g.drawLine(
+            {
+                //for (int j = -lineHalfWidth; j <= lineHalfWidth; j++)
+                //    g.drawLine(
+                    f = new Point(
                         fromRect.x - 1,
-                        fromRect.y + fromRect.height / 2 + j,
+                        fromRect.y + fromRect.height / 2 );//+ j );
+                    t = new Point(
                         toRect.x + toRect.width + 1,
-                        toRect.y + toRect.height / 2 + j
-                    );
+                        toRect.y + toRect.height / 2 );//+ j );
+            }
             else if (d.getDependencyType() == JDependency.ENDBEGIN)
-                for (int j = -lineHalfWidth; j <= lineHalfWidth; j++)
-                    g.drawLine(
-                        fromRect.x + fromRect.width + 1,
-                        fromRect.y + fromRect.height / 2 + j,
-                        toRect.x - 1,
-                        toRect.y + toRect.height / 2 + j
-                    );
+            {
+                    f = new Point(fromRect.x + fromRect.width + 1,
+                        fromRect.y + fromRect.height / 2 );
+                    t = new Point(toRect.x - 1, toRect.y + toRect.height / 2 );
+
+                    // draw line
+                    /*
+                    g.drawLine(f.x, f.y, f.x + u, f.y);
+                    g.drawLine(f.x+u, f.y, f.x+u, f.y+uh+u);
+                    g.drawLine(f.x+u, f.y+uh+u, t.x+(t.x<f.x?-u:u), f.y+uh+u);
+                    g.drawLine(t.x+(t.x<f.x?-u:u), f.y+uh+u, t.x+(t.x<f.x?-u:u),
+                            t.y);
+                    g.drawLine(t.x+(t.x<f.x?-u:u), t.y, t.x, t.y);
+                    */
+            }
             else if (d.getDependencyType() == JDependency.ENDEND)
-                for (int j = -lineHalfWidth; j <= lineHalfWidth; j++)
-                    g.drawLine(
-                        fromRect.x + fromRect.width + 1,
-                        fromRect.y + fromRect.height / 2 + j,
-                        toRect.x + toRect.width + 1,
-                        toRect.y + toRect.height / 2 + j
-                    );
+            {
+                    f = new Point(fromRect.x + fromRect.width + 1,
+                        fromRect.y + fromRect.height / 2 );
+                    t = new Point(toRect.x + toRect.width + 1,
+                        toRect.y + toRect.height / 2 );
+
+                    // draw line
+                    //if (f.x <= t.x)
+                    //{
+                        g.drawLine(f.x, f.y, t.x + u, f.y);
+                        g.drawLine(t.x + u, f.y, t.x + u, t.y);
+                        g.drawLine(t.x + u, t.y, t.x, t.y);
+                    //}
+                    //else
+                    //{
+                    //    g.drawLine(f.x, f.y, t.x + u, f.y);
+                    //}
+            }
             else {
                 g.setColor(Color.red);
                 g.drawString("ungültige Abhängigkeit"
@@ -767,8 +797,9 @@ public class DiagramView extends JComponent
                     , fromRect.x
                     , fromRect.y + fromRect.height + (d.getId()+1) * ascent
                 );
-            }
 
+                f = t = null;
+            }
         }
     }//}}}
     /* Gantt Paint Routines }}} */

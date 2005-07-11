@@ -837,7 +837,7 @@ public class JManager {
     }
 
     public void generateSampleProject() {
-/*
+
         newProject("Testprojekt", "1.0.0.0");
 
 	JInstance i;
@@ -864,9 +864,7 @@ public class JManager {
 		new GregorianCalendar(2005, 6, 14),
 		new GregorianCalendar(2005, 6, 29), 0));
 
-        a1.newDependency(a2.getId(), JDependency.ENDBEGIN);
-
-	i	= getProject().getInstance(getProject().newInstance(
+	/*i	= getProject().getInstance(getProject().newInstance(
 		"Instanz2",
 		new GregorianCalendar(2005, 6, 6),
 		new GregorianCalendar(2005, 6, 2),
@@ -879,12 +877,27 @@ public class JManager {
 		"Instanz3",
 		new GregorianCalendar(2005, 6, 8),
 		new GregorianCalendar(2005, 6, 2),
-		new GregorianCalendar(2005, 6, 34), true));
+		new GregorianCalendar(2005, 6, 34), true));*/
 
+       i.getActivity(a1.getId()).setStartDate(new GregorianCalendar(2005,6,9));
        	i.getActivity(a1.getId()).setEndDate(new GregorianCalendar(2005,6,18));
        i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005,6,12));
        	i.getActivity(a2.getId()).setEndDate(new GregorianCalendar(2005,6,24));
-*/
+
+	// for DiagramView testing
+	a9	= i.getActivity(i.newActivity(i.activities, "ENDEND1", "EE1",
+	  	new GregorianCalendar(2005, 6, 3),
+	  	new GregorianCalendar(2005, 6, 7), 0));
+	a1.newDependency(a9.getId(), JDependency.ENDEND);
+	a9	= i.getActivity(i.newActivity(i.activities, "ENDEND2", "EE2",
+	  	new GregorianCalendar(2005, 6, 15),
+	  	new GregorianCalendar(2005, 6, 19), 0));
+	a1.newDependency(a9.getId(), JDependency.ENDEND);
+	a9	= i.getActivity(i.newActivity(i.activities, "ENDEND3", "EE3",
+	  	new GregorianCalendar(2005, 6, 27),
+	  	new GregorianCalendar(2005, 6, 31), 0));
+	a1.newDependency(a9.getId(), JDependency.ENDEND);
+
 	//i.newActivity(i.activities,
 	//	"Aktivi1", "Akt1",
 	//	new GregorianCalendar(2005, 6, 2),
@@ -893,8 +906,8 @@ public class JManager {
      //i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005, 5, 17));
      //i.getActivity(a2.getId()).setEndDate(new GregorianCalendar(2005, 5, 21));
 
-	newProject();
-	loadProject("test.xml");
+	//newProject();
+	//loadProject("test.xml");
     }
 
     private void jbInit() throws Exception {
