@@ -10,6 +10,10 @@ import java.util.Date;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import com.borland.jbcl.layout.XYLayout;
+import com.borland.jbcl.layout.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
 
 /**
  * <p>Title: </p>
@@ -25,7 +29,6 @@ import java.awt.event.ActionListener;
  */
 public class DialogNewActivity extends JDialog {
     MainWindow mainwindow = null;
-    JInstance currentInstance = null;
 
     public DialogNewActivity() throws HeadlessException {
         super();
@@ -187,58 +190,106 @@ public class DialogNewActivity extends JDialog {
     private void jbInit() throws Exception {
         jContentPane.setLayout(null);
         this.setContentPane(jContentPane);
-        this.setSize(380, 210);
-        btnCreate.setBounds(new Rectangle(10, 153, 138, 25));
+        this.addWindowListener(new DialogNewActivity_this_windowAdapter(this));
+        this.setSize(458, 452);
+        btnCreate.setBounds(new Rectangle(8, 392, 138, 25));
         btnCreate.setSelected(true);
-        btnCreate.setText("Aktivitaet erstellen");
+        btnCreate.setText("Aufgabe erstellen");
         btnCreate.addActionListener(new DialogNewActivity_btnCreate_actionAdapter(this));
-        btnCancel.setBounds(new Rectangle(250, 153, 104, 25));
+        btnCancel.setBounds(new Rectangle(336, 392, 104, 25));
         btnCancel.setText("Abbrechen");
         btnCancel.addActionListener(new DialogNewActivity_btnCancel_actionAdapter(this));
-        lblInstanceName.setAlignmentX((float) 0.5);
-        lblInstanceName.setMaximumSize(new Dimension(34, 21));
-        lblInstanceName.setMinimumSize(new Dimension(34, 21));
-        lblInstanceName.setPreferredSize(new Dimension(34, 21));
-        lblInstanceName.setText("Instanzname:");
-        lblInstanceName.setBounds(new Rectangle(10, 11, 108, 21));
-        lblInstanceStartDate.setAlignmentX((float) 0.5);
-        lblInstanceStartDate.setMaximumSize(new Dimension(34, 21));
-        lblInstanceStartDate.setMinimumSize(new Dimension(34, 21));
-        lblInstanceStartDate.setPreferredSize(new Dimension(34, 21));
-        lblInstanceStartDate.setText("Startdatum:");
-        lblInstanceStartDate.setBounds(new Rectangle(10, 74, 108, 21));
-        lblInstanceEndDate.setAlignmentX((float) 0.5);
-        lblInstanceEndDate.setMaximumSize(new Dimension(34, 21));
-        lblInstanceEndDate.setMinimumSize(new Dimension(34, 21));
-        lblInstanceEndDate.setPreferredSize(new Dimension(34, 21));
-        lblInstanceEndDate.setText("Enddatum:");
-        lblInstanceEndDate.setBounds(new Rectangle(10, 105, 108, 21));
-        txtInstanceStartDate.setText("");
-        txtInstanceStartDate.setBounds(new Rectangle(123, 74, 82, 21));
-        txtInstanceEndDate.setText("");
-        txtInstanceEndDate.setBounds(new Rectangle(123, 105, 82, 21));
-        lblInstanceCreationDate.setAlignmentX((float) 0.5);
-        lblInstanceCreationDate.setMaximumSize(new Dimension(34, 21));
-        lblInstanceCreationDate.setMinimumSize(new Dimension(34, 21));
-        lblInstanceCreationDate.setPreferredSize(new Dimension(34, 21));
-        lblInstanceCreationDate.setText("Kurzname:");
-        lblInstanceCreationDate.setBounds(new Rectangle(10, 42, 108, 21));
-        txtInstanceName.setBounds(new Rectangle(123, 11, 138, 21));
-        txtShortname.setText("");
-        txtShortname.setBounds(new Rectangle(123, 42, 82, 21));
-        jContentPane.add(lblInstanceName, null);
-        jContentPane.add(txtInstanceName, null);
-        jContentPane.add(lblInstanceCreationDate, null);
-        jContentPane.add(lblInstanceStartDate, null);
-        jContentPane.add(txtInstanceStartDate, null);
-        jContentPane.add(txtInstanceEndDate, null);
-        jContentPane.add(lblInstanceEndDate, null);
-        jContentPane.add(btnCreate, null);
+        tabSettings.setBounds(new Rectangle(8, 12, 432, 372));
+        Aufgabedaten.setLayout(null);
+        txtName.setText("");
+        txtName.setBounds(new Rectangle(122, 29, 168, 22));
+        lblName.setAlignmentX((float) 0.5);
+        lblName.setMaximumSize(new Dimension(34, 21));
+        lblName.setMinimumSize(new Dimension(34, 21));
+        lblName.setPreferredSize(new Dimension(34, 21));
+        lblName.setText("Aufgabenname:");
+        lblName.setBounds(new Rectangle(20, 29, 89, 22));
+        lblEndDate.setAlignmentX((float) 0.5);
+        lblEndDate.setMaximumSize(new Dimension(34, 21));
+        lblEndDate.setMinimumSize(new Dimension(34, 21));
+        lblEndDate.setPreferredSize(new Dimension(34, 21));
+        lblEndDate.setText("Enddatum:");
+        lblEndDate.setBounds(new Rectangle(20, 210, 89, 22));
+        lblShortname.setAlignmentX((float) 0.5);
+        lblShortname.setMaximumSize(new Dimension(34, 21));
+        lblShortname.setMinimumSize(new Dimension(34, 21));
+        lblShortname.setPreferredSize(new Dimension(34, 21));
+        lblShortname.setText("Kurzname:");
+        lblShortname.setBounds(new Rectangle(20, 89, 89, 22));
+        lblStartDate.setAlignmentX((float) 0.5);
+        lblStartDate.setMaximumSize(new Dimension(34, 21));
+        lblStartDate.setMinimumSize(new Dimension(34, 21));
+        lblStartDate.setPreferredSize(new Dimension(34, 21));
+        lblStartDate.setText("Startdatum:");
+        lblStartDate.setBounds(new Rectangle(20, 150, 89, 22));
+        txtShortName.setBounds(new Rectangle(122, 89, 115, 22));
+        Abhängigkeiten.setLayout(null);
+        optEndeEnde.setText("Ende - Ende");
+        optEndeEnde.setBounds(new Rectangle(103, 85, 117, 23));
+        optEndeAnfang.setText("Ende - Anfang");
+        optEndeAnfang.setBounds(new Rectangle(217, 85, 117, 23));
+        optAnfangEnde.setText("Anfang - Ende");
+        optAnfangEnde.setBounds(new Rectangle(103, 115, 117, 23));
+        optAnfangAnfang.setText("Anfang - Anfang");
+        optAnfangAnfang.setBounds(new Rectangle(217, 115, 117, 23));
+        jLabel1.setLabelFor(null);
+        jLabel1.setText("Abhängigkeitstyp:");
+        jLabel1.setBounds(new Rectangle(15, 29, 304, 16));
+        btnAdd.setBounds(new Rectangle(192, 227, 52, 27));
+        btnAdd.setText(">>");
+        btnRemove.setBounds(new Rectangle(192, 305, 52, 27));
+        btnRemove.setText("<<");
+        jLabel2.setText("Alle Aufgaben/Phasen:");
+        jLabel2.setBounds(new Rectangle(15, 209, 146, 15));
+        jLabel3.setText("Abhängigkeit mit:");
+        jLabel3.setBounds(new Rectangle(302, 210, 124, 15));
+        lstAdded.setBorder(BorderFactory.createLoweredBevelBorder());
+        lstAdded.setBounds(new Rectangle(302, 227, 116, 105));
+        lstAdded.setSelectionModel(mdlSelected);
+        lstActivities.setBorder(BorderFactory.createLoweredBevelBorder());
+        lstActivities.setBounds(new Rectangle(15, 227, 116, 105));
+        lstActivities.setSelectionModel(mdlActivities);
+        Farbe.setMinimumSize(new Dimension(329, 338));
+        Farbe.setPreferredSize(new Dimension(329, 338));
+        txtStartDate.setBounds(new Rectangle(122, 150, 115, 22));
+        txtEndDate.setBounds(new Rectangle(122, 210, 115, 22));
         jContentPane.add(btnCancel, null);
-        jContentPane.add(txtShortname);
+        jContentPane.add(btnCreate, null);
+        jContentPane.add(tabSettings);
+
+        Aufgabedaten.add(lblName, null);
+        Aufgabedaten.add(txtName, null);
+        Aufgabedaten.add(txtShortName, null);
+        Aufgabedaten.add(lblShortname, null);
+        Aufgabedaten.add(lblStartDate, null);
+        Aufgabedaten.add(txtStartDate, null);
+        Aufgabedaten.add(txtEndDate, null);
+        Aufgabedaten.add(lblEndDate, null);
+        Abhängigkeiten.add(lstActivities, null);
+        Abhängigkeiten.add(jLabel2, null);
+        Abhängigkeiten.add(btnAdd, null);
+        Abhängigkeiten.add(jLabel3, null);
+        Abhängigkeiten.add(lstAdded, null);
+        Abhängigkeiten.add(btnRemove, null);
+        Abhängigkeiten.add(optAnfangEnde, null);
+        Abhängigkeiten.add(optEndeEnde, null);
+        Abhängigkeiten.add(optEndeAnfang, null);
+        Abhängigkeiten.add(optAnfangAnfang, null);
+        Abhängigkeiten.add(jLabel1, null);
+        tabSettings.add(Aufgabedaten, "Aufgabedaten");
+        tabSettings.add(Abhängigkeiten, "Abh\344ngigkeiten");
+        tabSettings.add(Farbe, "Farbe");
+        tabSettings.setSelectedComponent(Aufgabedaten);
         Calendar cal = Calendar.getInstance();
-        txtInstanceStartDate.setText(getCal(currentInstance.getStartDate()));
-        txtInstanceEndDate.setText(getCal(currentInstance.getEndDate()));
+        groupDependencies.add(optEndeEnde);
+        groupDependencies.add(optEndeAnfang);
+        groupDependencies.add(optAnfangAnfang);
+        groupDependencies.add(optAnfangEnde);
     }
 
     SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
@@ -246,34 +297,58 @@ public class DialogNewActivity extends JDialog {
     JPanel jContentPane = new JPanel();
     JButton btnCreate = new JButton();
     JButton btnCancel = new JButton();
-    JLabel lblInstanceName = new JLabel();
-    JTextField txtInstanceName = new JTextField();
-    JLabel lblInstanceStartDate = new JLabel();
-    JLabel lblInstanceEndDate = new JLabel();
-    JLabel lblInstanceCreationDate = new JLabel();
-    JFormattedTextField txtInstanceStartDate = new JFormattedTextField(format);
-    JFormattedTextField txtInstanceEndDate = new JFormattedTextField(format);
-    JTextField txtShortname = new JTextField();
+    JTabbedPane tabSettings = new JTabbedPane();
+    JPanel Aufgabedaten = new JPanel();
+    JTextField txtName = new JTextField();
+    JLabel lblName = new JLabel();
+    JLabel lblEndDate = new JLabel();
+    JFormattedTextField txtStartDate = new JFormattedTextField(format);
+    JTextField txtShortName = new JTextField();
+    JFormattedTextField txtEndDate = new JFormattedTextField(format);
+    JLabel lblShortname = new JLabel();
+    JLabel lblStartDate = new JLabel();
+    JPanel Abhängigkeiten = new JPanel();
+    JRadioButton optEndeEnde = new JRadioButton();
+    JRadioButton optEndeAnfang = new JRadioButton();
+    JRadioButton optAnfangEnde = new JRadioButton();
+    JRadioButton optAnfangAnfang = new JRadioButton();
+    JLabel jLabel1 = new JLabel();
+    JList lstActivities = new JList();
+    JButton btnAdd = new JButton();
+    JButton btnRemove = new JButton();
+    JList lstAdded = new JList();
+    JLabel jLabel2 = new JLabel();
+    JLabel jLabel3 = new JLabel();
+    JColorChooser Farbe = new JColorChooser();
+    ButtonGroup groupDependencies = new ButtonGroup();
+    JInstance currentInstance = null;
+    DefaultListSelectionModel mdlActivities = new DefaultListSelectionModel();
+    DefaultListSelectionModel mdlSelected = new DefaultListSelectionModel();
+
     public void btnCancel_actionPerformed(ActionEvent e) {
         dispose();
     }
 
     public void btnCreate_actionPerformed(ActionEvent e) {
-        String strName = txtInstanceName.getText(),
-               strShortname = txtShortname.getText(),
-               strStartDate = txtInstanceStartDate.getText(),
-               strEndDate = txtInstanceEndDate.getText();
+        String strStartDate = txtStartDate.getText(),
+               strEndDate = txtEndDate.getText(),
+               strName = txtName.getText(),
+               strShortName = txtShortName.getText();
 
-        if (strName.length() == 0 || strShortname.length() == 0) {
+        if (strName.length() == 0 || strShortName.length() == 0) {
+
+            tabSettings.setSelectedIndex(0);
 
             javax.swing.JOptionPane.showMessageDialog(this,
-            "Bitte füllen Sie alle Felder aus.", "Falsche Eingabe", 2);
+            "Bitte füllen Sie alle Textfelder aus.", "Falsche Eingabe", 2);
 
             return;
         }
 
         if (strStartDate.length() == 0
             || strEndDate.length() == 0) {
+
+            tabSettings.setSelectedIndex(0);
 
             javax.swing.JOptionPane.showMessageDialog(this,
             "Bitte geben Sie ein Erstellungs-, Start- und Enddatum im folgenden Format (01.01.2005) ein.", "Falsche Eingabe", 2);
@@ -289,6 +364,9 @@ public class DialogNewActivity extends JDialog {
             calEnd = toCal(strEndDate);
 
             if (calEnd.before(calStart) || calEnd.equals(calStart)) {
+
+                tabSettings.setSelectedIndex(0);
+
                 javax.swing.JOptionPane.showMessageDialog(this,
                 "Das Enddatum darf nicht vor- oder auf dem Startdatum liegen.",
                 "Falsche Eingabe", 2);
@@ -296,6 +374,9 @@ public class DialogNewActivity extends JDialog {
             }
 
             if (calEnd.after(currentInstance.getEndDate()) || calStart.before(currentInstance.getStartDate())) {
+
+                tabSettings.setSelectedIndex(0);
+
                 javax.swing.JOptionPane.showMessageDialog(this,
                 "Der Zeitraum der neuen Aktivitaet muss im Gesamtzeitraum der letzten Instanz liegen.\nVon " + getCal(currentInstance.getStartDate()) + " bis " + getCal(currentInstance.getEndDate()) + ".",
                 "Falsche Eingabe", 2);
@@ -303,18 +384,39 @@ public class DialogNewActivity extends JDialog {
             }
 
         } catch (java.text.ParseException ex) {
+
+            tabSettings.setSelectedIndex(0);
+
             javax.swing.JOptionPane.showMessageDialog(this,
             "Bitte geben Sie ein Erstellungs-, Start- und Enddatum im " +
             "folgenden Format (01.01.2005) ein.", "Falsche Eingabe", 2);
             return;
         }
 
+        Color col = Farbe.getColor();
+
         JManager manager = mainwindow.getManager() ;
-        currentInstance.newActivity(null, strName, strShortname, calStart, calEnd, 0);
+        currentInstance.newActivity(currentInstance.getActivities(), strName, strShortName, calStart, calEnd, col.getRGB());
 
         mainwindow.updateViews();
 
         dispose();
+    }
+
+    public void this_windowOpened(WindowEvent e) {
+
+    }
+}
+
+
+class DialogNewActivity_this_windowAdapter extends WindowAdapter {
+    private DialogNewActivity adaptee;
+    DialogNewActivity_this_windowAdapter(DialogNewActivity adaptee) {
+        this.adaptee = adaptee;
+    }
+
+    public void windowOpened(WindowEvent e) {
+        adaptee.this_windowOpened(e);
     }
 }
 

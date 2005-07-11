@@ -22,6 +22,10 @@ import java.util.*;
  * {{{ MainWindow */
 public class MainWindow {
 
+    //file open and save dialogs
+    JFileChooser opendialog = new JFileChooser();
+    JFileChooser savedialog = new JFileChooser();
+
     // manager
     JManager manager = new JManager();
 

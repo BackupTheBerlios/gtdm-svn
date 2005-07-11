@@ -99,7 +99,14 @@ class ProjectMenuAction extends AbstractAction {
                 return;
             }
 
-            DialogNewActivity pDlg = new DialogNewActivity(this.parent, "Neue Aktivitaet erstellen", true);
+            if (parent.getSelection() == null || parent.getSelection().getClass() != JInstance.class) {
+                javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                "Sie müssen zuerst eine Instanz im Projektbaum markieren, um ihr eine neue Aufgabe hinzufügen zu können.", "Keine Instanz markiert", 2);
+                return;
+            }
+
+            DialogNewActivity pDlg = new DialogNewActivity(this.parent, "Neue Aufgabe erstellen", true);
+            pDlg.currentInstance = (JInstance)parent.getSelection();
             pDlg.setLocationRelativeTo(null);
             pDlg.setModal(true);
             pDlg.show();

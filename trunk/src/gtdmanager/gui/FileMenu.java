@@ -9,7 +9,7 @@ import gtdmanager.core.*;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
-//import gtdmanager.gui.DialogNewProject;
+import javax.swing.JFileChooser;
 
 /* }}} */
 /**
@@ -50,10 +50,10 @@ public class FileMenu extends JMenu {
 class FileMenuAction extends AbstractAction {
 
     public static String generateProject = "Generiere Testprojekt";
-    public static String newProject = "Neues Projekt...";
-    public static String openProject= "Oeffne Projekt...";
-    public static String saveProject = "Projekt Speichern...";
-    public static String quit = "GTDManager beenden";
+    public static String newProject = "Neues Projekt erstellen...";
+    public static String openProject= "Projekt laden...";
+    public static String saveProject = "Projekt speichern...";
+    public static String quit = "Beenden";
 
     private static MainWindow parent = null;
 
@@ -79,6 +79,25 @@ class FileMenuAction extends AbstractAction {
             pDlg.setLocationRelativeTo(null);
             pDlg.setModal(true);
             pDlg.show();
+        }
+        else if (name == openProject) {
+            parent.opendialog.setDialogTitle("Projekt laden");
+            int nRet = parent.opendialog.showOpenDialog(parent.frame);
+
+            if (nRet == JFileChooser.APPROVE_OPTION) {
+                String strFilename = parent.opendialog.getSelectedFile().toString();
+                parent.manager.loadProject(strFilename);
+                parent.updateViews();
+            }
+        }
+        else if (name == saveProject) {
+            parent.savedialog.setDialogTitle("Projekt speichern");
+            int nRet = parent.savedialog.showSaveDialog(parent.frame);
+
+            if (nRet == JFileChooser.APPROVE_OPTION) {
+                String strFilename = parent.savedialog.getSelectedFile().toString();
+                parent.manager.saveProject(strFilename);
+            }
         }
         else if (name == quit) {
             System.exit(0);

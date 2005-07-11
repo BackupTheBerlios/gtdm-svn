@@ -57,6 +57,7 @@
   <property category="sys" name="VersionLabel" value="@version"/>
   <property category="sys" name="WorkingDirectory" value="."/>
   <property category="sys" name="uidesign.size.gtdmanager.gui.DialogEditProject" value="364,96"/>
+  <property category="sys" name="uidesign.size.gtdmanager.gui.DialogNewActivity" value="452,427"/>
   <property category="sys" name="uidesign.size.gtdmanager.gui.DialogNewInstance" value="364,189"/>
   <property category="sys" name="uidesign.size.gtdmanager.gui.DialogNewProject" value="369,320"/>
   <file path="freehep-base.jar"/>
