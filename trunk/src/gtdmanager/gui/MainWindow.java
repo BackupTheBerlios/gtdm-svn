@@ -41,6 +41,7 @@ public class MainWindow {
 
     public void setSelection(Object s) {
         selection = s;
+        //updateViews();
     }
     public Object getSelection() {
         return selection;
@@ -57,12 +58,12 @@ public class MainWindow {
         // add views to array
         views.add(new TreeView(new javax.swing.tree.DefaultMutableTreeNode(),
                     this));
-        views.add(new DiagramView());
+        views.add(new DiagramView(this));
 
         // add the two views to the frame via splitpane
         JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                (Component)views.get(0),
-                (Component)views.get(1)
+                new JScrollPane((Component)views.get(0)),
+                new JScrollPane((Component)views.get(1))
         );
         sp.setDividerLocation(150);
         panel.add(sp, BorderLayout.CENTER);

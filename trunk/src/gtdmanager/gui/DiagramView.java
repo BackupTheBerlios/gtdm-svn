@@ -37,6 +37,7 @@ public class DiagramView extends JComponent
     // varios messages the dialog spits out
     private static String msgNone = "";
     private static String msgDrag = "Mit der Maus Sichtbereich verschieben";
+    private static String msgNoProject = "Kein Projekt geladen";
     // the drawn message
     private String message = msgNone;
 
@@ -102,11 +103,15 @@ public class DiagramView extends JComponent
     // maybe-TODO: extend the interfaces Menu and View to handle such stuff.
     static public boolean showGantt = true;
 
+
+    MainWindow parent = null;
+
     /* Variables }}} */
 
     /* Constructors {{{ */
-    DiagramView() {
+    DiagramView(MainWindow parent) {
         super();
+        this.parent = parent;
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
@@ -155,16 +160,17 @@ public class DiagramView extends JComponent
 
     public void mouseDragged (MouseEvent e) {
         if (project != null) {
-            //if (showGantt) {
-                int xstep = (e.getX() - mouseLastX)/gridStep.x;
-                if (xstep != 0) {
-                    startDate -= xstep;
-                    endDate -= xstep;
-                    repaint();
+            int xstep = (e.getX() - mouseLastX)/gridStep.x;
+            if (xstep != 0) {
+                startDate -= xstep;
+                endDate -= xstep;
+                repaint();
 
-                    mouseLastX = e.getX();
-                }
-            //}
+                mouseLastX = e.getX();
+
+                // now the user should know :-)
+                msgDrag = "";
+            }
         }
         // if nothing matches, handle this as a simple move
         else mouseMoved(e);
@@ -229,9 +235,17 @@ public class DiagramView extends JComponent
 
     /* JComponent Overloading (paint) {{{ */
     public void paint(Graphics not2Dg) {
-        if (project == null) return;
-
         g = (Graphics2D)not2Dg;
+
+        if (project == null)
+        {
+            g.setColor(Color.gray);
+            g.drawString(msgNoProject,
+                (getWidth() - g.getFontMetrics().stringWidth(msgNoProject)) / 2,
+                (getHeight() - ascent) /2
+            );
+            return;
+        }
 
         advance = g.getFontMetrics().getMaxAdvance();
         ascent = g.getFontMetrics().getMaxAscent();
@@ -510,7 +524,10 @@ public class DiagramView extends JComponent
             -1,
             padding,
             getWidth() + 1,
-            getHeight() - 2 * padding
+            //getHeight() - 2 * padding
+
+            // i'm really sorry here, but for schedules' sake:
+            1024*1024*1024
         );
         gridStep = new Point(
             gridRect.width / (endDate - startDate),
@@ -521,13 +538,12 @@ public class DiagramView extends JComponent
         if (gridStep.x < advance/2)
         {
             gridStep.x = advance/2;
-            showDays = gridRect.width / gridStep.x;
+            //showDays = gridRect.width / gridStep.x;
         }
 
         // draw message (outside the clipping area)
         g.setColor(Color.gray);
-        g.drawString(message, gridRect.x + padding, gridRect.y
-                + gridRect.height + ascent);
+        g.drawString(message, gridRect.x + 2, gridRect.y - 2);
         
         // set clip rect, so that nothing can be drawn outside
         g.clip(gridRect);
@@ -575,7 +591,9 @@ public class DiagramView extends JComponent
 
                 case Calendar.MONDAY:
                     g.setColor(new Color(0x999999));
-                    drawVert(strx,(int)(y + h - h*.45), stringify(day));
+                    drawVert(strx,
+                        y + getHeight() - (stringify(day).length()+1) * ascent,
+                        stringify(day));
                     break;
                     
                 default:
@@ -588,7 +606,9 @@ public class DiagramView extends JComponent
                 g.fillRect(x + 1, y + 1, w, h);
 
                 g.setColor(new Color(0xd08060));
-                drawVert(strx,(int)(y + h - h*.45), stringify(day));
+                drawVert(strx,
+                        y + getHeight() - (stringify(day).length()+1) * ascent,
+                        stringify(day));
             }
 
             // print date at:
@@ -597,7 +617,9 @@ public class DiagramView extends JComponent
                 //currentInstance.getStartDate().add(Calendar.DATE, 1);
                 //if (cal.before(currentInstance.getStartDate())) {
                     g.setColor(new Color(0x777777));
-                    drawVert(strx,(int)(y + h - h*.45), stringify(day));
+                    drawVert(strx,
+                        y + getHeight() - (stringify(day).length()+1) * ascent,
+                        stringify(day));
                 //}
                 //currentInstance.getStartDate().add(Calendar.DATE, -1);
             }
@@ -608,7 +630,9 @@ public class DiagramView extends JComponent
                 //currentInstance.getEndDate().add(Calendar.DATE, -1);
                 //if (cal.after(currentInstance.getEndDate())) {
                     g.setColor(new Color(0x777777));
-                    drawVert(strx,(int)(y + h - h*.45), stringify(day));
+                    drawVert(strx,
+                        y + getHeight() - (stringify(day).length()+1) * ascent,
+                        stringify(day));
                 //}
                 //currentInstance.getEndDate().add(Calendar.DATE, 1);
             }
@@ -736,15 +760,18 @@ public class DiagramView extends JComponent
             JActivity to = currentInstance.getActivity(d.getToActivityId());
             Rectangle toRect = (Rectangle)actRects.get(to);
 
-            //int lineHalfWidth =(int)Math.floor((double)Math.abs(lineWidth)/2);
-
             // short names
             Point f, t; // from/to point
             int ud = 8; // unit divisor
             int u = barWidth / ud; // unit
-            int uh = barWidth / 2; // unit height
+            int uh = u + barWidth / 2; // unit height
 
-            g.setColor(new Color(from.getColor()));
+            /*try {
+                if (((JActivity)parent.getSelection()).getId() == from.getId())
+                    g.setColor(new Color(0xFFFFFF));
+            } catch (Exception e) {
+                g.setColor(new Color(0x424242));
+            }*/
             
             if (d.getDependencyType() == JDependency.BEGINBEGIN) {//{{{
                     f = new Point(
@@ -776,9 +803,18 @@ public class DiagramView extends JComponent
                     if (f.x < t.x)
                     {
                         g.drawLine(f.x, f.y, f.x - u, f.y);
-                        g.drawLine(f.x - u, f.y, f.x - u, f.y + uh + u);
-                        g.drawLine(f.x - u, f.y + uh + u, t.x + u, f.y+uh+u);
-                        g.drawLine(t.x + u, f.y+uh+u, t.x + u, t.y);
+                        if (f.y < t.x)
+                        {
+                            g.drawLine(f.x - u, f.y, f.x - u, f.y + uh + u);
+                            g.drawLine(f.x-u, f.y + uh + u, t.x + u, f.y+uh+u);
+                            g.drawLine(t.x + u, f.y + uh + u, t.x + u, t.y);
+                        }
+                        else
+                        {
+                            g.drawLine(f.x - u, f.y, f.x - u, f.y - uh - u);
+                            g.drawLine(f.x-u, f.y - uh - u, t.x + u, f.y-uh-u);
+                            g.drawLine(t.x + u, f.y - uh - u, t.x + u, t.y);
+                        }
                         g.drawLine(t.x + u, t.y, t.x, t.y);
                     }
                     else
@@ -801,18 +837,23 @@ public class DiagramView extends JComponent
                     }
                     else
                     {
+                        g.drawLine(f.x, f.y, f.x + u, f.y);
+                        if (f.y < t.y)
+                        {
+                            g.drawLine(f.x + u, f.y, f.x + u, f.y + uh);
+                            g.drawLine(f.x + u, f.y + uh, t.x - u, f.y + uh);
+                            g.drawLine(t.x - u, f.y + uh, t.x - u, t.y);
+                        }
+                        else
+                        {
+                            g.drawLine(f.x + u, f.y, f.x + u, f.y - uh);
+                            g.drawLine(f.x + u, f.y - uh, t.x - u, f.y - uh);
+                            g.drawLine(t.x - u, f.y - uh, t.x - u, t.y);
+                        }
+                        g.drawLine(t.x - u, t.y, t.x, t.y);
                     }
-                    /*
-                    g.drawLine(f.x, f.y, f.x + u, f.y);
-                    g.drawLine(f.x+u, f.y, f.x+u, f.y+uh+u);
-                    g.drawLine(f.x+u, f.y+uh+u, t.x+(t.x<f.x?-u:u), f.y+uh+u);
-                    g.drawLine(t.x+(t.x<f.x?-u:u), f.y+uh+u, t.x+(t.x<f.x?-u:u),
-                            t.y);
-                    g.drawLine(t.x+(t.x<f.x?-u:u), t.y, t.x, t.y);
-                    */
             }//}}}
-            else if (d.getDependencyType() == JDependency.ENDEND) //{{{
-            {
+            else if (d.getDependencyType() == JDependency.ENDEND) {//{{{
                     f = new Point(fromRect.x + fromRect.width + 1,
                         fromRect.y + fromRect.height / 2 );
                     t = new Point(toRect.x + toRect.width + 1,

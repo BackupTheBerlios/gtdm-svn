@@ -40,10 +40,10 @@ public class TreeView extends JTree implements View, TreeSelectionListener {
     }
 
     public void valueChanged(TreeSelectionEvent e) {
-        parent.setSelection(
-            ((DefaultMutableTreeNode)
-                e.getPath().getLastPathComponent()).getUserObject()
-        );
+        DefaultMutableTreeNode n = (DefaultMutableTreeNode)
+            e.getPath().getLastPathComponent();
+        if (n != null)
+            parent.setSelection(n.getUserObject());
         //System.out.println("selected: " + parent.getSelection());
         //System.out.println("id: "+((JActivity)parent.getSelection()).getId());
     }
@@ -53,7 +53,6 @@ public class TreeView extends JTree implements View, TreeSelectionListener {
         if (project == null) return; // nothing to do
 
         top.removeAllChildren();
-
         top.setUserObject(project);
 
         ListIterator l = project.getInstances().listIterator();
@@ -66,12 +65,26 @@ public class TreeView extends JTree implements View, TreeSelectionListener {
             while (m.hasNext()) updateActivity(n, (JActivity)m.next());
         }
 
-        updateUI();
+        // expand complete tree
+        int row = 0; 
+        while (row < getRowCount())  expandRow(row++);
+
+        //updateUI();
     }
 
     public void updateActivity(DefaultMutableTreeNode top, JActivity act) {
         DefaultMutableTreeNode n = new DefaultMutableTreeNode(act);
         top.add(n);
+
+        /*try
+        {
+            if (((JActivity)parent.getSelection()).getId() == act.getId())
+            {
+                TreePath p[] = n.getPath();
+                for (int i = 0; i < p.length; i++)
+                    expandPath(p[i]);
+            }
+        } catch (Exception e) {}*/
 
         ArrayList subacts = act.getActivities();
         if (subacts != null) {
