@@ -96,6 +96,7 @@ public class JInstance {
 
         JActivity act = new JActivity();
         act.id = getNextId(activities, 0); // gets the next higher id
+        // hier nicht actList sondern activities, da alle activities nach der größten id durchsucht werden müssen
 
         act.setName(strName);
         act.setShortName(strShortName);
@@ -110,7 +111,7 @@ public class JInstance {
 
 
     public ArrayList getActivities() {
-	    return activities;
+        return activities;
     }
 
     public JActivity getActivity(int id) {

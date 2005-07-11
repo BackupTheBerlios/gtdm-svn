@@ -34,7 +34,7 @@ public class JDependency {
     public JDependency() {
         toActivityId = -1;
         dependencyType = -1;
-        color = -1;
+        color = 0; // standard: black
         line = "";
     }
 

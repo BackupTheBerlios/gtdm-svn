@@ -17,15 +17,25 @@ import java.util.*;
  */
 public class JProject {
 
+    int fontSize, sizeX, sizeY;
     String name, author;
-    String version;
+    String version, unit;
+    boolean modified;
     ArrayList instances;
 
     public String toString() {
-	    return name;
+        return name;
     }
 
     public JProject() {
+        modified = false;
+        fontSize = 8;
+        sizeX = 8;
+        sizeY = 8;
+        unit = "cm";
+        name = "";
+        author = "";
+        version = "";
         this.instances = new ArrayList();
     }
 
@@ -53,6 +63,38 @@ public class JProject {
         this.version = strVersion;
     }
 
+    public int getFontSize() {
+        return this.fontSize;
+    }
+
+    public void setFontSize(int size) {
+        this.fontSize = size;
+    }
+
+    public int getSizeX() {
+        return this.sizeX;
+    }
+
+    public void setSizeX(int size) {
+        this.sizeX = size;
+    }
+
+    public int getSizeY() {
+        return this.sizeY;
+    }
+
+    public void setSizeY(int size) {
+        this.sizeY = size;
+    }
+
+    public String getUnit() {
+        return this.unit;
+    }
+
+    public void setUnit(String strUnit) {
+        this.unit = strUnit;
+    }
+
     // private function returns the next higher id after the last instance
     private int getNextId() {
         if (this.instances.size() <= 0) {
@@ -70,14 +112,16 @@ public class JProject {
         destinationAct.setColor(sourceAct.getColor());
         destinationAct.setStartDate(sourceAct.getStartDate());
         destinationAct.setEndDate(sourceAct.getEndDate());
-
+//RunClass.outputActivity(sourceAct, 1);
         for (int i = 0; i < sourceAct.dependencies.size(); i++) {
             JDependency srcDep = (JDependency)sourceAct.dependencies.get(i);
             JDependency dstDep = new JDependency();
 
             dstDep.setToActivityId(srcDep.getToActivityId());
             dstDep.setDependencyType(srcDep.getDependencyType());
-
+            dstDep.setColor(srcDep.getColor());
+            dstDep.setLine(srcDep.getLine());
+//RunClass.outputDependency(dstDep, 1);
             destinationAct.dependencies.add(dstDep);
         }
 

@@ -3,8 +3,9 @@ package gtdmanager.core;
 import java.util.*;
 import java.io.*;
 import javax.xml.parsers.*;
-//import java.awt.Color;
 import org.w3c.dom.*;
+import org.xml.sax.*;
+import java.net.*;
 
 /**
  * <p>Title: JManager class</p>
@@ -20,11 +21,6 @@ import org.w3c.dom.*;
  */
 public class JManager {
 
-    int fontSize, sizeX, sizeY;
-    String unit;
-
-    String fileName;
-    boolean modified;
     JProject project;
 
     private boolean projectNodeFound = false;
@@ -40,50 +36,12 @@ public class JManager {
 
 
     public JManager() {
-        modified = false;
-        fontSize = 8;
-        sizeX = 8;
-        sizeY = 8;
-        unit = "mm";
 
-        fileName = "";
         try {
             jbInit();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    public int getFontSize() {
-        return this.fontSize;
-    }
-
-    public void setFontSize(int size) {
-        this.fontSize = size;
-    }
-
-    public int getSizeX() {
-        return this.sizeX;
-    }
-
-    public void setSizeX(int size) {
-        this.sizeX = size;
-    }
-
-    public int getSizeY() {
-        return this.sizeY;
-    }
-
-    public void setSizeY(int size) {
-        this.sizeY = size;
-    }
-
-    public String getUnit() {
-        return this.unit;
-    }
-
-    public void setUnit(String strUnit) {
-        this.unit = strUnit;
     }
 
     public JProject getProject() {
@@ -546,13 +504,13 @@ public class JManager {
                     //boolean b = lastPropName.equalsIgnoreCase("size-x");
                     if (lastPropName.equalsIgnoreCase("font-size")) {
 // FEHLER: obwohl lastPropName = "font-size" ist, wird diese anweisung nicht ausgeführt
-                        setFontSize(Integer.parseInt(nodeMap.item(nodeIdx).getNodeValue())); // ???
+                        project.setFontSize(Integer.parseInt(nodeMap.item(nodeIdx).getNodeValue())); // ???
                     } else if (lastPropName.equalsIgnoreCase("size-x")) {
-                        setSizeX(Integer.parseInt(nodeMap.item(nodeIdx).getNodeValue()));
+                        project.setSizeX(Integer.parseInt(nodeMap.item(nodeIdx).getNodeValue()));
                     } else if (lastPropName.equalsIgnoreCase("size-y")) {
-                        setSizeY(Integer.parseInt(nodeMap.item(nodeIdx).getNodeValue()));
+                        project.setSizeY(Integer.parseInt(nodeMap.item(nodeIdx).getNodeValue()));
                     } else if (lastPropName.equalsIgnoreCase("unit")) {
-                        setUnit(nodeMap.item(nodeIdx).getNodeValue());
+                        project.setUnit(nodeMap.item(nodeIdx).getNodeValue());
                     } else {
 
                         if (lastPropName == "") { // keine Zuordnung des value-Werts möglich
@@ -734,7 +692,22 @@ public class JManager {
 
             DocumentBuilder domBuilder = dbf.newDocumentBuilder();
             File file = new File(fileName);
+
             Document document = domBuilder.parse(file);
+
+
+/*           // geht nicht, gtdmanager.dtd wird nicht gefunden!
+           URL dtdUrl = this.getClass().getResource("/gtdmanager.dtd");
+
+           FileInputStream fInSt = new FileInputStream(fileName);
+           InputSource is = new InputSource(fInSt);
+           is.setSystemId(dtdUrl.toString());
+           dbf.setValidating(true);
+           DocumentBuilder db = dbf.newDocumentBuilder();
+           //db.setErrorHandler(new GtdXMLErrorHandler());
+           Document document = db.parse(is);
+*/
+
             processDocument(document);
 
         } catch (Exception e) {
@@ -806,10 +779,10 @@ public class JManager {
 
             pWriter.println("\t<name>" + project.getName() + "</name>");
             pWriter.println("");
-            pWriter.println("\t<property name=\"size-x\" value=\"" + getSizeX() + "\" />");
-            pWriter.println("\t<property name=\"size-y\" value=\"" + getSizeY() + "\" />");
-            pWriter.println("\t<property name=\"unit\" value=\"" + getUnit() + "\" />");
-            pWriter.println("\t<property name=\"font-size\" value=\"" + getFontSize() + "\" />");
+            pWriter.println("\t<property name=\"size-x\" value=\"" + project.getSizeX() + "\" />");
+            pWriter.println("\t<property name=\"size-y\" value=\"" + project.getSizeY() + "\" />");
+            pWriter.println("\t<property name=\"unit\" value=\"" + project.getUnit() + "\" />");
+            pWriter.println("\t<property name=\"font-size\" value=\"" + project.getFontSize() + "\" />");
             pWriter.println("");
 
             for (int i = 0; i < project.instances.size(); i++) {
@@ -860,6 +833,9 @@ public class JManager {
 		new GregorianCalendar(2005, 6, 7),
 		new GregorianCalendar(2005, 6, 17), 0));
 
+    // mf: Dependency von a2 auf a1
+        a2.newDependency(a1.getId(), JDependency.ENDBEGIN);
+
         a3	= i.getActivity(i.newActivity(i.activities,
 		"Aktivi3", "Akt3",
 		new GregorianCalendar(2005, 6, 14),
@@ -870,7 +846,7 @@ public class JManager {
 	a3.setColor(0x0000ff);
 
 	// tv: *** WENN DASS ENABLED IST, ALLES ARSCH ***
-	/*i	= getProject().getInstance(getProject().newInstance(
+	i	= getProject().getInstance(getProject().newInstance(
 		"Instanz2",
 		new GregorianCalendar(2005, 6, 6),
 		new GregorianCalendar(2005, 6, 2),
@@ -883,8 +859,8 @@ public class JManager {
 		"Instanz3",
 		new GregorianCalendar(2005, 6, 8),
 		new GregorianCalendar(2005, 6, 2),
-		new GregorianCalendar(2005, 6, 34), true));*/
-
+		new GregorianCalendar(2005, 6, 34), true));
+       // --
        i.getActivity(a1.getId()).setStartDate(new GregorianCalendar(2005,6,9));
        	i.getActivity(a1.getId()).setEndDate(new GregorianCalendar(2005,6,18));
        i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005,6,12));

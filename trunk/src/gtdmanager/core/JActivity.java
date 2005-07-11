@@ -163,7 +163,7 @@ public class JActivity {
 */
 
     public ArrayList getActivities() {
-	    return activities;
+        return activities;
     }
 
     public JActivity getActivity(int id) {
