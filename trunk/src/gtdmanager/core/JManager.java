@@ -864,6 +864,10 @@ public class JManager {
 		new GregorianCalendar(2005, 6, 14),
 		new GregorianCalendar(2005, 6, 29), 0));
 
+	a1.setColor(0xff0000);
+	a2.setColor(0x00ff00);
+	a3.setColor(0x0000ff);
+
 	// tv: *** WENN DASS ENABLED IST, ALLES ARSCH ***
 	/*i	= getProject().getInstance(getProject().newInstance(
 		"Instanz2",
@@ -889,15 +893,36 @@ public class JManager {
 	a9	= i.getActivity(i.newActivity(i.activities, "ENDEND1", "EE1",
 	  	new GregorianCalendar(2005, 6, 3),
 	  	new GregorianCalendar(2005, 6, 7), 0));
+	a1.newDependency(a9.getId(), JDependency.BEGINBEGIN);
 	a1.newDependency(a9.getId(), JDependency.ENDEND);
 	a9	= i.getActivity(i.newActivity(i.activities, "ENDEND2", "EE2",
 	  	new GregorianCalendar(2005, 6, 15),
 	  	new GregorianCalendar(2005, 6, 19), 0));
+	a1.newDependency(a9.getId(), JDependency.BEGINBEGIN);
 	a1.newDependency(a9.getId(), JDependency.ENDEND);
 	a9	= i.getActivity(i.newActivity(i.activities, "ENDEND3", "EE3",
 	  	new GregorianCalendar(2005, 6, 27),
 	  	new GregorianCalendar(2005, 6, 31), 0));
+	a1.newDependency(a9.getId(), JDependency.BEGINBEGIN);
 	a1.newDependency(a9.getId(), JDependency.ENDEND);
+	a9	= i.getActivity(i.newActivity(i.activities, "BEGINEND1", "BE1",
+	  	new GregorianCalendar(2005, 6, 3),
+	  	new GregorianCalendar(2005, 6, 7), 0));
+	a2.newDependency(a9.getId(), JDependency.BEGINEND);
+	a2.newDependency(a9.getId(), JDependency.ENDBEGIN);
+	a9	= i.getActivity(i.newActivity(i.activities, "BEGINEND2", "BE2",
+	  	new GregorianCalendar(2005, 6, 15),
+	  	new GregorianCalendar(2005, 6, 19), 0));
+	a2.newDependency(a9.getId(), JDependency.BEGINEND);
+	a2.newDependency(a9.getId(), JDependency.ENDBEGIN);
+	a9	= i.getActivity(i.newActivity(i.activities, "BEGINEND2", "BE2",
+	  	new GregorianCalendar(2005, 6, 27),
+	  	new GregorianCalendar(2005, 6, 31), 0));
+	a2.newDependency(a9.getId(), JDependency.BEGINEND);
+	a2.newDependency(a9.getId(), JDependency.ENDBEGIN);
+
+
+
 
 	//i.newActivity(i.activities,
 	//	"Aktivi1", "Akt1",
