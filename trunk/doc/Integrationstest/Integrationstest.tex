@@ -1,0 +1,378 @@
+\documentclass[a4paper]{scrartcl}
+
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[german,ngerman]{babel}
+
+\usepackage{verbatim}
+
+\newif\ifpdf
+\ifx\pdfoutput\undefined
+\pdffalse
+\else
+\pdfoutput=1
+\pdfcompresslevel=9
+\pdftrue
+\fi
+
+\begin{document}
+
+\begin{titlepage}
+	\center
+	{\Huge \emph{GTDManager~}}\\[0.5cm]
+	{\large Integrationstest}\\[0.5cm]
+	Version 1.0 \\[1.0cm]
+	SoPra05 Gruppe 6\\[1.0cm]
+	\today
+	\setcounter{page}{0}
+\end{titlepage}
+
+\tableofcontents\newpage
+
+\section{Integrationstest}
+
+Tester: Tomislav Viljeti\'c\\[1cm]
+Big Bang Integration: bestanden\\[1cm]
+
+\subsection{Anmerkung}
+1. Es wurde so Entworfen, dass es Funktioniert ;-)\\
+2. Wir haben ueber die ganze Implementierungsphase hinweg bereits
+``Integriert''.
+   Da wir das Projekt Zentral mit einem Versionensystem verwalten war jedes
+   'commit' bereits ein 'Integrationstest' im Sinne von, kompilieren,
+   asufuehren und schauen ob das neue dazu passt und ob nichts offensichtlich
+   kaputt gegangen ist (liess sich nicht immer ausschliessen, dann gabs aber
+   gleich Gemecker vom Modulverwalter).\\
+3. Ausfuehrliche Modultests sind vorhanden.\\
+
+\newpage
+
+\section{Modultests des Package gtdmanager.core}
+\subsection{Modultest f\"ur Klasse JManager}
+Autor: Michael Fechter\\
+Tester: Michael Fechter\\
+Datum: 11.07.2005\\
+\\
+Methode: public void newProject(String strName, String strVersion)\\
+Eingabe: strName = "Testname", strVersion = "1.0"\\
+Erwartete Ausgabe: leeres Projekt mit angegebenen Namen und Version\\
+Ausgabe: leeres Projekt mit angegebenen Namen und Version\\
+Status: bestanden\\
+ \\
+Methode: public void loadProject(String fileName)\\
+Eingabe: fileName = "c:\ \ example.xml" (Beispieldatei aus dem DTD)\\
+Erwartete Ausgabe: Projekt aus angegebener XML-Datei geladen\\
+Ausgabe: korrekt aus der XML-Datei geladenes Projekt\\
+Status: bestanden\\
+\\
+Methode: public void saveProject(String fileName)\\
+Eingabe: fileName = "c:\ \ exam-out.xml"\\
+Erwartete Ausgabe: zuvor geladenes Projekt im korrekten Format in die
+	XML-Datei geschrieben\\
+Ausgabe: korrekt in die XML-Datei geschriebenes Projekt\\
+Status: bestanden\\
+\\
+
+\subsection{Modultest f\"ur Klasse JProject}
+Autor: Michael Fechter\\
+Tester: Michael Fechter\\
+Datum: 11.07.2005\\
+\\
+Methode: public int newInstance(String strName, Calendar calCreate,
+         Calendar calStart, Calendar calEnd, boolean active)\\
+Eingabe: strName = "Instanz1", calCreate = 1.6.2005, calStart = 1.6.2005,
+         calEnd = 30.6.2005, active = true, keine existierende Instanz\\
+Erwartete Ausgabe: leere Instanz mit angegebenen Namen und Daten\\
+Ausgabe: leere Instanz mit angegebenen Namen und Daten\\
+Status: bestanden\\
+\\
+Methode: public int newInstance(String strName, Calendar calCreate,
+         Calendar calStart, Calendar calEnd, boolean active)\\
+Eingabe: strName = "Instanz1", calCreate = 1.6.2005, calStart = 1.6.2005,
+         calEnd = 30.6.2005, active = true, zuvor existierende Instanz\\
+Erwartete Ausgabe: geklonte existierende Instanz mit angegebenen Namen und
+Daten\\
+Ausgabe: geklonte existierende Instanz mit angegebenen Namen und Daten\\
+Status: bestanden\\
+\\
+Methode: public void deleteInstance(int id)\\
+Eingabe: id = 0 (ID der zuvor erstellten Instanz)\\
+Erwartete Ausgabe: leeres Projekt / Instanz wurde gel\"oscht\\
+Ausgabe: leeres Projekt / Instanz wurde gel\"oscht\\
+Status: bestanden\\
+\\
+
+\subsection{Modultest f\"ur Klasse JInstance}
+Autor: Michael Fechter\\
+Tester: Michael Fechter\\
+Datum: 11.07.2005\\
+\\
+Methode: public int newActivity(ArrayList actList, String strName,
+         String strShortName, Calendar calStart, Calendar calEnd, int color)\\
+Eingabe: actList = instance.activities, strName = "Aktivi1",
+         strShortName = "Akt1", calStart = 2.6.2005, calEnd = 6.6.2005,
+         color = 0\\
+Erwartete Ausgabe: Instanz mit einer einzelnen Aktivit\"at\\
+Ausgabe: Instanz mit einer einzelnen Aktivit\"at\\
+Status: bestanden\\
+\\
+Methode: public boolean deleteActivity(int id)\\
+Eingabe: id = 0 (ID der zuvor erstellten Aktivit\"at)\\
+Erwartete Ausgabe: leere Instanz\\
+Ausgabe: leere Instanz\\
+Status: bestanden\\
+\\
+
+\subsection{Modultest f\"ur Klasse JActivity}
+Autor: Michael Fechter\\
+Tester: Michael Fechter\\
+Datum: 11.07.2005\\
+\\
+Methode: public int newDependency(int toActivityId, int dependencyType)\\
+Eingabe: toActivityId = 0, dependencyType = BEGINBEGIN,
+         zwei existierende Aktivit\"aten (IDs 0 und 1)\\
+Erwartete Ausgabe: erstellte Dependency einer Aktivit\"at zur anderen
+                   Aktivit\"at\\
+Ausgabe: erstellte Dependency einer Aktivit\"at zur anderen Aktivit\"at\\
+Status: bestanden\\
+\\
+Methode: public boolean deleteDependency(int id)\\
+Eingabe: id = 0 (ID der zuvor erstellten Dependency)\\
+Erwartete Ausgabe: keine Dependency in der Aktivit\"at\\
+Ausgabe: keine Dependency in der Aktivit\"at\\
+Status: bestanden\\
+\\
+
+\subsection{Resultat}
+Getestete Methoden: 10\\
+  davon bestanden: 10\\
+  davon nicht bestanden: 0\\
+\\
+
+
+\newpage
+
+\section{Modultest f\"ur Dialoge}
+Autor: Moritz Leutenecker\\
+Tester: Moritz Leutenecker\\
+Datum: 11.07.2005\\
+\subsection{Modultest f\"ur Klasse DialogNewProject}
+Methode: public void show()\\
+Eingabe: Keine\\
+Erwartete Ausgabe: Dialogfenster mit Steuerelementen zum Erstellen eines neuen Projekts und einer ersten Instanz wird angezeigt.\\
+Ausgabe: Dialog wird angezeigt. Felder werden gef\"ullt\\
+Status: bestanden\\
+\\
+Methode: public void btnCreate\_actionPerformed(ActionEvent e) 
+Eingabe: e = Best\"atigen/Speichern-Knopf wurde ge\"uckt
+Erwartete Ausgabe: \"Uberpf\"ufung der Textfelddat\"Anderung der internen Datenstukturen.
+Die Zeitr\"aume werden auf g\"ultigkeit \"uberpr\"uft.
+Ein neues Projekt wird angelegt und eine erste Instanz wird erstellt und dem neuen Projekt zugeordnet.
+Danach schlie{\ss}en sich das Fenster und die Ansicht im Hauptfenster wird aktualisieert.\\
+Ausgabe: Daten werden \"uberpr\"uft, \"uberergeben und die Ansichten werden aktualisiertt.\\
+Status: bestanden\\
+
+\subsection{Modultest f\"ur Klasse DialogEditProject}
+Methode: public void show()\\
+Eingabe: Keine\\
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum \"andern des Projektnamens wird angezeigt.\\
+Ausgabe: Dialog wird angezeigt. Felder werden gef\"ullt.\\
+Status: bestanden\\
+\\
+Methode: public void btnCreate\_actionPerformed(ActionEvent e)\\
+Eingabe: e = Best\"atigen/Speichern-Knopf wurde gedr\"uckt\\
+Erwartete Ausgabe: \"Uberpr\"ufung der Textfelddaten, \"anderung der internen Datenstrukturen.
+Danach schlie{\ss}t sich das Fenster und die Ansicht im Hauptfenster wird aktualisiert.
+Der Projektname sollte sich \"andern.
+Ausgabe: Daten werden \"uberpr\"uft, \"ubergeben und die Ansichten werden aktualisiert. Projektname wurde ge\"andert.\\
+Status: bestanden\\
+
+\subsection{Modultest f\"ur Klasse DialogNewActivity}
+Methode: public void show()\\
+Eingabe: Keine\\
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum Erstellen oder Bearbeiten einer neuen/bestehenden Aufgabe wird angezeigt.\\
+Die Liste der Bestehnden zu verlinkenden Aufgaben wird gef\"allt, und die Farbpalette initialisiert.\\
+Ausgabe: Dialog wird angezeigt. Liste wurde gef\"allt. Felder werden gef\"ullt.\\
+Status: bestanden\\
+\\
+Methode: public void btnCreate\_actionPerformed(ActionEvent e)\\
+Eingabe: e = Best\"atigen/Speichern-Knopf wurde gedr\"uckt\\
+Erwartete Ausgabe: \"Uberpr\"ufung der Textfelddaten, \"anderung der internen Datenstrukturen. Die Zeitr\"aume werden auf G\"ultigkeit \"Uberpr\"uft.
+Die einzelnen Abh\"angigkeiten werden \"uberpr\"uft und angepasst.
+Danach schlie{\ss}t sich das Fenster und die Ansicht im Hauptfenster wird aktualisiert.\\
+Ausgabe: Daten werden \"uberpr\"uft, \"ubergeben und die Ansichten werden aktualisiert.\\
+Status: bestanden\\
+
+\subsection{Modultest für Klasse DialogNewInstance}
+Methode: public void show()\\
+Eingabe: Keine\\
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum Erstellen einer neuen Instanz wird angezeigt.\\
+Ausgabe: Dialog wird angezeigt. Felder werden gefüllt.\\
+Status: bestanden\\
+\\
+Methode: public void btnCreate\_actionPerformed(ActionEvent e)\\
+Eingabe: e = Bestätigen/Speichern-Knopf wurde gedrückt\\
+Erwartete Ausgabe: Überprüfung der Textfelddaten, Änderung der internen Datenstrukturen.\\
+Die Zeiträume werden auf Gültigkeit überprüft.\\
+Danach schließt sich das Fenster und die Ansicht im Hauptfenster wird aktualisiert.\\
+Ausgabe: Daten werden überprüft, übergeben und die Ansichten werden aktualisiert.\\
+Status: bestanden\\
+
+\subsection{Modultest für Klasse DialogEditInstance}
+Methode: public void show()\\
+Eingabe: Keine\\
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum Bearbeiten einer Instanz wird angezeigt.\\
+Ausgabe: Dialog wird angezeigt. Felder werden gefüllt.\\
+Status: bestanden\\
+\\
+Methode: public void btnCreate\_actionPerformed(ActionEvent e\\
+Eingabe: e = Bestätigen/Speichern-Knopf wurde gedrückt\\
+Erwartete Ausgabe: Überprüfung der Textfelddaten, Änderung der internen Datenstrukturen.\\
+Die Zeiträume werden auf Gültigkeit überprüft.\\
+Danach schließt sich das Fenster und die Ansicht im Hauptfenster wird aktualisiert.\\
+Ausgabe: Daten werden überprüft, übergeben und die Ansichten werden aktualisiert.\\
+Status: bestanden\\
+\\
+
+\subsection{Modultest für Klasse DialogViewSettings}
+Methode: public void show()\\
+Eingabe: Keine\\
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum Konfigurieren der Anzeige wird angezeigt.\\
+Ausgabe: Dialog wird angezeigt. Felder werden gefüllt.\\
+Status: bestanden\\
+\\
+Methode: public void btnCreate\_actionPerformed(ActionEvent e)\\
+Eingabe: e = Bestätigen/Speichern-Knopf wurde gedrückt\\
+Erwartete Ausgabe: Überprüfung der Eingabedaten, Änderung der internen Datenstrukturen.\\
+Die Zeiträume werden auf Gültigkeit überprüft.\\
+Danach schließt sich das Fenster und die Ansicht im Hauptfenster wird aktualisiert.\\
+Ausgabe: Daten werden überprüft, übergeben und die Ansichten werden aktualisiert.\\
+Status: bestanden\\
+
+\subsection{Modultest für Klasse DialogExport}
+Methode: public void show()\\
+Eingabe: Keine\\
+Erwartete Ausgabe: Dialogfenster mit teilweise vorinitialisierten Steuerelementen zum Exportieren der Diagrammanzeige in ein Bildformat wird angezeigt.\\
+Ausgabe: Dialog wird angezeigt. Felder werden gefüllt und initialisiert.\\
+Status: bestanden\\
+\\
+Methode: public void btnCreate\_actionPerformed(ActionEvent e)\\
+Eingabe: e = Bestätigen/Speichern-Knopf wurde gedrückt\\
+Erwartete Ausgabe: Überprüfung der Eingabedaten, Filtereinstellungen (JPG, PNG usw).\\
+Danach schließt sich das Fenster und eine Grafik mit den gewünschten Ausgabeeinstellungen wird erstellt.\\
+Ausgabe: Daten werden überprüft, übergeben und die Grafikdatei wird erstellt.\\
+Status: bestanden\\
+\\
+\subsection{Resultat}
+Getestete Methoden: 7\\
+  davon bestanden: 7\\
+  davon nicht bestanden: 0\\
+\newpage
+
+\section{Moduletest des MainWindows und der Menu Klassen}
+Autor: Tomislav Viljeti\'c\\
+Tester: Tomislav Viljeti\'c\\
+Datum: 11.07.2005\\
+
+\subsection{Moduletest fuer Klasse gtdmanager.gui.MainWindow}
+Methode: setSelection\\
+Eingabe: \\
+Ausgabe:\\
+Status: nicht getestet, nur eine Zuweisung\\
+\\
+Methode: getSelection\\
+Eingabe:\\
+Ausgabe:\\
+Status: nicht getestet, nur eine Rueckgabe\\
+\\
+Methode: MainWindow\\
+Eingabe: keine\\
+Ausgabe: baut Fenster auf, oben Menu, links TreeView, rechts DiagramView\\
+Status: bestanden\\
+\\
+Methode: getManager\\
+Eingabe:\\
+Ausgabe:\\
+Status: nicht getestet, nur eine Zuweisung\\
+\\
+Methode: updateViews\\
+Eingabe: keine\\
+Ausgabe: ruft bei allen im Kontruktor zugewiesenen Views die Methode update auf\\
+Status: nicht getestet, lediglich Iteration ueber eine ArrayLisy und Aufruf
+	einer Funktion pro Array-Element.\\
+
+\subsection{Moduletest fuer die Menuklassen (Klasse private gtdmanager.gui.FileMenu)}
+Anmerkung: Nur eine getestet, da alle gleich aufgebaut sind.\\
+\\
+Methode: actionPerformed
+ (impliziert Konstruktoren fuer FileMenu und FileMenuAction)\\
+Eingabe: Klick auf beliebiges Element vom "Datei" Menu\\
+Ausgabe: Klick Ruft die erwarewte Funktion auf oder Ausgabe im
+	Standard-Output, falls noch nicht Implementiert.\\
+Status: bestanden\\
+\\
+
+\subsection{Resultat}
+Getestete Methoden: 2\\
+Bestandene Tests: 2\\
+Nicht getestete Methoden: 4\\
+
+
+\section{Moduletest der View Implementierungen}
+Autor: Tomislav Viljeti\'c\\
+Tester: Tomislav Viljeti\'c\\
+Datum: 11.07.2005\\
+\\
+Verwendetes Projekt: Generiertes Projekt via Datei -> Generiere Testprojekt\\
+\\
+\subsection{Moduletest fuer Klasse gtdmanager.gui.TreeView}
+Methode: valueChanged\\
+Eingabe: Klick auf ein beliebiges Element im Baum\\
+Ausgabe: Name des Elements wird in den Standard-Output geschrieben\\
+Status: bestanden\\
+\\
+Methode: update
+ (impliziert updateActivity)\\
+Eingabe: Verwendetes Projekt\\
+Ausgabe: Alle Elemente des Baums werden angezeigt\\
+Status: bestanden\\
+\\
+
+\subsection{Moduletest fuer Klasse gtdmanager.gui.DiagramView}
+Methode: mouseMoved, mouseDragged\\
+Eingabe: Klicken und ziehen des DiagramViews\\
+Ausgabe: Diagramm verschiebt sich\\
+Status: bestanden\\
+\\
+Methode: mouseEntered\\
+Eingabe: Maus verlaesst und betritt das DiagramView
+Ausgabe: Text am oberen linken Rand (nur, wenn noch nicht mouseDragged
+         ausgefuehrt wurde)\\
+Status: bestanden\\
+\\
+Methode: mouseWheelMoved\\
+Eingabe: im DiagramView am Mausraddrehen\\
+Ausgabe: Text mit maximaler Anzahl der angezeigten Tage erschein am o.l. Rand
+         und DiagramView zeight mehr/weniger Tage an.\\
+Status: bestanden\\
+\\
+Methode: update\\
+Eingabe: Verwendetes Projekt\\
+Ausgabe: Variablen werden gesetzt\\
+Status: nicht getestet, falls Java Variablen korrekt setzt ist diese Methode
+        ebenfall korrekt (werden spaetere Testfaelle zeigen)\\
+\\
+Methode: paint
+ (impliziert alle tdriftPaint und ganttPaint Methoden und cal2day, day2cal,
+ stringify (alle), drawVert, drawHoriz)\\
+Eingabe: Verwendetes Projekt\\
+Ausgabe: Diagramm wird im gewaehlten Format (siehe DiagramMenu) angezeigt.\\
+Status: nicht bestanden, Termindrift Diagramm uebeschneiden sich die Namen
+	der Aufgaben.\\
+
+\subsection{Resultat}
+Getestete Methoden: 6\\
+Bestandene Tests: 5\\
+Nicht getestete Methoden: 1\\
+\end{document}
