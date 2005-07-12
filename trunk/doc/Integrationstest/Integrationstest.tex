@@ -55,19 +55,19 @@ Tester: Michael Fechter\\
 Datum: 11.07.2005\\
 \\
 Methode: public void newProject(String strName, String strVersion)\\
-Eingabe: strName = "Testname", strVersion = "1.0"\\
+Eingabe: strName = "`Testname"', strVersion = "`1.0"'\\
 Erwartete Ausgabe: leeres Projekt mit angegebenen Namen und Version\\
 Ausgabe: leeres Projekt mit angegebenen Namen und Version\\
 Status: bestanden\\
  \\
 Methode: public void loadProject(String fileName)\\
-Eingabe: fileName = "c:\ \ example.xml" (Beispieldatei aus dem DTD)\\
+Eingabe: fileName = "`example.xml"' (Beispieldatei aus dem DTD)\\
 Erwartete Ausgabe: Projekt aus angegebener XML-Datei geladen\\
 Ausgabe: korrekt aus der XML-Datei geladenes Projekt\\
 Status: bestanden\\
 \\
 Methode: public void saveProject(String fileName)\\
-Eingabe: fileName = "c:\ \ exam-out.xml"\\
+Eingabe: fileName = "`exam-out.xml"'\\
 Erwartete Ausgabe: zuvor geladenes Projekt im korrekten Format in die
 	XML-Datei geschrieben\\
 Ausgabe: korrekt in die XML-Datei geschriebenes Projekt\\
@@ -81,7 +81,7 @@ Datum: 11.07.2005\\
 \\
 Methode: public int newInstance(String strName, Calendar calCreate,
          Calendar calStart, Calendar calEnd, boolean active)\\
-Eingabe: strName = "Instanz1", calCreate = 1.6.2005, calStart = 1.6.2005,
+Eingabe: strName = "`Instanz1"', calCreate = 1.6.2005, calStart = 1.6.2005,
          calEnd = 30.6.2005, active = true, keine existierende Instanz\\
 Erwartete Ausgabe: leere Instanz mit angegebenen Namen und Daten\\
 Ausgabe: leere Instanz mit angegebenen Namen und Daten\\
@@ -89,7 +89,7 @@ Status: bestanden\\
 \\
 Methode: public int newInstance(String strName, Calendar calCreate,
          Calendar calStart, Calendar calEnd, boolean active)\\
-Eingabe: strName = "Instanz1", calCreate = 1.6.2005, calStart = 1.6.2005,
+Eingabe: strName = "`Instanz1"', calCreate = 1.6.2005, calStart = 1.6.2005,
          calEnd = 30.6.2005, active = true, zuvor existierende Instanz\\
 Erwartete Ausgabe: geklonte existierende Instanz mit angegebenen Namen und
 Daten\\
@@ -110,8 +110,8 @@ Datum: 11.07.2005\\
 \\
 Methode: public int newActivity(ArrayList actList, String strName,
          String strShortName, Calendar calStart, Calendar calEnd, int color)\\
-Eingabe: actList = instance.activities, strName = "Aktivi1",
-         strShortName = "Akt1", calStart = 2.6.2005, calEnd = 6.6.2005,
+Eingabe: actList = instance.activities, strName = "`Aktivi1"',
+         strShortName = "`Akt1"', calStart = 2.6.2005, calEnd = 6.6.2005,
          color = 0\\
 Erwartete Ausgabe: Instanz mit einer einzelnen Aktivit\"at\\
 Ausgabe: Instanz mit einer einzelnen Aktivit\"at\\
