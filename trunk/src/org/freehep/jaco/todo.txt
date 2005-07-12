@@ -1,0 +1,21 @@
+- handle properly fully qualified names if needed....
+- parse and keep import statements ?
+
+- testing of the CPP parser
+
+- Need to add support for non-primitive arguments passed in to C++ code
+- Need to test support for multiple inheritance
+
+JACO C++ Library
+
+- Locks (needed for synchronization between threads) need to be implemented properly
+  (currently commented out, otherwise code crashes)
+- calling delete method from java should null out CPP pointer
+- attempt to access proxy with null CPP pointer should throw an exception
+- need to add support for starting JVM from C++
+- Add optional base class for C++ classes. Should zero out CPP pointer in class destructor
+
+
+DOCUMENTATION
+
+- We need a JACO Users Guide

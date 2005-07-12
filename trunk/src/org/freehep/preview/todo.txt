@@ -1,0 +1,8 @@
+- LabelPlacer
+=============
+http://citeseer.nj.nec.com/christensen94placing.html
+http://citeseer.nj.nec.com/christensen95empirical.html
+http://citeseer.nj.nec.com/49900.html
+http://www.cs.umd.edu/hcil/excentric/
+-1 implements SA algorithm
+-2 look up line label placing
