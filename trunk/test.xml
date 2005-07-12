@@ -20,27 +20,27 @@
 			<end-date date="18" month="6" year="2005" />
 			<property name="color" value="red" />
 			<dependency type="begin-begin" activity-id="A3">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 			<dependency type="end-end" activity-id="A3">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 			<dependency type="begin-begin" activity-id="A4">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 			<dependency type="end-end" activity-id="A4">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 			<dependency type="begin-begin" activity-id="A5">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 			<dependency type="end-end" activity-id="A5">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 		</activity>
@@ -51,27 +51,27 @@
 			<end-date date="24" month="6" year="2005" />
 			<property name="color" value="lime" />
 			<dependency type="begin-end" activity-id="A6">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 			<dependency type="end-begin" activity-id="A6">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 			<dependency type="begin-end" activity-id="A7">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 			<dependency type="end-begin" activity-id="A7">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 			<dependency type="begin-end" activity-id="A8">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 			<dependency type="end-begin" activity-id="A8">
-				<property name="color" value="#ffffffff" />
+				<property name="color" value="#ffffff" />
 				<property name="line" value="" />
 			</dependency>
 		</activity>

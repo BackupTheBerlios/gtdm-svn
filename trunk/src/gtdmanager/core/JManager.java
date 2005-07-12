@@ -689,24 +689,23 @@ public class JManager {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
-
+/*
             DocumentBuilder domBuilder = dbf.newDocumentBuilder();
             File file = new File(fileName);
 
             Document document = domBuilder.parse(file);
-
-
-/*           // geht nicht, gtdmanager.dtd wird nicht gefunden!
-           URL dtdUrl = this.getClass().getResource("/gtdmanager.dtd");
-
-           FileInputStream fInSt = new FileInputStream(fileName);
-           InputSource is = new InputSource(fInSt);
-           is.setSystemId(dtdUrl.toString());
-           dbf.setValidating(true);
-           DocumentBuilder db = dbf.newDocumentBuilder();
-           //db.setErrorHandler(new GtdXMLErrorHandler());
-           Document document = db.parse(is);
 */
+
+            URL dtdUrl = this.getClass().getResource("/gtdmanager.dtd");
+            // dtd muss sich im ordner /classes befinden!
+
+            FileInputStream fInSt = new FileInputStream(fileName);
+            InputSource is = new InputSource(fInSt);
+            is.setSystemId(dtdUrl.toString());
+            dbf.setValidating(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            //db.setErrorHandler(new GtdXMLErrorHandler());
+            Document document = db.parse(is);
 
             processDocument(document);
 
@@ -800,11 +799,17 @@ public class JManager {
     }
 
     public void newProject() {
+        projectNodeFound = false;
+        projectNameNodeFound = false;
+        instNameNodeFound = false;
+        actLastNameNode = "";
+        actNameNodeFound = false;
+
         this.project = new JProject();
     }
 
     public void newProject(String strName, String strVersion) {
-        this.project = new JProject();
+        newProject();
         this.project.setName(strName);
         this.project.setVersion(strVersion);
     }
@@ -812,7 +817,6 @@ public class JManager {
     public void generateSampleProject() {
 
         newProject("Testprojekt", "1.0.0.0");
-	
 
 	JInstance i;
 	JActivity a1, a2, a3, a4, a5, a6, a7, a8, a9;
