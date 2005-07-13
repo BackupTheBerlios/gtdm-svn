@@ -83,6 +83,9 @@ public class DiagramView extends JComponent
     static int mouseLastX = 0;
     static int mouseLastY = 0;
 
+    // view port dimenstions for scrollpane
+    private Dimension dimension = new Dimension(0,0);
+
     // this is the project to draw
     private JProject project = null;
     private JInstance initialInstance = null;
@@ -233,7 +236,7 @@ public class DiagramView extends JComponent
 
     public Dimension getPreferredSize()
     {
-        return new Dimension(800, 600);
+        return dimension;
     }
 
     //}}}
@@ -266,8 +269,8 @@ public class DiagramView extends JComponent
     public void paint(Graphics not2Dg) {
         g = (Graphics2D)not2Dg;
 
-        g.setColor(Color.lightGray);
-        g.fillRect(getX(), getY(), getWidth(), getHeight());
+        //g.setColor(Color.lightGray);
+        //g.fillRect(getX(), getY(), getWidth(), getHeight());
 
         if (project == null)
         {
@@ -297,6 +300,9 @@ public class DiagramView extends JComponent
         if (showGantt) {
             ganttPaintGrid(g);
 
+
+            dimension.setSize(0, gridRect.getHeight());
+
             // set initial y position
             yActOffset = gridRect.y + padding;
 
@@ -305,6 +311,8 @@ public class DiagramView extends JComponent
             ganttPaintDependencies(currentInstance.getActivities());
         }
         else {
+            dimension.setSize(0, 0);
+
             // init geometry
             gridRect = new Rectangle(
                 padding + 2 * advance,
@@ -336,6 +344,7 @@ public class DiagramView extends JComponent
             tdriftPaintGrid(g);
             tdriftPaintActivities(g);
         }
+
     }
     /* JComponent Overloading }}} */
 
@@ -569,7 +578,12 @@ public class DiagramView extends JComponent
             //getHeight() - 2 * padding
 
             // i'm really sorry here, but for schedules' sake:
-            1024*1024*1024
+            //1024*1024*1024
+
+            Math.max(
+                currentInstance.getActivities().size()
+                    * (barWidth + padding * 2),
+                getHeight())
         );
         gridStep = new Point(
             gridRect.width / (endDate - startDate),
