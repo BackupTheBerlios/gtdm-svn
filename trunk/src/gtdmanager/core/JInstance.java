@@ -152,6 +152,25 @@ public class JInstance {
         return deleteActivity(activities, id);
     }
 
+    private void deleteDependencies(ArrayList elemList, int toActId) {
+        for (int i = elemList.size() - 1; i >= 0; i--) {
+            if (elemList.get(i).getClass() == JActivity.class) {
+                JActivity act = (JActivity)elemList.get(i);
+                deleteDependencies(act.dependencies, toActId);
+            } else if (elemList.get(i).getClass() == JDependency.class) {
+                JDependency dep = (JDependency)elemList.get(i);
+                if (dep.getToActivityId() == toActId) {
+                    elemList.remove(i);
+                }
+            }
+        }
+    }
+
+    public void deleteDependencies(int toActId) {
+        // löscht alle dependencies, die auf die id verweisen
+        deleteDependencies(activities, toActId);
+    }
+
     public void setName(String strName) {
         this.name = strName;
     }
