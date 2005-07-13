@@ -102,14 +102,12 @@ class DiagramMenuAction extends AbstractAction {
             ExportDialog export = new ExportDialog();
             export.addExportFileType(new JPGExportFileType());
             export.addExportFileType(new EPSExportFileType());
-            try {
-                export.showExportDialog(parent.getParent(),
-                    "Diagramm exportieren als...",
-                    parent.getParentWindow().getDiagramView(),
-                    "export" );
-            } catch (Exception ex) {
-                // let that b*atch cry..
-            }
+            export.showExportDialog(parent.getParent(),
+                "Diagramm exportieren als...",
+                parent.getParentWindow().getDiagramView(),
+                "export" );
+            System.out.println("*** Alles ueber dieser Zeile sind keine"
+                    + " Fehler, dass gehoert so :-) ***");
             //}
             //});
         }
