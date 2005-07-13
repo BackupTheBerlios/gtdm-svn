@@ -260,8 +260,6 @@ public class DiagramView extends JPanel
     public void paint(Graphics not2Dg) {
         g = (Graphics2D)not2Dg;
 
-        setBounds(0,0, 800, 600);
-
         g.setColor(Color.lightGray);
         g.fillRect(getX(), getY(), getWidth(), getHeight());
 
