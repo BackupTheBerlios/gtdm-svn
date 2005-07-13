@@ -717,7 +717,7 @@ public class DiagramView extends JComponent
             //gridRect.x + (start - startDate) * gridStep.x,
             //toX(a.getStartDate()),
             gridRect.x
-                + (cal2day(a.getStartDate()) - startDate)
+                + (cal2day(a.getStartDate()) - startDate + 1)
                 * gridStep.x,
             yActOffset,
             // +1: end day ist inclusive:
