@@ -139,7 +139,9 @@ public class JInstance {
                 actList.remove(i);
                 return true;
             } else {
-                return deleteActivity(act.activities, id);
+                if (deleteActivity(act.activities, id)) {
+                    return true;
+                }
             }
         }
         return false;
