@@ -26,7 +26,7 @@ import org.freehep.graphics2d.VectorGraphics;
  * @author Tomislav Viljetić
  * @version 1.0
  * {{{ DiagramView */
-public class DiagramView extends JPanel
+public class DiagramView extends JComponent
     implements View, MouseListener, MouseMotionListener,
                MouseWheelListener
 
@@ -228,6 +228,12 @@ public class DiagramView extends JPanel
             + showDays + " Tage im Diagramm gezeigt.";
 
         repaint();
+    }
+
+
+    public Dimension getPreferredSize()
+    {
+        return new Dimension(800, 600);
     }
 
     //}}}
