@@ -25,7 +25,7 @@ public class JActivity {
 
 
     public String toString() {
-	    return name;
+        return name;
     }
 
     public JActivity() {
@@ -39,29 +39,29 @@ public class JActivity {
 	return id;
     }
 
-    // private function returns the next higher id after the last dependency
+    // gibt die nächst größere id nach der letzten dependency zurück
     private int getNextId() {
-        if (this.dependencies.size() <= 0) {
-            return 0; // no existing dependency given
+        if (dependencies.size() <= 0) {
+            return 0; // keine dependency vorhanden
         } else {
-            return ((JDependency)this.dependencies.get(this.dependencies.size()-1)).id + 1;
-        } // returns id + 1 of the last existing dependency
+            return ((JDependency)dependencies.get(dependencies.size()-1)).id+1;
+        } // gibt die id der letzten dependency + 1 zurück
     }
 
     public int newDependency(int toActivityId, int dependencyType) {
 
         JDependency dep = new JDependency();
-        dep.id = getNextId(); // gets the next higher id
+        dep.id = getNextId();
         dep.setToActivityId(toActivityId);
         dep.setDependencyType(dependencyType);
 
-        dependencies.add(dep);  // adds the new dependency to the arraylist
+        dependencies.add(dep);  // fügt die neue dependency der arraylist hinzu
 
-        return dep.id;  // return id of the new dependency
+        return dep.id;  // übergibt die id der neuen dependency
     }
 
     public JDependency getDependency(int id) {
-
+        // gibt die dependency mit der übergebenen id zurück
         for (int i=0; i<this.dependencies.size(); i++) {
             JDependency dep = (JDependency)this.dependencies.get(i);
             if (dep.id == id) {
@@ -76,7 +76,7 @@ public class JActivity {
     }
 
     public boolean deleteDependency(int id) {
-
+        // löscht die dependency mit der übergebenen id
         JDependency dep = getDependency(id);
         if (dep != null) {
             return this.dependencies.remove(dep);
@@ -124,44 +124,6 @@ public class JActivity {
         this.color = col;
     }
 
-/*
-    // private function returns the next higher id after the last activity
-    private int getNextActivityId() {
-        if (this.activities.size() <= 0) {
-            return 0; // no existing activity given
-        } else {
-            return ((JActivity)this.activities.get(this.activities.size()-1)).id + 1;
-        } // returns id + 1 of the last existing activity
-    }
-
-// nicht erlaubt, da newActivity aus der Instanz aufgerufen werden muss (unter Angabe der ArrayList, zu welcher hinzugefügt werden soll)
-    int newActivity() {
-
-        JActivity act = new JActivity();
-        act.id = getNextActivityId(); // gets the next higher id
-
-        activities.add(act);  // adds the new activity to the arraylist
-
-        return act.id;  // return id of the new activity
-    }
-
-    int newActivity(String strName, String strShortName, Calendar calStart, Calendar calEnd, int color) {
-
-        JActivity act = new JActivity();
-        act.id = getNextActivityId(); // gets the next higher id
-
-        act.setName(strName);
-        act.setShortName(strShortName);
-        act.setStartDate(calStart);
-        act.setEndDate(calEnd);
-        act.setColor(color);
-
-        activities.add(act);  // adds the new activity to the arraylist
-
-        return act.id;  // return id of the new activity
-    }
-*/
-
     public ArrayList getActivities() {
         return activities;
     }
@@ -181,17 +143,5 @@ public class JActivity {
         }
         return null;
     }
-/*
-// wird ebenfalls aus der Instanz aufgerufen
-    public boolean deleteActivity(int id) {
-
-        JActivity act = getActivity(id);
-        if (act != null) {
-            return this.activities.remove(act);
-        }
-        return false;
-    }
-*/
-
 
 }

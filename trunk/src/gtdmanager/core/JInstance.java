@@ -43,35 +43,32 @@ public class JInstance {
         return this.active;
     }
 
-    /*boolean deleteInstance() {
-    //??? wird dies benötigt?
-         } */
-
     public int getId() {
 	return id;
     }
 
-    // private function returns the next higher id after all activities
+    // gibt die nächst größere id nach allen (!) activities zurück
     private int getNextId(ArrayList actList, int beginId) {
 
         int retId = beginId;
 
         if (actList.size() > 0) {
-            //return ((JActivity)this.activities.get(this.activities.size()-1)).id + 1;
 
             for (int actIdx = 0; actIdx < actList.size(); actIdx++) {
 
                 JActivity act = (JActivity)actList.get(actIdx);
-                // durchsucht alle in actList gegebenen activities nach größeren ids
+                // durchsucht alle in actList geg. activities nach größeren ids
                 if (act.getId() >= retId) {
                     retId = act.getId() + 1;
                 }
 
-                // durchsucht auch die kinder der in actList gegebenen activities nach größeren ids
+                // durchsucht auch die kinder der in actList gegebenen
+                // activities nach größeren ids
                 retId = getNextId(act.activities, retId);
             }
 
-        } // returns id + 1 of all activities
+        }
+        // gibt die höchste id von allen activities + 1 zurück
         return retId;
     }
 
@@ -79,24 +76,29 @@ public class JInstance {
 
         JActivity act = new JActivity();
 
-        act.id = getNextId(activities, 0); // gets the next higher id
-        // hier nicht actList sondern activities, da alle activities nach der größten id durchsucht werden müssen
+        act.id = getNextId(activities, 0);
+        // hier nicht actList sondern activities,
+        // da alle activities nach der größten id durchsucht werden müssen
 
-        actList.add(act);  // adds the new activity to the arraylist
+        actList.add(act);  // fügt die neue activity zur arraylist hinzu
 
-        return act.id;  // return id of the new activity
+        return act.id;  // gibt die id der neuen activity zurück
     }
 
     public int newActivity() {
-        // creates an activity in this instance
+        // erstellt eine neue activity in dieser instanz
         return newActivity(activities);
     }
 
-    public int newActivity(ArrayList actList, String strName, String strShortName, Calendar calStart, Calendar calEnd, int color) {
+    public int newActivity(ArrayList actList, String strName,
+                           String strShortName, Calendar calStart,
+                           Calendar calEnd, int color) {
 
         JActivity act = new JActivity();
-        act.id = getNextId(activities, 0); // gets the next higher id
-        // hier nicht actList sondern activities, da alle activities nach der größten id durchsucht werden müssen
+
+        act.id = getNextId(activities, 0);
+        // hier nicht actList sondern activities,
+        // da alle activities nach der größten id durchsucht werden müssen
 
         act.setName(strName);
         act.setShortName(strShortName);
@@ -104,9 +106,9 @@ public class JInstance {
         act.setEndDate(calEnd);
         act.setColor(color);
 
-        actList.add(act);  // adds the new activity to the arraylist
+        actList.add(act);  // fügt die neue activity zur arraylist hinzu
 
-        return act.id;  // return id of the new activity
+        return act.id;  // gibt die id der neuen activity zurück
     }
 
 
@@ -115,7 +117,7 @@ public class JInstance {
     }
 
     public JActivity getActivity(int id) {
-
+        // gibt die activity mit der übergebenen id zurück
         for (int i=0; i<this.activities.size(); i++) {
             JActivity act = (JActivity)this.activities.get(i);
             if (act.id == id) {
@@ -131,7 +133,6 @@ public class JInstance {
     }
 
     private boolean deleteActivity(ArrayList actList, int id) {
-
         for (int i = 0; i < actList.size(); i++) {
             JActivity act = (JActivity)actList.get(i);
             if (act.getId() == id) {
@@ -145,6 +146,7 @@ public class JInstance {
     }
 
     public boolean deleteActivity(int id) {
+        // löscht die activity mit der übergebenen id
         return deleteActivity(activities, id);
     }
 

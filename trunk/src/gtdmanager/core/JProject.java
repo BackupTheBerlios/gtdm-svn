@@ -1,6 +1,5 @@
 package gtdmanager.core;
 
-import java.*;
 import java.util.*;
 
 /**
@@ -95,24 +94,25 @@ public class JProject {
         this.unit = strUnit;
     }
 
-    // private function returns the next higher id after the last instance
+    // gibt die nächst größere id nach der letzten instanz zurück
     private int getNextId() {
-        if (this.instances.size() <= 0) {
-            return 0; // no existing instance given
+        if (instances.size() <= 0) {
+            return 0; // keine instanz vorhanden
         } else {
-            return ((JInstance)this.instances.get(this.instances.size()-1)).id + 1;
-        } // returns id + 1 of the last existing instance
+            return ((JInstance)instances.get(instances.size()-1)).id + 1;
+        } // gibt die id der letzten instanz + 1 zurück
     }
 
-    private void copyActivityValues(JActivity sourceAct, JActivity destinationAct) {
+    private void copyActivityValues(JActivity sourceAct,
+                                    JActivity destinationAct) {
 
-        destinationAct.id = sourceAct.getId(); // same id in new instance
+        destinationAct.id = sourceAct.getId(); // selbe id in neuer instanz
         destinationAct.setName(sourceAct.getName());
         destinationAct.setShortName(sourceAct.getShortName());
         destinationAct.setColor(sourceAct.getColor());
         destinationAct.setStartDate(sourceAct.getStartDate());
         destinationAct.setEndDate(sourceAct.getEndDate());
-//RunClass.outputActivity(sourceAct, 1);
+
         for (int i = 0; i < sourceAct.dependencies.size(); i++) {
             JDependency srcDep = (JDependency)sourceAct.dependencies.get(i);
             JDependency dstDep = new JDependency();
@@ -121,13 +121,13 @@ public class JProject {
             dstDep.setDependencyType(srcDep.getDependencyType());
             dstDep.setColor(srcDep.getColor());
             dstDep.setLine(srcDep.getLine());
-//RunClass.outputDependency(dstDep, 1);
             destinationAct.dependencies.add(dstDep);
         }
 
     }
 
-    private void cloneActivities(ArrayList sourceActs, ArrayList destinationActs) {
+    private void cloneActivities(ArrayList sourceActs,
+                                 ArrayList destinationActs) {
 
         if (sourceActs != null) {
             for (int i = 0; i < sourceActs.size(); i++) {
@@ -135,10 +135,14 @@ public class JProject {
                 JActivity srcAct = (JActivity)sourceActs.get(i);
                 JActivity dstAct = new JActivity(); // neue activity anlegen
 
-                copyActivityValues(srcAct, dstAct); // werte der activity mitsamt dependencies kopieren
-                cloneActivities(srcAct.activities, dstAct.activities); // activities der activity klonen
+                copyActivityValues(srcAct, dstAct);
+                // werte der activity mitsamt dependencies kopieren
 
-                destinationActs.add(dstAct); // die neu erstellte, geklonte activity hinzufügen
+                cloneActivities(srcAct.activities, dstAct.activities);
+                // activities der activity klonen
+
+                destinationActs.add(dstAct);
+                // die neu erstellte, geklonte activity hinzufügen
             }
         }
     }
@@ -146,19 +150,19 @@ public class JProject {
     public JInstance newEmptyInstance() {
 
         JInstance inst = new JInstance();
-        inst.id = getNextId(); // gets the next higher id
-        instances.add(inst);  // adds the new instance to the arraylist
+        inst.id = getNextId(); // nächst höhere id
+        instances.add(inst);  // fügt die neue instanz der arraylist hinzu
 
-        return inst;  // return the new empty instance
+        return inst;  // übergibt die neue leere instanz
     }
 
     public int newInstance() {
 
         JInstance inst = new JInstance();
-        inst.id = getNextId(); // gets the next higher id
+        inst.id = getNextId(); // nächst höhere id
 
-        if (this.instances.size() > 0) {
-            JInstance lastInst = (JInstance)this.instances.get(this.instances.size()-1);
+        if (instances.size() > 0) {
+            JInstance lastInst = (JInstance)instances.get(instances.size() - 1);
 
             inst.setName(lastInst.getName());
             inst.setCreationDate(lastInst.getCreationDate());
@@ -169,16 +173,18 @@ public class JProject {
 
         }
 
-        instances.add(inst);  // adds the new instance to the arraylist
+        instances.add(inst);  // fügt die neue instanz der arraylist hinzu
 
         inst.setActive(true);
 
-        return inst.id;  // return id of the new instance
+        return inst.id;  // übergibt die id der neuen instanz
     }
 
-    public int newInstance(String strName, Calendar calCreate, Calendar calStart, Calendar calEnd, boolean active) {
+    public int newInstance(String strName, Calendar calCreate,
+                           Calendar calStart, Calendar calEnd, boolean active) {
 
-        int i = newInstance(); // creates new instance (clones the last instance)
+        int i = newInstance();
+        // erstellt neue instanz, wobei die letzte instanz geklont wird
 
         JInstance inst = getInstance(i);
 
@@ -188,7 +194,7 @@ public class JProject {
         inst.setEndDate(calEnd);
         inst.setActive(active);
 
-        return inst.id;  // return id of the new instance
+        return inst.id;  // übergibt die id der neuen instanz
     }
 
     public ArrayList getInstances() {
@@ -196,7 +202,7 @@ public class JProject {
     }
 
     public JInstance getInstance(int id) {
-
+        // gibt die instanz mit der übergebenen id zurück
         for (int i=0; i<this.instances.size(); i++) {
             JInstance inst = (JInstance)this.instances.get(i);
             if (inst.id == id) {
@@ -207,7 +213,7 @@ public class JProject {
     }
 
     public void deleteInstance(int id) {
-
+        // löscht die instanz mit der übergebenen id
         JInstance inst = getInstance(id);
         if (inst != null) {
             this.instances.remove(inst);

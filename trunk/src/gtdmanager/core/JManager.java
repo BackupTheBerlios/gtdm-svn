@@ -4,8 +4,6 @@ import java.util.*;
 import java.io.*;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
-import org.xml.sax.*;
-import java.net.*;
 
 /**
  * <p>Title: JManager class</p>
@@ -21,38 +19,28 @@ import java.net.*;
  */
 public class JManager {
 
-    private static int MONTHINC = 1;
+    private static int MONTHINC = 1; // in Calendar beginnen Monate bei 0
 
     JProject project;
 
     private boolean projectNodeFound = false;
-
-    //private String projectLastNameNode = "";
     private boolean projectNameNodeFound = false;
-
-    //private String instLastNameNode = "";
     private boolean instNameNodeFound = false;
-
     private String actLastNameNode = "";
     private boolean actNameNodeFound = false;
 
 
     public JManager() {
-
-        try {
-            jbInit();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        projectNodeFound = false;
+        projectNameNodeFound = false;
+        instNameNodeFound = false;
+        actLastNameNode = "";
+        actNameNodeFound = false;
     }
 
     public JProject getProject() {
         return this.project;
     }
-
-
-    // --------------------------------------------------------------------------------------
-
 
     private void processDependencyPropertyNode(Node propNode, JDependency dep) {
 
@@ -62,7 +50,7 @@ public class JManager {
         if (nodeName.equalsIgnoreCase("property")) {
             if (propNode.hasAttributes()) {
                 NamedNodeMap nodeMap = propNode.getAttributes();
-                for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
+                for (int nodeIdx=0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
 
                     String itemName = nodeMap.item(nodeIdx).getNodeName();
                     String itemValue = nodeMap.item(nodeIdx).getNodeValue();
@@ -70,6 +58,7 @@ public class JManager {
                     if (itemName.equalsIgnoreCase("name")) {
                         lastPropName = itemValue;
                     } else if (itemName.equalsIgnoreCase("value")) {
+
                         if (lastPropName.equalsIgnoreCase("color")) {
                             dep.setColor(getColorInt(itemValue));
                         } else if (lastPropName.equalsIgnoreCase("line")) {
@@ -96,19 +85,23 @@ public class JManager {
 
                 if (itemName.equalsIgnoreCase("type")) {
 
-                    if (itemValue.equalsIgnoreCase("begin-begin")) {
+                    if (itemValue.equalsIgnoreCase(dep.BEGINBEGINSTR)) {
                         dep.setDependencyType(dep.BEGINBEGIN);
-                    } else if (itemValue.equalsIgnoreCase("begin-end")) {
+
+                    } else if (itemValue.equalsIgnoreCase(dep.BEGINENDSTR)) {
                         dep.setDependencyType(dep.BEGINEND);
-                    } else if (itemValue.equalsIgnoreCase("end-begin")) {
+
+                    } else if (itemValue.equalsIgnoreCase(dep.ENDBEGINSTR)) {
                         dep.setDependencyType(dep.ENDBEGIN);
-                    } else if (itemValue.equalsIgnoreCase("end-end")) {
+
+                    } else if (itemValue.equalsIgnoreCase(dep.ENDENDSTR)) {
                         dep.setDependencyType(dep.ENDEND);
                     }
 
                 } else if (itemName.equalsIgnoreCase("activity-id")) {
 
-                    dep.setToActivityId(Integer.parseInt(itemValue.substring(1)));
+                    dep.setToActivityId(
+                         Integer.parseInt(itemValue.substring(1)));
 
                 }
             }
@@ -132,19 +125,23 @@ public class JManager {
         int yearInt = -1;
 
         String nodeName = dateNode.getNodeName();
-        //System.out.println("       Date-Node found '" + nodeName + "'");
 
         if (dateNode.hasAttributes()) {
 
             NamedNodeMap nodeMap = dateNode.getAttributes();
             for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
+
                 String itemName = nodeMap.item(nodeIdx).getNodeName();
                 String itemValue = nodeMap.item(nodeIdx).getNodeValue();
-                //System.out.println("    DateAttrib found: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
+
                 if (itemName.equalsIgnoreCase("date")) {
                     dateInt = Integer.parseInt(itemValue);
+
                 } else if (itemName.equalsIgnoreCase("month")) {
-                    monthInt = Integer.parseInt(itemValue);
+                    monthInt = Integer.parseInt(itemValue) - MONTHINC;
+                    // hier wird 1 vom Monat abgezogen,
+                    // da in Calendar die Monate bei 0 beginnen
+
                 } else if (itemName.equalsIgnoreCase("year")) {
                     yearInt = Integer.parseInt(itemValue);
                 }
@@ -157,17 +154,25 @@ public class JManager {
 
                 if (nodeName.equalsIgnoreCase("start-date")) {
                     act.setStartDate(c);
+
                 } else if (nodeName.equalsIgnoreCase("end-date")) {
                     act.setEndDate(c);
+
                 } else {
-                    System.out.println("Unbekannter Datumsknoten in activity: " + nodeName);
+                    System.out.println("Unbekannter Datumsknoten in " +
+                                       "activity: " + nodeName);
                 }
 
-            } else { // eines oder mehrere der attribute date, month und year wurden nicht gefunden
-                System.out.println("Der Datumsknoten '" + nodeName + "' besitzt nicht genügend Attribute für ein korrektes Datum!");
+            } else {
+                // eines oder mehrere der attribute
+                // date, month und year wurden nicht gefunden
+                System.out.println("Der Datumsknoten '" + nodeName +
+                                   "' besitzt nicht genügend Attribute " +
+                                   "für ein korrektes Datum!");
             }
         } else {
-            System.out.println("Der Datumsknoten '" + nodeName + "' besitzt keine Attribute!");
+            System.out.println("Der Datumsknoten '" + nodeName +
+                               "' besitzt keine Attribute!");
         }
     }
 
@@ -175,12 +180,10 @@ public class JManager {
 
         int retColor = 0;
 
-        if (colorStr.startsWith("0x")) { // example: given as 0xFFFF0000
+        if (colorStr.startsWith("0x")) { // example: 0xFFFF0000
             retColor = Integer.parseInt(colorStr.substring(2), 16);
-        } else if (colorStr.startsWith("#")) { // example: given as #FF0000
+        } else if (colorStr.startsWith("#")) { // example: #FF0000
             retColor = Integer.parseInt(colorStr.substring(1), 16);
-        /*} else if (colorStr.startsWith("0") && (colorStr.length() > 1)) {
-            retColor = Integer.parseInt(colorStr.substring(1), 8);*/
         } else if (colorStr.equalsIgnoreCase("white")) {
             retColor = Integer.parseInt("FFFFFF", 16);
         } else if (colorStr.equalsIgnoreCase("black")) {
@@ -213,12 +216,12 @@ public class JManager {
             retColor = Integer.parseInt("00FFFF", 16);
         } else {
             retColor = Integer.parseInt(colorStr);
-            //System.out.println("Unbekannte Farbe gefunden: " + colorStr);
         }
         return retColor;
     }
 
     private String getColorStr(String hexStr) {
+        // wandelt eine hex-zahl (z.b. #FF0000) in text um ("red")
 
         if (hexStr.equalsIgnoreCase("#FFFFFF")) {
             return "white";
@@ -257,59 +260,82 @@ public class JManager {
     private void processActivityPropertyNode(Node childNode, JActivity act) {
         // Bsp: <property name="color" value="red" />
         if (childNode.getAttributes().getLength() >= 2) {
-            if ((childNode.getAttributes().item(0).getNodeName().equalsIgnoreCase("name")) &&
-                (childNode.getAttributes().item(1).getNodeName().equalsIgnoreCase("value"))) {
+            if ((childNode.getAttributes().item(0).getNodeName()
+                 .equalsIgnoreCase("name")) &&
+                (childNode.getAttributes().item(1).getNodeName()
+                 .equalsIgnoreCase("value"))) {
 
-                String nameStr = childNode.getAttributes().item(0).getNodeValue();
-                String valueStr = childNode.getAttributes().item(1).getNodeValue();
+                String nameStr = childNode.getAttributes().item(0)
+                                 .getNodeValue();
+                String valueStr = childNode.getAttributes().item(1)
+                                  .getNodeValue();
 
                 if (nameStr.equalsIgnoreCase("color")) {
-                    act.setColor(getColorInt(valueStr)); // z.b. color "red" in int-zahl umwandeln
+                    act.setColor(getColorInt(valueStr));
+                    // z.b. color "red" in int-zahl umwandeln
                 }
             }
         }
     }
 
     private void processActivityChildNode(Node childNode, JActivity act) {
-        // Kindknoten eines activity-Knotens: name, short-name, start-date, end-date, property, #text, activity*, dependency*
+        // Kindknoten eines activity-Knotens:
+        // name, short-name, start-date, end-date, property, #text,
+        // activity*, dependency*
 
         short nodeType = childNode.getNodeType();
         String nodeName = childNode.getNodeName();
 
         switch (nodeType) {
         case Node.ELEMENT_NODE:
-            // Elemente des instance-Knotens: name, short-name, start-date, end-date, activity*
-            //System.out.println("ActivityElement found: " + childNode.getNodeName() + " = " + childNode.getNodeValue());
+            // Elemente des activity-Knotens:
+            // name, short-name, start-date, end-date, property,
+            // dependency*, activity*
 
             actNameNodeFound = false;
-            if ((nodeName.equalsIgnoreCase("name")) || (nodeName.equalsIgnoreCase("short-name"))) {
-                actNameNodeFound = true; // muss true sein, damit ein übergebener Text als name identifiziert werden kann
+            if ((nodeName.equalsIgnoreCase("name")) ||
+                (nodeName.equalsIgnoreCase("short-name"))) {
+
+                actNameNodeFound = true;
+                // muss true sein, damit ein übergebener Text
+                // als name identifiziert werden kann
+
                 actLastNameNode = nodeName;
                 if (childNode.hasChildNodes()) {
+                    // der Text-Knoten des name-Knotens wird als
+                    // Kindknoten des name-Knotens geliefert
                     processActivityChildNode(childNode.getFirstChild(), act);
                 }
+
             } else if (nodeName.endsWith("-date")) {
                 processActDateNode(childNode, act);
+
             } else if (nodeName.equalsIgnoreCase("property")) {
                 processActivityPropertyNode(childNode, act);
+
             } else if (nodeName.equalsIgnoreCase("dependency")) {
                 processDependencyNode(childNode, act);
+
             } else if (nodeName.equalsIgnoreCase("activity")) {
                 processActivityNode(childNode, act.activities);
-                //System.out.println("Instanz gefunden");
+
             } else {
-                System.out.println("Unbekanntes Element innerhalb eines activity-Knotens der XML-Datei: " + nodeName + " = " + childNode.getNodeValue());
+                System.out.println("Unbekanntes Element innerhalb eines " +
+                                   "activity-Knotens der XML-Datei: " +
+                                   nodeName + " = " + childNode.getNodeValue());
             }
             break;
 
         case Node.TEXT_NODE:
-            // Text des instance-Knotens: Inhalt von name
+            // möglicher Text des activity-Knotens: Inhalt von name, short-name
+
             String nodeValue = childNode.getNodeValue();
 
-            // das erste Zeichen des nodeValue-Strings wird auf das Zeichen #10 (Ascii-Code 10) untersucht
+            // Das erste Zeichen des nodeValue-Strings wird auf die
+            // Zeichen #10 (Ascii-Code 10) und #13 (Ascii-Code 13) untersucht.
             // nicht gerade schön, Verbesserungsvorschläge erwünscht
-            if ((nodeValue.charAt(0) != 10) && (nodeValue.charAt(0) != 13)) { // no carriage return and tabs
-                //System.out.println("   Text found: " + nodeName + " = " + nodeValue);
+            if ((nodeValue.charAt(0) != 10) && (nodeValue.charAt(0) != 13)) {
+            // kein Zeilenumbruch (kein Zeichen #10 oder #13)
 
                 if (actNameNodeFound) {
 
@@ -319,37 +345,47 @@ public class JManager {
                         act.setShortName(childNode.getNodeValue());
                     }
                     actNameNodeFound = false;
-                } else { // kein name-Knoten vor diesem Text gefunden
-                    System.out.println("Unbekannter Text gefunden: " + nodeName + " = " + nodeValue);
+
+                } else {
+                    // kein name-Knoten vor diesem Text gefunden
+                    System.out.println("Unbekannter Text gefunden: " +
+                                       nodeName + " = " + nodeValue);
                 }
                 actNameNodeFound = false;
             }
             break;
 
         default:
-            // Unbekannter Knoten im instance-Knoten
-            System.out.println("Unbekannter Knoten in instance-Knoten gefunden: " + nodeName + " = " + childNode.getNodeValue());
+            // Unbekannter Knoten im activity-Knoten
+            System.out.println("Unbekannter Knoten in activity-Knoten " +
+                               "gefunden: " + nodeName + " = " +
+                               childNode.getNodeValue());
             break;
         }
 
     }
 
     private void processActivityNode(Node actNode, ArrayList activities) {
-        // Parameter: actNode:    der activity-Knoten des XML-Dokuments
-        //            activities: die ArrayList, in welche diese activity eingefügt werden soll
+    // Parameter: actNode:    activity-Knoten des XML-Dokuments
+    //            activities: ArrayList, in welche die activity eingefügt wird
 
         JActivity act = new JActivity();
 
         if (actNode.hasAttributes()) {
-            if (actNode.getAttributes().item(0).getNodeName().equalsIgnoreCase("id")) {
+            if (actNode.getAttributes().item(0).
+                getNodeName().equalsIgnoreCase("id")) {
+
                 String idStr = actNode.getAttributes().item(0).getNodeValue();
                 act.id = Integer.parseInt(idStr.substring(1));
-                // das erste Zeichen des id-Strings wird ignoriert (id="A3" => id=3)
+                // das erste Zeichen des id-Strings wird ignoriert
+                // (id="A3" => id=3)
+
             }
         }
 
         if (actNode.hasChildNodes()) {
-        // childNodes des actNode: name, short-name, start-date, end-date, #text, activity*
+        // childNodes des actNode:
+        // name, short-name, start-date, end-date, #text, activity*
 
             NodeList nodeList = actNode.getChildNodes();
             for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
@@ -369,19 +405,23 @@ public class JManager {
         int yearInt = -1;
 
         String nodeName = dateNode.getNodeName();
-        //System.out.println("       Date-Node found '" + nodeName + "'");
 
         if (dateNode.hasAttributes()) {
 
             NamedNodeMap nodeMap = dateNode.getAttributes();
             for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
+
                 String itemName = nodeMap.item(nodeIdx).getNodeName();
                 String itemValue = nodeMap.item(nodeIdx).getNodeValue();
-                //System.out.println("    DateAttrib found: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
+
                 if (itemName.equalsIgnoreCase("date")) {
                     dateInt = Integer.parseInt(itemValue);
+
                 } else if (itemName.equalsIgnoreCase("month")) {
                     monthInt = Integer.parseInt(itemValue) - MONTHINC;
+                    // hier wird 1 vom Monat abgezogen,
+                    // da in Calendar die Monate bei 0 beginnen
+
                 } else if (itemName.equalsIgnoreCase("year")) {
                     yearInt = Integer.parseInt(itemValue);
                 }
@@ -394,64 +434,85 @@ public class JManager {
 
                 if (nodeName.equalsIgnoreCase("creation-date")) {
                     destInst.setCreationDate(c);
+
                 } else if (nodeName.equalsIgnoreCase("start-date")) {
                     destInst.setStartDate(c);
+
                 } else if (nodeName.equalsIgnoreCase("end-date")) {
                     destInst.setEndDate(c);
+
                 } else {
-                    System.out.println("Unbekannter Datumsknoten in instance: " + nodeName);
+                    System.out.println("Unbekannter Datumsknoten " +
+                                       "in instance: " + nodeName);
                 }
 
-            } else { // eines oder mehrere der attribute date, month und year wurden nicht gefunden
-                System.out.println("Der Datumsknoten '" + nodeName + "' besitzt nicht genügend Attribute für ein korrektes Datum!");
+            } else {
+                // eines oder mehrere der attribute
+                // date, month und year wurden nicht gefunden
+                System.out.println("Der Datumsknoten '" + nodeName +
+                                   "' besitzt nicht genügend Attribute " +
+                                   "für ein korrektes Datum!");
             }
         } else {
-            System.out.println("Der Datumsknoten '" + nodeName + "' besitzt keine Attribute!");
+            System.out.println("Der Datumsknoten '" + nodeName +
+                               "' besitzt keine Attribute!");
         }
     }
 
     private void processInstanceChildNode(Node childNode, JInstance destInst) {
-        // Kindknoten des instance-Knoten: name, creation-date, start-date, end-date, #text, activity*
+        // Kindknoten des instance-Knoten:
+        // name, creation-date, start-date, end-date, #text, activity*
 
         short nodeType = childNode.getNodeType();
         String nodeName = childNode.getNodeName();
-        //System.out.println("instChild: " + nodeName + " = " + childNode.getNodeValue());
 
         switch (nodeType) {
         case Node.ELEMENT_NODE:
-            // Elemente des instance-Knotens: name, creation-date, start-date, end-date, activity*
-            //System.out.println("InstanceElement found: " + childNode.getNodeName() + " = " + childNode.getNodeValue());
+            // Elemente des instance-Knotens:
+            // name, creation-date, start-date, end-date, activity*
 
             instNameNodeFound = false;
             if (nodeName.equalsIgnoreCase("name")) {
-                instNameNodeFound = true; // muss true sein, damit ein übergebener Text als name identifiziert werden kann
+                instNameNodeFound = true;
+                // muss true sein, damit ein übergebener Text
+                // als name identifiziert werden kann
                 if (childNode.hasChildNodes()) {
-                    processInstanceChildNode(childNode.getFirstChild(), destInst);
+                    processInstanceChildNode(childNode.getFirstChild(),
+                                             destInst);
                 }
+
             } else if (nodeName.endsWith("-date")) {
                 processInstDateNode(childNode, destInst);
+
             } else if (nodeName.equalsIgnoreCase("activity")) {
                 processActivityNode(childNode, destInst.activities);
-                //System.out.println("Instanz gefunden");
+
             } else {
-                System.out.println("Unbekanntes Element innerhalb eines instance-Knotens der XML-Datei: " + nodeName + " = " + childNode.getNodeValue());
+                System.out.println("Unbekanntes Element innerhalb eines " +
+                                   "instance-Knotens der XML-Datei: " +
+                                   nodeName + " = " + childNode.getNodeValue());
             }
             break;
 
         case Node.TEXT_NODE:
-            // Text des instance-Knotens: Inhalt von name
+            // möglicher Text des instance-Knotens: Inhalt von name
+
             String nodeValue = childNode.getNodeValue();
 
-            // das erste Zeichen des nodeValue-Strings wird auf das Zeichen #10 (Ascii-Code 10) untersucht
+            // Das erste Zeichen des nodeValue-Strings wird auf die
+            // Zeichen #10 (Ascii-Code 10) und #13 (Ascii-Code 13) untersucht.
             // nicht gerade schön, Verbesserungsvorschläge erwünscht
-            if ((nodeValue.charAt(0) != 10) && (nodeValue.charAt(0) != 13)) { // no carriage return and tabs
-                //System.out.println("   Text found: " + nodeName + " = " + nodeValue);
+            if ((nodeValue.charAt(0) != 10) && (nodeValue.charAt(0) != 13)) {
+            // kein Zeilenumbruch (kein Zeichen #10 oder #13)
 
                 if (instNameNodeFound) {
+
                     destInst.setName(nodeValue);
                     instNameNodeFound = false;
+
                 } else { // kein name-Knoten vor diesem Text gefunden
-                    System.out.println("Unbekannter Text gefunden: " + nodeName + " = " + nodeValue);
+                    System.out.println("Unbekannter Text gefunden: " +
+                                       nodeName + " = " + nodeValue);
                 }
                 instNameNodeFound = false;
             }
@@ -459,7 +520,9 @@ public class JManager {
 
         default:
             // Unbekannter Knoten im instance-Knoten
-            System.out.println("Unbekannter Knoten in instance-Knoten gefunden: " + nodeName + " = " + childNode.getNodeValue());
+            System.out.println("Unbekannter Knoten in instance-Knoten " +
+                               "gefunden: " + nodeName + " = " +
+                               childNode.getNodeValue());
             break;
         }
     }
@@ -469,68 +532,90 @@ public class JManager {
         JInstance inst = project.newEmptyInstance();
 
         if (instNode.hasChildNodes()) {
-            // childNodes des instNode: name, creation-date, start-date, end-date, #text, activity*
+            // childNodes des instNode:
+            // name, creation-date, start-date, end-date, #text, activity*
 
             NodeList nodeList = instNode.getChildNodes();
             for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
 
                 processInstanceChildNode(nodeList.item(nodeIdx), inst);
-//                System.out.println("Instanz gefunden: " + instNode.getNodeName());
 
             }
         }
-
     }
 
     private void processProjectPropertyNode(Node propertyNode) {
-        // durchsucht die Attribute eines property-Knoten innerhalb des project-Knotens
+        // durchsucht die Attribute eines property-Knoten
+        // innerhalb des project-Knotens
 
-        String lastPropName = ""; // hier wird der Property-Name gespeichert, um den folgenden Wert zuordnen zu können
+        String lastPropName = "";
+        // hier wird der Property-Name gespeichert,
+        // um den folgenden Wert zuordnen zu können
 
-        if (propertyNode.hasAttributes()) { // Attribute einer Project-Property: name, value
+        if (propertyNode.hasAttributes()) {
+        // Attribute einer Project-Property: name, value
 
             NamedNodeMap nodeMap = propertyNode.getAttributes();
             for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
 
                 String itemName = nodeMap.item(nodeIdx).getNodeName();
-                //System.out.println("    propertyChild found: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
 
                 if (itemName == "name") {
-                    // gibt den Namen der Eigenschaft an, deren Wert im nächsten value-Attribut übergeben wird
+                    // gibt den Namen der Eigenschaft an, deren Wert im
+                    // nächsten value-Attribut übergeben wird
 
-                    lastPropName = nodeMap.item(nodeIdx).getNodeValue(); // z.B. size-x, size-y, unit, font-size
+                    lastPropName = nodeMap.item(nodeIdx).getNodeValue();
+                    // z.B. size-x, size-y, unit, font-size
 
                 } else if (itemName == "value") {
-                    // gibt den Wert der Eigenschaft an, deren Name im vorherigen name-Attribut übergeben wurde
+                    // gibt den Wert der Eigenschaft an, deren Name im
+                    // vorherigen name-Attribut übergeben wurde
 
-                    //boolean b = lastPropName.equalsIgnoreCase("size-x");
                     if (lastPropName.equalsIgnoreCase("font-size")) {
-// FEHLER: obwohl lastPropName = "font-size" ist, wird diese anweisung nicht ausgeführt
-                        project.setFontSize(Integer.parseInt(nodeMap.item(nodeIdx).getNodeValue())); // ???
+                        project.setFontSize(Integer.parseInt(
+                                nodeMap.item(nodeIdx).getNodeValue()));
+
                     } else if (lastPropName.equalsIgnoreCase("size-x")) {
-                        project.setSizeX(Integer.parseInt(nodeMap.item(nodeIdx).getNodeValue()));
+                        project.setSizeX(Integer.parseInt(
+                                nodeMap.item(nodeIdx).getNodeValue()));
+
                     } else if (lastPropName.equalsIgnoreCase("size-y")) {
-                        project.setSizeY(Integer.parseInt(nodeMap.item(nodeIdx).getNodeValue()));
+                        project.setSizeY(Integer.parseInt(
+                                nodeMap.item(nodeIdx).getNodeValue()));
+
                     } else if (lastPropName.equalsIgnoreCase("unit")) {
                         project.setUnit(nodeMap.item(nodeIdx).getNodeValue());
+
                     } else {
 
-                        if (lastPropName == "") { // keine Zuordnung des value-Werts möglich
-                            System.out.println("Kein name-Attribut vor diesem value-Attribut gefunden: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
+                        if (lastPropName == "") {
+                            // keine Zuordnung des value-Werts möglich
+                            System.out.println("Kein name-Attribut vor diesem" +
+                                " value-Attribut gefunden: " + itemName +
+                                " = " + nodeMap.item(nodeIdx).getNodeValue());
+
                         } else { // unbekannter property-Name
-                            System.out.println("Unbekanntes name-Attribut vor diesem value-Attribut gefunden: " + lastPropName + "? : " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
+                            System.out.println("Unbekanntes name-Attribut " +
+                                "vor diesem value-Attribut gefunden: " +
+                                lastPropName + "? : " + itemName + " = " +
+                                nodeMap.item(nodeIdx).getNodeValue());
                         }
 
                     }
-                    lastPropName = ""; // damit kein value-Attribut doppelt vorkommen und damit überschrieben werden kann
+                    lastPropName = "";
+                    // damit kein value-Attribut doppelt vorkommen und damit
+                    // überschrieben werden kann
 
                 } else {
-                    System.out.println("Unbekanntes property-Attribut: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
+                    System.out.println("Unbekanntes property-Attribut: " +
+                                       itemName + " = " +
+                                       nodeMap.item(nodeIdx).getNodeValue());
                 }
 
             }
         } else { // property besitzt keine Attribute
-            System.out.println("Ein property-Knoten innerhalb des project-Knotens besitzt keine Attribute!");
+            System.out.println("Ein property-Knoten innerhalb des " +
+                               "project-Knotens besitzt keine Attribute!");
         }
     }
 
@@ -539,16 +624,18 @@ public class JManager {
 
         short nodeType = childNode.getNodeType();
         String nodeName = childNode.getNodeName();
-        //System.out.println("ProjChild: " + nodeName + " = " + childNode.getNodeValue());
 
         switch (nodeType) {
         case Node.ELEMENT_NODE:
             // Elemente des project-Knotens: name, property, instance
-            //System.out.println("Element found: " + childNode.getNodeName() + " = " + childNode.getNodeValue());
 
             projectNameNodeFound = false;
             if (nodeName == "name") {
-                projectNameNodeFound = true; // muss true sein, damit ein übergebener Text als name identifiziert werden kann
+
+                projectNameNodeFound = true;
+                // muss true sein, damit ein übergebener Text
+                // als name identifiziert werden kann
+
                 if (childNode.hasChildNodes()) {
                     processProjectChildNode(childNode.getFirstChild());
                 }
@@ -556,42 +643,43 @@ public class JManager {
                 processProjectPropertyNode(childNode);
             } else if (nodeName == "instance") {
                 processInstanceNode(childNode);
-                //System.out.println("Instanz gefunden");
             } else {
-                System.out.println("Unbekanntes Element innerhalb des project-Knotens der XML-Datei: " + nodeName + " = " + childNode.getNodeValue());
+                System.out.println("Unbekanntes Element innerhalb des " +
+                                   "project-Knotens der XML-Datei: " +
+                                   nodeName + " = " + childNode.getNodeValue());
             }
             break;
 
         case Node.TEXT_NODE:
-            // Text des project-Knotens: Inhalt von name
+            // möglicher Text des project-Knotens: Inhalt von name
+
             String nodeValue = childNode.getNodeValue();
 
-            // das erste Zeichen des nodeValue-Strings wird auf das Zeichen #10 (Ascii-Code 10) untersucht
+            // Das erste Zeichen des nodeValue-Strings wird auf die
+            // Zeichen #10 (Ascii-Code 10) und #13 (Ascii-Code 13) untersucht.
             // nicht gerade schön, Verbesserungsvorschläge erwünscht
-            if ((nodeValue.charAt(0) != 10) && (nodeValue.charAt(0) != 13)) { // no carriage return and tabs
-                //System.out.println("   Text found: " + nodeName + " = " + nodeValue);
+            if ((nodeValue.charAt(0) != 10) && (nodeValue.charAt(0) != 13)) {
+            // kein Zeilenumbruch (kein Zeichen #10 oder #13)
 
                 if (projectNameNodeFound) {
+
                     project.setName(nodeValue);
                     projectNameNodeFound = false;
+
                 } else { // kein name-Knoten vor diesem Text gefunden
-                    System.out.println("Unbekannter Text gefunden: " + nodeName + " = " + nodeValue);
+                    System.out.println("Unbekannter Text gefunden: " +
+                                       nodeName + " = " + nodeValue);
                 }
                 projectNameNodeFound = false;
             }
             break;
 
-        /*case Node.ATTRIBUTE_NODE:
-            //...
-            System.out.println("Attribute found: " + document.getNodeName() + " = " + document.getNodeValue());
-            break; */
-
         default:
             // Unbekannter Knoten im project-Knoten
-            System.out.println("Unbekannter Knoten im project-Knoten gefunden: " + nodeName + " = " + childNode.getNodeValue());
+            System.out.println("Unbekannter Knoten im project-Knoten gefunden: "
+                               + nodeName + " = " + childNode.getNodeValue());
             break;
         }
-
     }
 
     private void processProjectNode(Node projectNode) {
@@ -604,14 +692,15 @@ public class JManager {
             for (int nodeIdx = 0; nodeIdx < nodeMap.getLength(); nodeIdx++) {
 
                 String itemName = nodeMap.item(nodeIdx).getNodeName();
-                //System.out.println("    projectChild found: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
 
                 if (itemName == "vendor-id") {
                     project.setAuthor(nodeMap.item(nodeIdx).getNodeValue());
                 } else if (itemName == "version") {
                     project.setVersion(nodeMap.item(nodeIdx).getNodeValue());
                 } else {
-                    System.out.println("Unbekanntes Attribut des project-Knotens gefunden: " + itemName + " = " + nodeMap.item(nodeIdx).getNodeValue());
+                    System.out.println("Unbekanntes Attribut des project-" +
+                                       "Knotens gefunden: " + itemName + " = " +
+                                       nodeMap.item(nodeIdx).getNodeValue());
                 }
 
             }
@@ -632,9 +721,9 @@ public class JManager {
 
     }
 
-
     private void processDocChildNode(Node docChild) {
-        // wird mit allen Kindknoten des Dokuments aufgerufen (im Normalfall nur project, ansonsten Fehlermeldung)
+        // wird mit allen Kindknoten des Dokuments aufgerufen
+        // (im Normalfall nur project, ansonsten Fehlermeldung)
 
         short nodeType = docChild.getNodeType();
         String nodeName = docChild.getNodeName();
@@ -642,18 +731,18 @@ public class JManager {
         if (nodeType == Node.ELEMENT_NODE) {
 
             if (nodeName == "project") {
-                //System.out.println("  projectNode found: " + nodeName + " = " + docChild.getNodeValue());
 
                 if (!projectNodeFound) {
                     projectNodeFound = true;
-                    //lastNameNode = "project";
                     processProjectNode(docChild);
                 } else {
-                    System.out.println("In der XML-Datei wurden mehrere project-Knoten gefunden!");
+                    System.out.println(
+                    "In der XML-Datei wurden mehrere project-Knoten gefunden!");
                 }
 
             } else {
-                System.out.println("Unbekanntes Element in der XML-Datei: " + nodeName + " = " + docChild.getNodeValue());
+                System.out.println("Unbekanntes Element in der XML-Datei: " +
+                                   nodeName + " = " + docChild.getNodeValue());
             }
 
         } else {
@@ -661,17 +750,16 @@ public class JManager {
             //case Node.ATTRIBUTE_NODE:
             //default:
             if (nodeName.equalsIgnoreCase("project")) {
-                // !DOCTYPE project ... // gibt verwendetes DTD an (überprüfen, verwenden?)
+                // !DOCTYPE project ... // gibt verwendetes DTD an
             } else {
-                System.out.println("Unbekannter Knoten in der XML-Datei: " + nodeName + " = " + docChild.getNodeValue());
+                System.out.println("Unbekannter Knoten in der XML-Datei: " +
+                                   nodeName + " = " + docChild.getNodeValue());
             }
         }
 
     } // end of processDocChildNode
 
     private void processDocument(Node document) {
-        //System.out.println("DOC: " + document.getNodeName());
-        //processNode(document); // for testing only
 
         if (document.hasChildNodes()) {
 
@@ -681,33 +769,34 @@ public class JManager {
             }
 
         } else {
-            System.out.println("Es befinden sich keine Elemente in der XML-Datei!");
+            System.out.println(
+            "Es befinden sich keine Elemente in der XML-Datei!");
         }
 
     } // end of processDocument
 
     public void loadProject(String fileName) {
-        // loads project from xml-file
+        // läd das Projekt aus der angegebenen XML-Datei
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
-
+        // das DTD muss sich in dem Ordner befinden,
+        // welcher in der XML-Datei angegeben ist
             DocumentBuilder domBuilder = dbf.newDocumentBuilder();
             File file = new File(fileName);
 
             Document document = domBuilder.parse(file);
 
-/*
+/* // bei dieser Art des Ladens wird das DTD aus den Resourcen geladen
             URL dtdUrl = this.getClass().getResource("/gtdmanager.dtd");
             // dtd muss sich im ordner /classes befinden!
 
             FileInputStream fInSt = new FileInputStream(fileName);
-            InputSource is = new InputSource(fInSt);
-            is.setSystemId(dtdUrl.toString());
+            InputSource inSrc = new InputSource(fInSt);
+            inSrc.setSystemId(dtdUrl.toString());
             dbf.setValidating(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
-            //db.setErrorHandler(new GtdXMLErrorHandler());
-            Document document = db.parse(is);
+            Document document = db.parse(inSrc);
 */
             processDocument(document);
 
@@ -718,6 +807,8 @@ public class JManager {
     }
 
     private String getColorInXML(int color) {
+    // color wird nicht in der Form #00FF00 sondern als integer abgespeichert
+
         /*String s = Integer.toHexString(color);
         while (s.length() < 6) {
             s = "0" + s;
@@ -727,41 +818,64 @@ public class JManager {
     }
 
     private String getCalendarInXml(Calendar c) {
-        return "date=\"" + c.get(Calendar.DATE) + "\" month=\"" + c.get(Calendar.MONTH + MONTHINC) + "\" year=\"" + c.get(Calendar.YEAR) + "\"";
+    // die Monate in Calendar fangen bei 0 an,
+    // daher wird hier der Monat + 1 abgespeichert
+
+        return "date=\"" + c.get(Calendar.DATE) +
+                "\" month=\"" + c.get(Calendar.MONTH + MONTHINC) +
+                "\" year=\"" + c.get(Calendar.YEAR) + "\"";
     }
 
-    private void writeDependency(PrintWriter pWriter, JDependency dep, String tabs) {
-        pWriter.println(tabs + "<dependency type=\"" + dep.getDependencyTypeStr() + "\" activity-id=\"A" + dep.getToActivityId() + "\">");
-        pWriter.println(tabs + "\t<property name=\"color\" value=\"" + getColorInXML(dep.getColor()) + "\" />");
-        pWriter.println(tabs + "\t<property name=\"line\" value=\"" + dep.getLine() + "\" />");
+    private void writeDependency(PrintWriter pWriter, JDependency dep,
+                                 String tabs) {
+
+        pWriter.println(tabs + "<dependency type=\"" +
+                        dep.getDependencyTypeStr() + "\" activity-id=\"A" +
+                        dep.getToActivityId() + "\">");
+        pWriter.println(tabs + "\t<property name=\"color\" value=\"" +
+                        getColorInXML(dep.getColor()) + "\" />");
+        pWriter.println(tabs + "\t<property name=\"line\" value=\"" +
+                        dep.getLine() + "\" />");
         pWriter.println(tabs + "</dependency>");
     }
 
-    private void writeActivity(PrintWriter pWriter, JActivity act, String tabs) {
+    private void writeActivity(PrintWriter pWriter, JActivity act,
+                               String tabs) {
+
         pWriter.println(tabs + "<activity id=\"A" + act.getId() + "\">");
         pWriter.println(tabs + "\t<name>" + act.getName() + "</name>");
-        pWriter.println(tabs + "\t<short-name>" + act.getShortName() + "</short-name>");
-        pWriter.println(tabs + "\t<start-date " + getCalendarInXml(act.getStartDate()) + " />");
-        pWriter.println(tabs + "\t<end-date " + getCalendarInXml(act.getEndDate()) + " />");
-        pWriter.println(tabs + "\t<property name=\"color\" value=\"" + getColorInXML(act.getColor()) + "\" />");
+        pWriter.println(tabs + "\t<short-name>" +
+                        act.getShortName() + "</short-name>");
+        pWriter.println(tabs + "\t<start-date " +
+                        getCalendarInXml(act.getStartDate()) + " />");
+        pWriter.println(tabs + "\t<end-date " +
+                        getCalendarInXml(act.getEndDate()) + " />");
+        pWriter.println(tabs + "\t<property name=\"color\" value=\"" +
+                        getColorInXML(act.getColor()) + "\" />");
 
         for (int i = 0; i < act.dependencies.size(); i++) {
-            writeDependency(pWriter, (JDependency)act.dependencies.get(i), tabs + "\t");
+            writeDependency(pWriter, (JDependency)act.dependencies.get(i),
+                            tabs + "\t");
         }
 
         for (int i = 0; i < act.activities.size(); i++) {
-            writeActivity(pWriter, (JActivity)act.activities.get(i), tabs + "\t");
+            writeActivity(pWriter, (JActivity)act.activities.get(i),
+                          tabs + "\t");
         }
 
         pWriter.println(tabs + "</activity>");
     }
 
     private void writeInstance(PrintWriter pWriter, JInstance inst) {
+
         pWriter.println("\t<instance>");
         pWriter.println("\t\t<name>" + inst.getName() + "</name>");
-        pWriter.println("\t\t<creation-date " + getCalendarInXml(inst.getCreationDate()) + " />");
-        pWriter.println("\t\t<start-date " + getCalendarInXml(inst.getStartDate()) + " />");
-        pWriter.println("\t\t<end-date " + getCalendarInXml(inst.getEndDate()) + " />");
+        pWriter.println("\t\t<creation-date " +
+                        getCalendarInXml(inst.getCreationDate()) + " />");
+        pWriter.println("\t\t<start-date " +
+                        getCalendarInXml(inst.getStartDate()) + " />");
+        pWriter.println("\t\t<end-date " +
+                        getCalendarInXml(inst.getEndDate()) + " />");
 
         for (int i = 0; i < inst.activities.size(); i++) {
             writeActivity(pWriter, (JActivity)inst.activities.get(i), "\t\t");
@@ -781,14 +895,19 @@ public class JManager {
 
             pWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             pWriter.println("<!DOCTYPE project SYSTEM \"gtdmanager.dtd\">");
-            pWriter.println("<project vendor-id=\"" + project.getAuthor() + "\" version=\"" + project.getVersion() + "\">");
+            pWriter.println("<project vendor-id=\"" + project.getAuthor() +
+                            "\" version=\"" + project.getVersion() + "\">");
 
             pWriter.println("\t<name>" + project.getName() + "</name>");
             pWriter.println("");
-            pWriter.println("\t<property name=\"size-x\" value=\"" + project.getSizeX() + "\" />");
-            pWriter.println("\t<property name=\"size-y\" value=\"" + project.getSizeY() + "\" />");
-            pWriter.println("\t<property name=\"unit\" value=\"" + project.getUnit() + "\" />");
-            pWriter.println("\t<property name=\"font-size\" value=\"" + project.getFontSize() + "\" />");
+            pWriter.println("\t<property name=\"size-x\" value=\"" +
+                            project.getSizeX() + "\" />");
+            pWriter.println("\t<property name=\"size-y\" value=\"" +
+                            project.getSizeY() + "\" />");
+            pWriter.println("\t<property name=\"unit\" value=\"" +
+                            project.getUnit() + "\" />");
+            pWriter.println("\t<property name=\"font-size\" value=\"" +
+                            project.getFontSize() + "\" />");
             pWriter.println("");
 
             for (int i = 0; i < project.instances.size(); i++) {
@@ -913,17 +1032,6 @@ public class JManager {
 	  	new GregorianCalendar(2005, 6, 32), 0));
 	a2.newDependency(a9.getId(), JDependency.BEGINEND);
 	a2.newDependency(a9.getId(), JDependency.ENDBEGIN);
-
-
-
-
-	//i.newActivity(i.activities,
-	//	"Aktivi1", "Akt1",
-	//	new GregorianCalendar(2005, 6, 2),
-	//	new GregorianCalendar(2005, 6, 6), 0));
-
-     //i.getActivity(a2.getId()).setStartDate(new GregorianCalendar(2005, 5, 17));
-     //i.getActivity(a2.getId()).setEndDate(new GregorianCalendar(2005, 5, 21));
 
 	//newProject();
 	//loadProject("test.xml");
