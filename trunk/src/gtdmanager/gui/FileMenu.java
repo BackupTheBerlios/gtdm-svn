@@ -60,7 +60,6 @@ public class FileMenu extends JMenu {
  * {{{ FileMenuAction */
 class FileMenuAction extends AbstractAction {
 
-    public static String generateProject = "Generiere Testprojekt";
     public static String newProject = "Neues Projekt erstellen...";
     public static String openProject= "Projekt laden...";
     public static String saveProject = "Projekt speichern...";
@@ -76,16 +75,7 @@ class FileMenuAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         String name = e.getActionCommand();
 
-        if (name == generateProject) {
-            parent.getManager().generateSampleProject();
-            System.out.println("project: "
-                    + parent.getManager().getProject().getName());
-            //JProject project = man.getProject();
-            //System.out.println("Ende");
-
-            parent.updateViews();
-        }
-        else if (name == newProject) {
+        if (name == newProject) {
             DialogNewProject pDlg = new DialogNewProject(this.parent, "Neues Projekt erstellen", true);
             pDlg.setLocationRelativeTo(null);
             pDlg.setModal(true);
@@ -99,14 +89,25 @@ class FileMenuAction extends AbstractAction {
                 String strFilename = parent.opendialog.getSelectedFile().toString();
                 parent.manager.lastErrorString = "";
                 parent.manager.newProject();
-                if (parent.manager.loadProject(strFilename) == true &&
-                parent.manager.lastErrorString == "") {
-                  parent.updateViews();
+
+                boolean bRet = parent.manager.loadProject(strFilename);
+
+                if (bRet == true) {
+
+                    if (parent.manager.lastErrorString != "") {
+                        javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                        "Es ist folgender Fehler aufgetreten: \"" +
+                        parent.manager.lastErrorString + "\" das Projekt wird trotzdem geladen." ,
+                        "Fehler beim Laden des Projekts", 1);
+                    }
+
+                    parent.updateViews();
                 }
                 else {
                     javax.swing.JOptionPane.showMessageDialog(parent.frame,
                     parent.manager.lastErrorString,
-                    "Fehler beim Öffnen des Projekts", 2);
+                    "Fehler beim Laden des Projekts", 2);
+                    return;
                 }
             }
         }
@@ -118,11 +119,20 @@ class FileMenuAction extends AbstractAction {
                 String strFilename = parent.savedialog.getSelectedFile().toString();
                 parent.manager.lastErrorString = "";
 
-                if (!(parent.manager.saveProject(strFilename) == true &&
-                parent.manager.lastErrorString == "")) {
+                boolean bRet = parent.manager.saveProject(strFilename);
+
+                if (bRet == false) {
                     javax.swing.JOptionPane.showMessageDialog(parent.frame,
                     parent.manager.lastErrorString,
-                    "Fehler beim Öffnen des Projekts", 2);
+                    "Fehler beim Speichern des Projekts", 2);
+                    return;
+                }
+
+                if (bRet == true && parent.manager.lastErrorString != "") {
+                    javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                    "Es ist folgender Fehler aufgetreten: \"" +
+                    parent.manager.lastErrorString + "\" das Projekt wird trotzdem gespeichert." ,
+                    "Fehler beim Speichern des Projekts", 1);
                 }
             }
         }

@@ -144,6 +144,62 @@ class ProjectMenuAction extends AbstractAction {
             pDlg.setModal(true);
             pDlg.show();
         }
+        else if (name == editActivity) {
+
+            if (parent.manager.getProject() == null || parent.manager.getProject().getInstances().size() == 0) {
+                javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                "Sie haben noch kein Projekt geladen oder erstellt.", "Kein bestehendes Projekt vorhanden", 2);
+                return;
+            }
+
+            if (parent.getSelection() == null || parent.getSelection().getClass() != JActivity.class) {
+                javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                "Bitte markieren Sie eine Aufgabe der aktuellen Instanz " +
+                "im Baum auf der linken Seite..",
+                "Keine Aufgabe markiert", 2);
+                return;
+            }
+
+            DialogEditActivity pDlg = new DialogEditActivity(this.parent, "Aufgabe bearbeiten", true);
+
+            int nIndex = parent.manager.getProject().getInstances().size()-1;
+            JInstance currentInstance = (JInstance)parent.manager.getProject().getInstances().get(nIndex);
+            JActivity currentActivity = (JActivity)parent.getSelection();
+
+            pDlg.currentActivity = currentActivity;
+
+            //pDlg.currentInstance = currentInstance;
+            //pDlg.mdlInsertAfter.addElement(currentInstance);
+
+            //for (int i = 0; i < currentInstance.getActivities().size(); i++) {
+            //  pDlg.mdlInsertAfter.addElement(currentInstance.getActivities().get(i));
+            //}
+
+            /*if (parent.getSelection() != null) {
+
+              if (pDlg.mdlInsertAfter.getIndexOf(parent.getSelection()) > -1) {
+                  if (parent.getSelection().getClass() == JActivity.class) {
+                    pDlg.parentActivity = (JActivity)parent.getSelection();
+                    pDlg.mdlInsertAfter.setSelectedItem(parent.getSelection());
+                  }
+                  else {
+                      pDlg.mdlInsertAfter.setSelectedItem(parent.getSelection());
+                  }
+              }
+              else {
+                    javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                    "Sie müssen eine Aufgabe aus der letzten Instanz markieren.", "Falsche Aufgabe markiert", 2);
+                    return;
+                }
+            }*/
+
+            pDlg.setLocationRelativeTo(null);
+            pDlg.setModal(true);
+            pDlg.show();
+        }
+        else if (name == deleteActivity) {
+
+        }
     }
 }
 
