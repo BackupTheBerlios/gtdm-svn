@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /* }}} */
 /**
@@ -23,8 +24,15 @@ import javax.swing.JFileChooser;
  * @version 1.0
  * {{{ FileMenu */
 public class FileMenu extends JMenu {
+    public FileMenu() {
+        try {
+            jbInit();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
-	FileMenu(MainWindow window) {
+    FileMenu(MainWindow window) {
         super();
 		setText("Datei");
         //add(new FileMenuAction(FileMenuAction.generateProject, window));
@@ -33,6 +41,9 @@ public class FileMenu extends JMenu {
         add(new FileMenuAction(FileMenuAction.saveProject, window));
         add(new FileMenuAction(FileMenuAction.quit, window));
 	}
+
+    private void jbInit() throws Exception {
+    }
 
 }
 
@@ -86,9 +97,17 @@ class FileMenuAction extends AbstractAction {
 
             if (nRet == JFileChooser.APPROVE_OPTION) {
                 String strFilename = parent.opendialog.getSelectedFile().toString();
+                parent.manager.lastErrorString = "";
                 parent.manager.newProject();
-                parent.manager.loadProject(strFilename);
-                parent.updateViews();
+                if (parent.manager.loadProject(strFilename) == true &&
+                parent.manager.lastErrorString == "") {
+                  parent.updateViews();
+                }
+                else {
+                    javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                    parent.manager.lastErrorString,
+                    "Fehler beim Öffnen des Projekts", 2);
+                }
             }
         }
         else if (name == saveProject) {
@@ -97,7 +116,14 @@ class FileMenuAction extends AbstractAction {
 
             if (nRet == JFileChooser.APPROVE_OPTION) {
                 String strFilename = parent.savedialog.getSelectedFile().toString();
-                parent.manager.saveProject(strFilename);
+                parent.manager.lastErrorString = "";
+
+                if (!(parent.manager.saveProject(strFilename) == true &&
+                parent.manager.lastErrorString == "")) {
+                    javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                    parent.manager.lastErrorString,
+                    "Fehler beim Öffnen des Projekts", 2);
+                }
             }
         }
         else if (name == quit) {

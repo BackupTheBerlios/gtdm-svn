@@ -225,32 +225,6 @@ public class DialogNewActivity extends JDialog {
         lblStartDate.setText("Startdatum:");
         lblStartDate.setBounds(new Rectangle(20, 150, 89, 22));
         txtShortName.setBounds(new Rectangle(122, 89, 115, 22));
-        Abhaengigkeiten.setLayout(null);
-        optEndeEnde.setText("Ende - Ende");
-        optEndeEnde.setBounds(new Rectangle(103, 85, 117, 23));
-        optEndeAnfang.setText("Ende - Anfang");
-        optEndeAnfang.setBounds(new Rectangle(217, 85, 117, 23));
-        optAnfangEnde.setText("Anfang - Ende");
-        optAnfangEnde.setBounds(new Rectangle(103, 115, 117, 23));
-        optAnfangAnfang.setText("Anfang - Anfang");
-        optAnfangAnfang.setBounds(new Rectangle(217, 115, 117, 23));
-        jLabel1.setLabelFor(null);
-        jLabel1.setText("Abhaengigkeitstyp:");
-        jLabel1.setBounds(new Rectangle(15, 29, 304, 16));
-        btnAdd.setBounds(new Rectangle(192, 227, 52, 27));
-        btnAdd.setText(">>");
-        btnRemove.setBounds(new Rectangle(192, 305, 52, 27));
-        btnRemove.setText("<<");
-        jLabel2.setText("Alle Aufgaben/Phasen:");
-        jLabel2.setBounds(new Rectangle(15, 209, 146, 15));
-        jLabel3.setText("Abhaengigkeit mit:");
-        jLabel3.setBounds(new Rectangle(302, 210, 124, 15));
-        lstAdded.setBorder(BorderFactory.createLoweredBevelBorder());
-        lstAdded.setBounds(new Rectangle(302, 227, 116, 105));
-        lstAdded.setModel(mdlSelected);
-        lstActivities.setBorder(BorderFactory.createLoweredBevelBorder());
-        lstActivities.setBounds(new Rectangle(15, 227, 116, 105));
-        lstActivities.setModel(mdlActivities);
         Farbe.setMinimumSize(new Dimension(329, 338));
         Farbe.setPreferredSize(new Dimension(329, 338));
         txtStartDate.setBounds(new Rectangle(122, 150, 115, 22));
@@ -263,6 +237,8 @@ public class DialogNewActivity extends JDialog {
         jLabel4.setBounds(new Rectangle(20, 270, 89, 22));
         cmbInsertAfter.setModel(mdlInsertAfter);
         cmbInsertAfter.setBounds(new Rectangle(122, 270, 168, 22));
+        cmbInsertAfter.addActionListener(new
+                DialogNewActivity_cmbInsertAfter_actionAdapter(this));
         jContentPane.add(btnCancel, null);
         jContentPane.add(btnCreate, null);
         jContentPane.add(tabSettings);
@@ -277,26 +253,10 @@ public class DialogNewActivity extends JDialog {
         Aufgabedaten.add(lblEndDate, null);
         Aufgabedaten.add(jLabel4);
         Aufgabedaten.add(cmbInsertAfter);
-        Abhaengigkeiten.add(lstActivities, null);
-        Abhaengigkeiten.add(jLabel2, null);
-        Abhaengigkeiten.add(btnAdd, null);
-        Abhaengigkeiten.add(jLabel3, null);
-        Abhaengigkeiten.add(lstAdded, null);
-        Abhaengigkeiten.add(btnRemove, null);
-        Abhaengigkeiten.add(optAnfangEnde, null);
-        Abhaengigkeiten.add(optEndeEnde, null);
-        Abhaengigkeiten.add(optEndeAnfang, null);
-        Abhaengigkeiten.add(optAnfangAnfang, null);
-        Abhaengigkeiten.add(jLabel1, null);
         tabSettings.add(Aufgabedaten, "Aufgabedaten");
-        tabSettings.add(Abhaengigkeiten, "Abh\344ngigkeiten");
         tabSettings.add(Farbe, "Farbe");
         tabSettings.setSelectedComponent(Aufgabedaten);
         Calendar cal = Calendar.getInstance();
-        groupDependencies.add(optEndeEnde);
-        groupDependencies.add(optEndeAnfang);
-        groupDependencies.add(optAnfangAnfang);
-        groupDependencies.add(optAnfangEnde);
     }
 
     SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
@@ -314,18 +274,6 @@ public class DialogNewActivity extends JDialog {
     JFormattedTextField txtEndDate = new JFormattedTextField(format);
     JLabel lblShortname = new JLabel();
     JLabel lblStartDate = new JLabel();
-    JPanel Abhaengigkeiten = new JPanel();
-    JRadioButton optEndeEnde = new JRadioButton();
-    JRadioButton optEndeAnfang = new JRadioButton();
-    JRadioButton optAnfangEnde = new JRadioButton();
-    JRadioButton optAnfangAnfang = new JRadioButton();
-    JLabel jLabel1 = new JLabel();
-    JList lstActivities = new JList();
-    JButton btnAdd = new JButton();
-    JButton btnRemove = new JButton();
-    JList lstAdded = new JList();
-    JLabel jLabel2 = new JLabel();
-    JLabel jLabel3 = new JLabel();
     JColorChooser Farbe = new JColorChooser();
     ButtonGroup groupDependencies = new ButtonGroup();
 
@@ -337,7 +285,6 @@ public class DialogNewActivity extends JDialog {
     public JActivity parentActivity = null;
     JLabel jLabel4 = new JLabel();
     JComboBox cmbInsertAfter = new JComboBox();
-
     public void btnCancel_actionPerformed(ActionEvent e) {
         dispose();
     }
@@ -396,14 +343,12 @@ public class DialogNewActivity extends JDialog {
             return;
         }
 
-        Color col = Farbe.getColor();
-
         JManager manager = mainwindow.getManager() ;
 
         if (mdlInsertAfter.getSelectedItem().getClass() == JActivity.class) {
-          currentInstance.newActivity(((JActivity)mdlInsertAfter.getSelectedItem()).getActivities(), strName, strShortName, calStart, calEnd, col.getRGB());
+          currentInstance.newActivity(((JActivity)mdlInsertAfter.getSelectedItem()).getActivities(), strName, strShortName, calStart, calEnd, Farbe.getColor().getRGB());
         } else {
-          currentInstance.newActivity(currentInstance.getActivities(), strName, strShortName, calStart, calEnd, col.getRGB());
+          currentInstance.newActivity(currentInstance.getActivities(), strName, strShortName, calStart, calEnd, Farbe.getColor().getRGB());
         }
 
         mainwindow.updateViews();
@@ -421,6 +366,31 @@ public class DialogNewActivity extends JDialog {
             txtStartDate.setText(getCal(parentActivity.getStartDate()));
             txtEndDate.setText(getCal(parentActivity.getEndDate()));
         }
+    }
+
+    public void cmbInsertAfter_actionPerformed(ActionEvent e) {
+
+        if (mdlInsertAfter.getSelectedItem().getClass() == JActivity.class) {
+          JActivity act = (JActivity)mdlInsertAfter.getSelectedItem();
+          txtStartDate.setText(getCal(act.getStartDate()));
+          txtEndDate.setText(getCal(act.getEndDate()));
+        } else {
+            JInstance inst = (JInstance)mdlInsertAfter.getSelectedItem();
+            txtStartDate.setText(getCal(inst.getStartDate()));
+            txtEndDate.setText(getCal(inst.getEndDate()));
+        }
+    }
+}
+
+
+class DialogNewActivity_cmbInsertAfter_actionAdapter implements ActionListener {
+    private DialogNewActivity adaptee;
+    DialogNewActivity_cmbInsertAfter_actionAdapter(DialogNewActivity adaptee) {
+        this.adaptee = adaptee;
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        adaptee.cmbInsertAfter_actionPerformed(e);
     }
 }
 
