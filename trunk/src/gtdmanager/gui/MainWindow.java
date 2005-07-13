@@ -36,6 +36,7 @@ public class MainWindow {
 
     // list of all views
     ArrayList views = new ArrayList();
+    JComponent diagramView = null;
 
     Object selection = null;
 
@@ -47,6 +48,10 @@ public class MainWindow {
         return selection;
     }
 
+    public JComponent getDiagramView() {
+        return diagramView;
+    }
+
     MainWindow() {
         // create menu
         menuBar.add(new FileMenu(this));
@@ -56,9 +61,10 @@ public class MainWindow {
         panel.add(menuBar, BorderLayout.NORTH);
 
         // add views to array
+        diagramView = (JComponent)new DiagramView(this);
         views.add(new TreeView(new javax.swing.tree.DefaultMutableTreeNode(),
                     this));
-        views.add(new DiagramView(this));
+        views.add(diagramView);
 
         // add the two views to the frame via splitpane
         JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,

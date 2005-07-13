@@ -4,12 +4,18 @@
 
 package gtdmanager.gui;
 
-import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
+import java.awt.event.*;
+import javax.swing.*;
+//import javax.swing.JMenu;
+//import javax.swing.JMenuItem;
 import gtdmanager.gui.DiagramView;
 import gtdmanager.gui.MainWindow;
+
+import org.freehep.graphics2d.VectorGraphics;
+import org.freehep.util.export.ExportDialog;
+
+import org.freehep.graphicsio.jpg.JPGExportFileType;
+import org.freehep.graphicsio.ps.EPSExportFileType;
 
 /* }}} */
 /**
@@ -26,6 +32,10 @@ public class DiagramMenu extends JMenu {
 
     MainWindow parent;
     JMenuItem gantt, tdrift;
+
+    public MainWindow getParentWindow() {
+        return parent;
+    }
     
 	DiagramMenu(MainWindow parent) {
         super();
@@ -84,6 +94,24 @@ class DiagramMenuAction extends AbstractAction {
         }
         else if (e.getActionCommand() == showTermindriftDiagram) {
             DiagramView.showGantt = false;
+        }
+        else if (e.getActionCommand() == exportDiagram) {
+            //JMenuItem exportItem = new JMenuItem( "Export..." );
+            //exportItem.addActionListener( new ActionListener() {
+            //public void actionPerformed( ActionEvent e ) {
+            ExportDialog export = new ExportDialog();
+            export.addExportFileType(new JPGExportFileType());
+            export.addExportFileType(new EPSExportFileType());
+            try {
+                export.showExportDialog(parent.getParent(),
+                    "Diagramm exportieren als...",
+                    parent.getParentWindow().getDiagramView(),
+                    "export" );
+            } catch (Exception ex) {
+                // let that b*atch cry..
+            }
+            //}
+            //});
         }
         else {
             System.out.println("DiagramMenu: unhandled Action: "
