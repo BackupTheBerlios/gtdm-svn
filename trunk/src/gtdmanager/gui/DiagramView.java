@@ -148,7 +148,30 @@ public class DiagramView extends JComponent
 
     private int cal2day(Calendar cal)
     {
-        return (int)(cal.getTimeInMillis() / 1000L / 60L / 60L / 24L);
+/*        double d = cal.getTimeInMillis();
+//        double d = cal.getTimeInMillis() / 1000L / 60L / 60L / 24L;
+        System.out.println("0  " + d);
+        System.out.println("1  " + (d) % 1000);
+        System.out.println("2  " + (d / 1000) % 60);
+        System.out.println("3  " + (d / 1000 / 60) % 60);
+        System.out.println("4  " + (d / 1000 / 60 / 60) % 24);
+        System.out.println("5  " + (d / 1000 / 60 / 60 / 24));*/
+
+        long l = cal.getTimeInMillis();
+        // remove milliesecs
+        l -= l % 1000;
+        l /= 1000;
+        // remove secs
+        l -= l % 60;
+        l /= 60;
+        // remove mins
+        l -= l % 60;
+        l /= 60;
+        // remove hours
+        l -= l % 24;
+        l /= 24;
+
+        return (int)l; //(cal.getTimeInMillis() / 1000L / 60L / 60L / 24L);
     }
     //}}}
     
