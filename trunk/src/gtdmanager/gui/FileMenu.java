@@ -27,7 +27,7 @@ public class FileMenu extends JMenu {
 	FileMenu(MainWindow window) {
         super();
 		setText("Datei");
-        add(new FileMenuAction(FileMenuAction.generateProject, window));
+        //add(new FileMenuAction(FileMenuAction.generateProject, window));
         add(new FileMenuAction(FileMenuAction.newProject, window));
         add(new FileMenuAction(FileMenuAction.openProject, window));
         add(new FileMenuAction(FileMenuAction.saveProject, window));

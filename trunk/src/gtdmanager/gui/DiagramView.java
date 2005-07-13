@@ -29,7 +29,7 @@ import org.freehep.graphics2d.VectorGraphics;
 public class DiagramView extends JComponent
     implements View, MouseListener, MouseMotionListener,
                MouseWheelListener
-                   
+
 {
 
     /* Variables {{{ */
@@ -64,7 +64,7 @@ public class DiagramView extends JComponent
     private Calendar gridStart = null;
 
     // geometry of the diagramgrid and spefwidth
-//    private int gridX, gridY, gridW, gridH, 
+//    private int gridX, gridY, gridW, gridH,
     private Point gridStep = null;
     private Rectangle gridRect = null;
 
@@ -123,7 +123,7 @@ public class DiagramView extends JComponent
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         return df.format(cal.getTime());
     }
-    private String stringify(int day) { 
+    private String stringify(int day) {
         return stringify(day2cal(day));
     }
     //}}}
@@ -174,7 +174,7 @@ public class DiagramView extends JComponent
         return (int)l; //(cal.getTimeInMillis() / 1000L / 60L / 60L / 24L);
     }
     //}}}
-    
+
     // MouseListener/MouseMotionListener/MouseWheelListener Implementation {{{
     public void mouseMoved (MouseEvent e) {
         mouseLastX = e.getX();
@@ -229,7 +229,7 @@ public class DiagramView extends JComponent
 
         repaint();
     }
-    
+
     //}}}
 
     /* View Implementation {{{ */
@@ -287,7 +287,7 @@ public class DiagramView extends JComponent
 
         if (showGantt) {
             ganttPaintGrid(g);
-        
+
             // set initial y position
             yActOffset = gridRect.y + padding;
 
@@ -322,7 +322,7 @@ public class DiagramView extends JComponent
             g.setColor(Color.gray);
             g.drawString(message, gridRect.x + padding, gridRect.y
                     + gridRect.height + ascent);
-            
+
 
             tdriftPaintGrid(g);
             tdriftPaintActivities(g);
@@ -406,7 +406,7 @@ public class DiagramView extends JComponent
                     gridRect.x + x + gridStep.x, gridRect.y + y + gridStep.y);
 
         }
-        
+
         // todayline {{{
         if (today >= startDate) {
             g.setColor(new Color(0xf0c080));
@@ -453,8 +453,8 @@ public class DiagramView extends JComponent
 
             String shortName = null;
             int shortNameX = 0, shortNameY = 0;
-            
-            //g.setColor(new Color(0xff00ff));    
+
+            //g.setColor(new Color(0xff00ff));
 
             // get iterator over all instances
             ListIterator iIt = project.getInstances().listIterator();
@@ -489,13 +489,13 @@ public class DiagramView extends JComponent
                                 Math.max(y, gridRect.y) );
 
                 g.setColor(new Color(a.getColor()));
-                
+
                 x0 = x;
                 // y0 = y;
 
                 // x = x0;
                 y = gridRect.y + (aEndDay - startDate) * gridStep.y;
-                
+
                 // draw vertical line
                 if (x > gridRect.x)
                     g.drawLine( Math.max(x0, gridRect.x),
@@ -577,14 +577,14 @@ public class DiagramView extends JComponent
         // draw message (outside the clipping area)
         g.setColor(Color.gray);
         g.drawString(message, gridRect.x + 2, gridRect.y - 2);
-        
+
         // set clip rect, so that nothing can be drawn outside
         g.clip(gridRect);
-        
+
         // grid borders
         g.setColor(Color.gray);
         g.drawRect(gridRect.x, gridRect.y, gridRect.width, gridRect.height - 1);
-        
+
         // day grid
         for (int i = 0; i < gridRect.width; i += gridStep.x) {
             int day = startDate + i/gridStep.x;
@@ -637,7 +637,7 @@ public class DiagramView extends JComponent
                         y + getHeight() - (stringify(day).length()+1) * ascent,
                         stringify(day));
                     break;
-                    
+
                 default:
                     //g.setColor(new Color(0xc0c0c0));
                     break;
@@ -703,9 +703,14 @@ public class DiagramView extends JComponent
         if (a == null) return null;
 
         // our granularity is 1 day, offset is start of epoch (in UTC)
+        String strName = a.getName();
+        String strDay = Integer.toString(a.getStartDate().get(Calendar.DATE));
+        String strMonth = Integer.toString(a.getStartDate().get(Calendar.MONTH) + 1);
+        String strYear = Integer.toString(a.getStartDate().get(Calendar.YEAR));
+
         int start = cal2day(a.getStartDate());
         int end = cal2day(a.getEndDate());
-        
+
         // calculate geometry for activity bar
         //System.out.println(a.getShortName() + " " + (start - startDate));
         Rectangle r = new Rectangle(
@@ -735,18 +740,18 @@ public class DiagramView extends JComponent
             // ...and the text
             g.setColor(Color.black);
             g.drawString(a.getShortName()
-                , r.x + (r.width 
+                , r.x + (r.width
                     - g.getFontMetrics().stringWidth(a.getShortName())) / 2
                 , r.y + (barWidth + ascent) / 2 + 1
             );
             g.drawString(a.getShortName()
-                , r.x + (r.width 
+                , r.x + (r.width
                     - g.getFontMetrics().stringWidth(a.getShortName())) / 2 + 1
                 , r.y + (barWidth + ascent) / 2 + 1
             );
             g.setColor(Color.white);
             g.drawString(a.getShortName()
-                , r.x + (r.width 
+                , r.x + (r.width
                     - g.getFontMetrics().stringWidth(a.getShortName())) / 2
                 , r.y + (barWidth + ascent) / 2
             );
@@ -758,7 +763,7 @@ public class DiagramView extends JComponent
         return r;
     }//}}}
 
-    
+
     private void ganttPaintDependencies(ArrayList a) {//{{{
         // iterate through all activities.
         // this method is meant to be called recursive
@@ -766,7 +771,7 @@ public class DiagramView extends JComponent
         ListIterator i = a.listIterator();
         while (i.hasNext()) ganttPaintDependencies((JActivity)i.next());
     }//}}}
-    
+
     private void ganttPaintDependencies(JActivity from) {//{{{
         Rectangle fromRect = (Rectangle)actRects.get(from);
 
@@ -791,7 +796,7 @@ public class DiagramView extends JComponent
             } catch (Exception e) {
                 g.setColor(new Color(0x424242));
             }*/
-            
+
             if (d.getDependencyType() == JDependency.BEGINBEGIN) {//{{{
                     f = new Point(
                         fromRect.x - 1,

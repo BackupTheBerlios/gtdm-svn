@@ -7,7 +7,9 @@ package gtdmanager.gui;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
+import gtdmanager.core.JActivity;
 import gtdmanager.core.JInstance;
+import java.util.*;
 
 /* }}} */
 /**
@@ -21,17 +23,26 @@ import gtdmanager.core.JInstance;
  * @version 1.0
  * {{{ ProjectMenu */
 public class ProjectMenu extends JMenu {
+    public ProjectMenu() {
+        try {
+            jbInit();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
-	ProjectMenu(MainWindow window) {
+    ProjectMenu(MainWindow window) {
         super();
 		setText("Projekt");
         add(new ProjectMenuAction(ProjectMenuAction.editProject, window));
         add(new ProjectMenuAction(ProjectMenuAction.newInstance, window));
-        add(new ProjectMenuAction(ProjectMenuAction.deleteInstance, window));
         add(new ProjectMenuAction(ProjectMenuAction.newActivity, window));
         add(new ProjectMenuAction(ProjectMenuAction.editActivity, window));
         add(new ProjectMenuAction(ProjectMenuAction.deleteActivity, window));
 	}
+
+    private void jbInit() throws Exception {
+    }
 
 }
 
@@ -50,7 +61,6 @@ class ProjectMenuAction extends AbstractAction {
 
     public static String editProject = "Projekt bearbeiten...";
     public static String newInstance = "Neue Instanz erstellen...";
-    public static String deleteInstance = "Instanz loeschen";
     public static String newActivity = "Neue Aktivitaet...";
     public static String editActivity = "Aktivitaet bearbeiten...";
     public static String deleteActivity = "Aktivitaet loeschen";
@@ -80,7 +90,7 @@ class ProjectMenuAction extends AbstractAction {
         }
         else if (name == newInstance) {
 
-            if (parent.manager.getProject() == null || parent.manager.getProject().getInstance(0) == null) {
+            if (parent.manager.getProject() == null || parent.manager.getProject().getInstances().size() == 0) {
                 javax.swing.JOptionPane.showMessageDialog(parent.frame,
                 "Sie haben noch kein Projekt geladen oder erstellt.", "Kein bestehendes Projekt vorhanden", 2);
                 return;
@@ -93,20 +103,43 @@ class ProjectMenuAction extends AbstractAction {
         }
         else if (name == newActivity) {
 
-            if (parent.manager.getProject() == null || parent.manager.getProject().getInstance(0) == null) {
+            if (parent.manager.getProject() == null || parent.manager.getProject().getInstances().size() == 0) {
                 javax.swing.JOptionPane.showMessageDialog(parent.frame,
                 "Sie haben noch kein Projekt geladen oder erstellt.", "Kein bestehendes Projekt vorhanden", 2);
                 return;
             }
 
-            if (parent.getSelection() == null || parent.getSelection().getClass() != JInstance.class) {
-                javax.swing.JOptionPane.showMessageDialog(parent.frame,
-                "Sie müssen zuerst eine Instanz im Projektbaum markieren, um ihr eine neue Aufgabe hinzufügen zu können.", "Keine Instanz markiert", 2);
-                return;
+            DialogNewActivity pDlg = new DialogNewActivity(this.parent, "Neue Aufgabe erstellen", true);
+
+            int nIndex = parent.manager.getProject().getInstances().size()-1;
+            JInstance currentInstance = (JInstance)parent.manager.getProject().getInstances().get(nIndex);
+
+            pDlg.currentInstance = currentInstance;
+            pDlg.mdlInsertAfter.addElement(currentInstance);
+
+            for (int i = 0; i < currentInstance.getActivities().size(); i++) {
+              pDlg.mdlInsertAfter.addElement(currentInstance.getActivities().get(i));
+              pDlg.mdlActivities.addElement(currentInstance.getActivities().get(i));
             }
 
-            DialogNewActivity pDlg = new DialogNewActivity(this.parent, "Neue Aufgabe erstellen", true);
-            pDlg.currentInstance = (JInstance)parent.getSelection();
+            if (parent.getSelection() != null) {
+
+              if (pDlg.mdlInsertAfter.getIndexOf(parent.getSelection()) > -1) {
+                  if (parent.getSelection().getClass() == JActivity.class) {
+                    pDlg.parentActivity = (JActivity)parent.getSelection();
+                    pDlg.mdlInsertAfter.setSelectedItem(parent.getSelection());
+                  }
+                  else {
+                      pDlg.mdlInsertAfter.setSelectedItem(parent.getSelection());
+                  }
+              }
+              else {
+                    javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                    "Sie müssen eine Aufgabe aus der letzten Instanz markieren.", "Falsche Aufgabe markiert", 2);
+                    return;
+                }
+            }
+
             pDlg.setLocationRelativeTo(null);
             pDlg.setModal(true);
             pDlg.show();

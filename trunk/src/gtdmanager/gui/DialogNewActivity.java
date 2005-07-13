@@ -247,14 +247,22 @@ public class DialogNewActivity extends JDialog {
         jLabel3.setBounds(new Rectangle(302, 210, 124, 15));
         lstAdded.setBorder(BorderFactory.createLoweredBevelBorder());
         lstAdded.setBounds(new Rectangle(302, 227, 116, 105));
-        lstAdded.setSelectionModel(mdlSelected);
+        lstAdded.setModel(mdlSelected);
         lstActivities.setBorder(BorderFactory.createLoweredBevelBorder());
         lstActivities.setBounds(new Rectangle(15, 227, 116, 105));
-        lstActivities.setSelectionModel(mdlActivities);
+        lstActivities.setModel(mdlActivities);
         Farbe.setMinimumSize(new Dimension(329, 338));
         Farbe.setPreferredSize(new Dimension(329, 338));
         txtStartDate.setBounds(new Rectangle(122, 150, 115, 22));
         txtEndDate.setBounds(new Rectangle(122, 210, 115, 22));
+        jLabel4.setAlignmentX((float) 0.5);
+        jLabel4.setMaximumSize(new Dimension(34, 21));
+        jLabel4.setMinimumSize(new Dimension(34, 21));
+        jLabel4.setPreferredSize(new Dimension(34, 21));
+        jLabel4.setText("Einfügen nach:");
+        jLabel4.setBounds(new Rectangle(20, 270, 89, 22));
+        cmbInsertAfter.setModel(mdlInsertAfter);
+        cmbInsertAfter.setBounds(new Rectangle(122, 270, 168, 22));
         jContentPane.add(btnCancel, null);
         jContentPane.add(btnCreate, null);
         jContentPane.add(tabSettings);
@@ -267,6 +275,8 @@ public class DialogNewActivity extends JDialog {
         Aufgabedaten.add(txtStartDate, null);
         Aufgabedaten.add(txtEndDate, null);
         Aufgabedaten.add(lblEndDate, null);
+        Aufgabedaten.add(jLabel4);
+        Aufgabedaten.add(cmbInsertAfter);
         Abhaengigkeiten.add(lstActivities, null);
         Abhaengigkeiten.add(jLabel2, null);
         Abhaengigkeiten.add(btnAdd, null);
@@ -318,9 +328,15 @@ public class DialogNewActivity extends JDialog {
     JLabel jLabel3 = new JLabel();
     JColorChooser Farbe = new JColorChooser();
     ButtonGroup groupDependencies = new ButtonGroup();
-    JInstance currentInstance = null;
-    DefaultListSelectionModel mdlActivities = new DefaultListSelectionModel();
-    DefaultListSelectionModel mdlSelected = new DefaultListSelectionModel();
+
+    DefaultListModel mdlActivities = new DefaultListModel();
+    DefaultListModel mdlSelected = new DefaultListModel();
+    DefaultComboBoxModel mdlInsertAfter = new DefaultComboBoxModel();
+
+    public JInstance currentInstance = null;
+    public JActivity parentActivity = null;
+    JLabel jLabel4 = new JLabel();
+    JComboBox cmbInsertAfter = new JComboBox();
 
     public void btnCancel_actionPerformed(ActionEvent e) {
         dispose();
@@ -360,11 +376,6 @@ public class DialogNewActivity extends JDialog {
             calStart = toCal(strStartDate);
             calEnd = toCal(strEndDate);
 
-            //-> debug info: has to be deleted in final release!
-            int day1 = calStart.get(Calendar.DATE);
-            int month1 = calStart.get(Calendar.MONTH);
-            //<- debug end
-
             if (calEnd.before(calStart) || calEnd.equals(calStart)) {
 
                 tabSettings.setSelectedIndex(0);
@@ -375,20 +386,6 @@ public class DialogNewActivity extends JDialog {
                 return;
             }
 
-            /*if (!(calEnd.equals(currentInstance.getEndDate()) && calStart.equals(currentInstance.getStartDate()))) {
-                if (calEnd.after(currentInstance.getEndDate()) ||
-                    calStart.before(currentInstance.getStartDate())) {
-
-                    tabSettings.setSelectedIndex(0);
-
-                    javax.swing.JOptionPane.showMessageDialog(this,
-                    "Der Zeitraum der neuen Aktivitaet muss im Gesamtzeitraum der letzten Instanz liegen.\nVon " +
-                    getCal(currentInstance.getStartDate()) + " bis " +
-                    getCal(currentInstance.getEndDate()) + ".",
-                    "Falsche Eingabe", 2);
-                    return;
-                }
-            }*/
         } catch (java.text.ParseException ex) {
 
             tabSettings.setSelectedIndex(0);
@@ -402,7 +399,12 @@ public class DialogNewActivity extends JDialog {
         Color col = Farbe.getColor();
 
         JManager manager = mainwindow.getManager() ;
-        currentInstance.newActivity(currentInstance.getActivities(), strName, strShortName, calStart, calEnd, col.getRGB());
+
+        if (mdlInsertAfter.getSelectedItem().getClass() == JActivity.class) {
+          currentInstance.newActivity(((JActivity)mdlInsertAfter.getSelectedItem()).getActivities(), strName, strShortName, calStart, calEnd, col.getRGB());
+        } else {
+          currentInstance.newActivity(currentInstance.getActivities(), strName, strShortName, calStart, calEnd, col.getRGB());
+        }
 
         mainwindow.updateViews();
 
@@ -413,6 +415,11 @@ public class DialogNewActivity extends JDialog {
         if (currentInstance != null) {
             txtStartDate.setText(getCal(currentInstance.getStartDate()));
             txtEndDate.setText(getCal(currentInstance.getEndDate()));
+        }
+
+        if (parentActivity != null) {
+            txtStartDate.setText(getCal(parentActivity.getStartDate()));
+            txtEndDate.setText(getCal(parentActivity.getEndDate()));
         }
     }
 }
