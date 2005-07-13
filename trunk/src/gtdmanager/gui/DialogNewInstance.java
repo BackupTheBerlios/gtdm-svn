@@ -10,6 +10,8 @@ import java.util.Date;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
 
 /**
  * <p>Title: </p>
@@ -25,7 +27,6 @@ import java.awt.event.ActionListener;
  */
 public class DialogNewInstance extends JDialog {
     MainWindow mainwindow = null;
-    JInstance firstInstance = null;
 
     public DialogNewInstance() throws HeadlessException {
         super();
@@ -186,6 +187,7 @@ public class DialogNewInstance extends JDialog {
     private void jbInit() throws Exception {
         jContentPane.setLayout(null);
         this.setContentPane(jContentPane);
+        this.addWindowListener(new DialogNewInstance_this_windowAdapter(this));
         this.setSize(380, 210);
         btnCreate.setBounds(new Rectangle(10, 153, 138, 25));
         btnCreate.setSelected(true);
@@ -236,17 +238,6 @@ public class DialogNewInstance extends JDialog {
         jContentPane.add(btnCancel, null);
         Calendar cal = Calendar.getInstance();
         txtInstanceCreationDate.setText(getCal(cal));
-
-        if (mainwindow != null) {
-            JManager manager = mainwindow.getManager();
-
-            if (manager != null && manager.getProject() != null
-                && manager.getProject().getInstance(0) != null) {
-                firstInstance = manager.getProject().getInstance(0);
-                txtInstanceStartDate.setText(getCal(firstInstance.getStartDate()));
-                txtInstanceEndDate.setText(getCal(firstInstance.getEndDate()));
-            }
-        }
     }
 
     SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
@@ -262,6 +253,8 @@ public class DialogNewInstance extends JDialog {
     JFormattedTextField txtInstanceStartDate = new JFormattedTextField(format);
     JFormattedTextField txtInstanceEndDate = new JFormattedTextField(format);
     JFormattedTextField txtInstanceCreationDate = new JFormattedTextField(format);
+
+    public JInstance currentInstance = null;
 
     public void btnCancel_actionPerformed(ActionEvent e) {
         dispose();
@@ -305,12 +298,12 @@ public class DialogNewInstance extends JDialog {
                 return;
             }
 
-            if (calEnd.after(firstInstance.getEndDate()) || calStart.before(firstInstance.getStartDate())) {
+            /*if (calEnd.after(currentInstance.getEndDate()) || calStart.before(currentInstance.getStartDate())) {
                 javax.swing.JOptionPane.showMessageDialog(this,
                 "Der Zeitraum der neuen Instanz muss im Zeitraum der alten Instanz liegen.\nVon " + getCal(firstInstance.getStartDate()) + " bis " + getCal(firstInstance.getEndDate()) + ".",
                 "Falsche Eingabe", 2);
                 return;
-            }
+            }*/
 
         } catch (java.text.ParseException ex) {
             javax.swing.JOptionPane.showMessageDialog(this,
@@ -325,6 +318,25 @@ public class DialogNewInstance extends JDialog {
         mainwindow.updateViews();
 
         dispose();
+    }
+
+    public void this_windowOpened(WindowEvent e) {
+      if (currentInstance != null) {
+        txtInstanceStartDate.setText(getCal(currentInstance.getStartDate()));
+        txtInstanceEndDate.setText(getCal(currentInstance.getEndDate()));
+      }
+    }
+}
+
+
+class DialogNewInstance_this_windowAdapter extends WindowAdapter {
+    private DialogNewInstance adaptee;
+    DialogNewInstance_this_windowAdapter(DialogNewInstance adaptee) {
+        this.adaptee = adaptee;
+    }
+
+    public void windowOpened(WindowEvent e) {
+        adaptee.this_windowOpened(e);
     }
 }
 

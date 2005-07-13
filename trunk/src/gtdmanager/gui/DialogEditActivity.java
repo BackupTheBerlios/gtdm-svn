@@ -189,9 +189,9 @@ public class DialogEditActivity extends JDialog {
         this.setContentPane(jContentPane);
         this.addWindowListener(new DialogEditActivity_this_windowAdapter(this));
         this.setSize(458, 452);
-        btnCreate.setBounds(new Rectangle(8, 392, 138, 25));
+        btnCreate.setBounds(new Rectangle(8, 392, 170, 25));
         btnCreate.setSelected(true);
-        btnCreate.setText("Aufgabe erstellen");
+        btnCreate.setText("Änderungen speichern");
         btnCreate.addActionListener(new DialogEditActivity_btnCreate_actionAdapter(this));
         btnCancel.setBounds(new Rectangle(336, 392, 104, 25));
         btnCancel.setText("Abbrechen");
@@ -229,12 +229,6 @@ public class DialogEditActivity extends JDialog {
         Farbe.setPreferredSize(new Dimension(329, 338));
         txtStartDate.setBounds(new Rectangle(122, 150, 115, 22));
         txtEndDate.setBounds(new Rectangle(122, 210, 115, 22));
-        jLabel4.setAlignmentX((float) 0.5);
-        jLabel4.setMaximumSize(new Dimension(34, 21));
-        jLabel4.setMinimumSize(new Dimension(34, 21));
-        jLabel4.setPreferredSize(new Dimension(34, 21));
-        jLabel4.setText("Einfügen nach:");
-        jLabel4.setBounds(new Rectangle(20, 270, 89, 22));
         /*cmbInsertAfter.setModel(mdlInsertAfter);
         cmbInsertAfter.setBounds(new Rectangle(122, 270, 168, 22));
         cmbInsertAfter.addActionListener(new
@@ -251,7 +245,7 @@ public class DialogEditActivity extends JDialog {
         Aufgabedaten.add(txtStartDate, null);
         Aufgabedaten.add(txtEndDate, null);
         Aufgabedaten.add(lblEndDate, null);
-        Aufgabedaten.add(jLabel4);
+        //Aufgabedaten.add(jLabel4);
         //Aufgabedaten.add(cmbInsertAfter);
         tabSettings.add(Aufgabedaten, "Aufgabedaten");
         tabSettings.add(Farbe, "Farbe");
@@ -279,10 +273,7 @@ public class DialogEditActivity extends JDialog {
     //DefaultComboBoxModel mdlInsertAfter = new DefaultComboBoxModel();
 
     //public JInstance currentInstance = null;
-    public JActivity currentActivity = null;
-
-    JLabel jLabel4 = new JLabel();
-    //JComboBox cmbInsertAfter = new JComboBox();
+    public JActivity currentActivity = null; //JComboBox cmbInsertAfter = new JComboBox();
     public void btnCancel_actionPerformed(ActionEvent e) {
         dispose();
     }
@@ -347,12 +338,6 @@ public class DialogEditActivity extends JDialog {
         currentActivity.setEndDate(calEnd);
         currentActivity.setColor(Farbe.getColor().getRGB());
 
-        /*if (mdlInsertAfter.getSelectedItem().getClass() == JActivity.class) {
-          currentInstance.newActivity(((JActivity)mdlInsertAfter.getSelectedItem()).getActivities(), strName, strShortName, calStart, calEnd, Farbe.getColor().getRGB());
-        } else {
-          currentInstance.newActivity(currentInstance.getActivities(), strName, strShortName, calStart, calEnd, Farbe.getColor().getRGB());
-        }*/
-
         mainwindow.updateViews();
 
         dispose();
@@ -360,8 +345,11 @@ public class DialogEditActivity extends JDialog {
 
     public void this_windowOpened(WindowEvent e) {
         if (currentActivity != null) {
+            txtName.setText(currentActivity.getName());
+            txtShortName.setText(currentActivity.getShortName());
             txtStartDate.setText(getCal(currentActivity.getStartDate()));
             txtEndDate.setText(getCal(currentActivity.getEndDate()));
+            Farbe.setColor(currentActivity.getColor());
         }
     }
 }
