@@ -689,13 +689,13 @@ public class JManager {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
-/*
+
             DocumentBuilder domBuilder = dbf.newDocumentBuilder();
             File file = new File(fileName);
 
             Document document = domBuilder.parse(file);
-*/
 
+/*
             URL dtdUrl = this.getClass().getResource("/gtdmanager.dtd");
             // dtd muss sich im ordner /classes befinden!
 
@@ -706,7 +706,7 @@ public class JManager {
             DocumentBuilder db = dbf.newDocumentBuilder();
             //db.setErrorHandler(new GtdXMLErrorHandler());
             Document document = db.parse(is);
-
+*/
             processDocument(document);
 
         } catch (Exception e) {
