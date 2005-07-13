@@ -21,6 +21,8 @@ import java.net.*;
  */
 public class JManager {
 
+    private static int MONTHINC = 1;
+
     JProject project;
 
     private boolean projectNodeFound = false;
@@ -177,8 +179,8 @@ public class JManager {
             retColor = Integer.parseInt(colorStr.substring(2), 16);
         } else if (colorStr.startsWith("#")) { // example: given as #FF0000
             retColor = Integer.parseInt(colorStr.substring(1), 16);
-        } else if (colorStr.startsWith("0") && (colorStr.length() > 1)) {
-            retColor = Integer.parseInt(colorStr.substring(1), 8);
+        /*} else if (colorStr.startsWith("0") && (colorStr.length() > 1)) {
+            retColor = Integer.parseInt(colorStr.substring(1), 8);*/
         } else if (colorStr.equalsIgnoreCase("white")) {
             retColor = Integer.parseInt("FFFFFF", 16);
         } else if (colorStr.equalsIgnoreCase("black")) {
@@ -379,7 +381,7 @@ public class JManager {
                 if (itemName.equalsIgnoreCase("date")) {
                     dateInt = Integer.parseInt(itemValue);
                 } else if (itemName.equalsIgnoreCase("month")) {
-                    monthInt = Integer.parseInt(itemValue);
+                    monthInt = Integer.parseInt(itemValue) - MONTHINC;
                 } else if (itemName.equalsIgnoreCase("year")) {
                     yearInt = Integer.parseInt(itemValue);
                 }
@@ -716,11 +718,16 @@ public class JManager {
     }
 
     private String getColorInXML(int color) {
-        String s = Integer.toHexString(color);
+        /*String s = Integer.toHexString(color);
         while (s.length() < 6) {
             s = "0" + s;
         }
-        return getColorStr("#"+ s);
+        return getColorStr("#"+ s);*/
+        return Integer.toString(color);
+    }
+
+    private String getCalendarInXml(Calendar c) {
+        return "date=\"" + c.get(Calendar.DATE) + "\" month=\"" + c.get(Calendar.MONTH + MONTHINC) + "\" year=\"" + c.get(Calendar.YEAR) + "\"";
     }
 
     private void writeDependency(PrintWriter pWriter, JDependency dep, String tabs) {
@@ -734,8 +741,8 @@ public class JManager {
         pWriter.println(tabs + "<activity id=\"A" + act.getId() + "\">");
         pWriter.println(tabs + "\t<name>" + act.getName() + "</name>");
         pWriter.println(tabs + "\t<short-name>" + act.getShortName() + "</short-name>");
-        pWriter.println(tabs + "\t<start-date date=\"" + act.getStartDate().get(Calendar.DATE) + "\" month=\"" + act.getStartDate().get(Calendar.MONTH) + "\" year=\"" + act.getStartDate().get(Calendar.YEAR) + "\" />");
-        pWriter.println(tabs + "\t<end-date date=\"" + act.getEndDate().get(Calendar.DATE) + "\" month=\"" + act.getEndDate().get(Calendar.MONTH) + "\" year=\"" + act.getEndDate().get(Calendar.YEAR) + "\" />");
+        pWriter.println(tabs + "\t<start-date " + getCalendarInXml(act.getStartDate()) + " />");
+        pWriter.println(tabs + "\t<end-date " + getCalendarInXml(act.getEndDate()) + " />");
         pWriter.println(tabs + "\t<property name=\"color\" value=\"" + getColorInXML(act.getColor()) + "\" />");
 
         for (int i = 0; i < act.dependencies.size(); i++) {
@@ -752,9 +759,9 @@ public class JManager {
     private void writeInstance(PrintWriter pWriter, JInstance inst) {
         pWriter.println("\t<instance>");
         pWriter.println("\t\t<name>" + inst.getName() + "</name>");
-        pWriter.println("\t\t<creation-date date=\"" + inst.getCreationDate().get(Calendar.DATE) + "\" month=\"" + inst.getCreationDate().get(Calendar.MONTH) + "\" year=\"" + inst.getCreationDate().get(Calendar.YEAR) + "\" />");
-        pWriter.println("\t\t<start-date date=\"" + inst.getStartDate().get(Calendar.DATE) + "\" month=\"" + inst.getStartDate().get(Calendar.MONTH) + "\" year=\"" + inst.getStartDate().get(Calendar.YEAR) + "\" />");
-        pWriter.println("\t\t<end-date date=\"" + inst.getEndDate().get(Calendar.DATE) + "\" month=\"" + inst.getEndDate().get(Calendar.MONTH) + "\" year=\"" + inst.getEndDate().get(Calendar.YEAR) + "\" />");
+        pWriter.println("\t\t<creation-date " + getCalendarInXml(inst.getCreationDate()) + " />");
+        pWriter.println("\t\t<start-date " + getCalendarInXml(inst.getStartDate()) + " />");
+        pWriter.println("\t\t<end-date " + getCalendarInXml(inst.getEndDate()) + " />");
 
         for (int i = 0; i < inst.activities.size(); i++) {
             writeActivity(pWriter, (JActivity)inst.activities.get(i), "\t\t");
@@ -764,7 +771,7 @@ public class JManager {
     }
 
     public void saveProject(String fileName) {
-        // saves project in xml-file
+        // speichert das Projekt unter dem angegebenen Dateinamen
 
         try {
 
@@ -799,6 +806,9 @@ public class JManager {
     }
 
     public void newProject() {
+        // erstellt ein neues Projekt und
+        // setzt die globalen Variablen zurück (wird für das Laden benötigt)
+
         projectNodeFound = false;
         projectNameNodeFound = false;
         instNameNodeFound = false;
@@ -809,12 +819,14 @@ public class JManager {
     }
 
     public void newProject(String strName, String strVersion) {
+        // erstellt ein neues Projekt und übergibt Name und Version
         newProject();
         this.project.setName(strName);
         this.project.setVersion(strVersion);
     }
 
     public void generateSampleProject() {
+        // generiert ein Beispielprojekt (Testphase)
 
         newProject("Testprojekt", "1.0.0.0");
 
@@ -917,7 +929,9 @@ public class JManager {
 	//loadProject("test.xml");
     }
 
-    private void jbInit() throws Exception {
-    }
+/*
+Handbuch
+Klassendiagramm / Entwurf vergleichen
 
+*/
 }
