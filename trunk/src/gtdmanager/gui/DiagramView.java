@@ -26,7 +26,7 @@ import org.freehep.graphics2d.VectorGraphics;
  * @author Tomislav Viljetić
  * @version 1.0
  * {{{ DiagramView */
-public class DiagramView extends JComponent
+public class DiagramView extends JPanel
     implements View, MouseListener, MouseMotionListener,
                MouseWheelListener
 
@@ -259,6 +259,11 @@ public class DiagramView extends JComponent
     /* paint() (overloads JComponent) {{{ */
     public void paint(Graphics not2Dg) {
         g = (Graphics2D)not2Dg;
+
+        setBounds(0,0, 800, 600);
+
+        g.setColor(Color.lightGray);
+        g.fillRect(getX(), getY(), getWidth(), getHeight());
 
         if (project == null)
         {
