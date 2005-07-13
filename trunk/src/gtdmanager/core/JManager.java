@@ -26,20 +26,28 @@ public class JManager {
     private boolean projectNodeFound = false;
     private boolean projectNameNodeFound = false;
     private boolean instNameNodeFound = false;
-    private String actLastNameNode = "";
     private boolean actNameNodeFound = false;
+
+    private String actLastNameNode = "";
+    public String lastErrorString = "";
 
 
     public JManager() {
         projectNodeFound = false;
         projectNameNodeFound = false;
         instNameNodeFound = false;
-        actLastNameNode = "";
         actNameNodeFound = false;
+        actLastNameNode = "";
+        lastErrorString = "";
     }
 
     public JProject getProject() {
         return this.project;
+    }
+
+    private void errorMessage(String errorMsg) {
+        //System.out.println(errorMsg);
+        lastErrorString = errorMsg;
     }
 
     private void processDependencyPropertyNode(Node propNode, JDependency dep) {
@@ -159,19 +167,19 @@ public class JManager {
                     act.setEndDate(c);
 
                 } else {
-                    System.out.println("Unbekannter Datumsknoten in " +
-                                       "activity: " + nodeName);
+                    errorMessage("Unbekannter Datumsknoten in " +
+                                 "activity: " + nodeName);
                 }
 
             } else {
                 // eines oder mehrere der attribute
                 // date, month und year wurden nicht gefunden
-                System.out.println("Der Datumsknoten '" + nodeName +
+                errorMessage("Der Datumsknoten '" + nodeName +
                                    "' besitzt nicht genügend Attribute " +
                                    "für ein korrektes Datum!");
             }
         } else {
-            System.out.println("Der Datumsknoten '" + nodeName +
+            errorMessage("Der Datumsknoten '" + nodeName +
                                "' besitzt keine Attribute!");
         }
     }
@@ -320,7 +328,7 @@ public class JManager {
                 processActivityNode(childNode, act.activities);
 
             } else {
-                System.out.println("Unbekanntes Element innerhalb eines " +
+                errorMessage("Unbekanntes Element innerhalb eines " +
                                    "activity-Knotens der XML-Datei: " +
                                    nodeName + " = " + childNode.getNodeValue());
             }
@@ -348,7 +356,7 @@ public class JManager {
 
                 } else {
                     // kein name-Knoten vor diesem Text gefunden
-                    System.out.println("Unbekannter Text gefunden: " +
+                    errorMessage("Unbekannter Text gefunden: " +
                                        nodeName + " = " + nodeValue);
                 }
                 actNameNodeFound = false;
@@ -357,7 +365,7 @@ public class JManager {
 
         default:
             // Unbekannter Knoten im activity-Knoten
-            System.out.println("Unbekannter Knoten in activity-Knoten " +
+            errorMessage("Unbekannter Knoten in activity-Knoten " +
                                "gefunden: " + nodeName + " = " +
                                childNode.getNodeValue());
             break;
@@ -442,19 +450,19 @@ public class JManager {
                     destInst.setEndDate(c);
 
                 } else {
-                    System.out.println("Unbekannter Datumsknoten " +
+                    errorMessage("Unbekannter Datumsknoten " +
                                        "in instance: " + nodeName);
                 }
 
             } else {
                 // eines oder mehrere der attribute
                 // date, month und year wurden nicht gefunden
-                System.out.println("Der Datumsknoten '" + nodeName +
+                errorMessage("Der Datumsknoten '" + nodeName +
                                    "' besitzt nicht genügend Attribute " +
                                    "für ein korrektes Datum!");
             }
         } else {
-            System.out.println("Der Datumsknoten '" + nodeName +
+            errorMessage("Der Datumsknoten '" + nodeName +
                                "' besitzt keine Attribute!");
         }
     }
@@ -488,7 +496,7 @@ public class JManager {
                 processActivityNode(childNode, destInst.activities);
 
             } else {
-                System.out.println("Unbekanntes Element innerhalb eines " +
+                errorMessage("Unbekanntes Element innerhalb eines " +
                                    "instance-Knotens der XML-Datei: " +
                                    nodeName + " = " + childNode.getNodeValue());
             }
@@ -520,7 +528,7 @@ public class JManager {
 
         default:
             // Unbekannter Knoten im instance-Knoten
-            System.out.println("Unbekannter Knoten in instance-Knoten " +
+            errorMessage("Unbekannter Knoten in instance-Knoten " +
                                "gefunden: " + nodeName + " = " +
                                childNode.getNodeValue());
             break;
@@ -590,12 +598,12 @@ public class JManager {
 
                         if (lastPropName == "") {
                             // keine Zuordnung des value-Werts möglich
-                            System.out.println("Kein name-Attribut vor diesem" +
+                            errorMessage("Kein name-Attribut vor diesem" +
                                 " value-Attribut gefunden: " + itemName +
                                 " = " + nodeMap.item(nodeIdx).getNodeValue());
 
                         } else { // unbekannter property-Name
-                            System.out.println("Unbekanntes name-Attribut " +
+                            errorMessage("Unbekanntes name-Attribut " +
                                 "vor diesem value-Attribut gefunden: " +
                                 lastPropName + "? : " + itemName + " = " +
                                 nodeMap.item(nodeIdx).getNodeValue());
@@ -607,14 +615,14 @@ public class JManager {
                     // überschrieben werden kann
 
                 } else {
-                    System.out.println("Unbekanntes property-Attribut: " +
+                    errorMessage("Unbekanntes property-Attribut: " +
                                        itemName + " = " +
                                        nodeMap.item(nodeIdx).getNodeValue());
                 }
 
             }
         } else { // property besitzt keine Attribute
-            System.out.println("Ein property-Knoten innerhalb des " +
+            errorMessage("Ein property-Knoten innerhalb des " +
                                "project-Knotens besitzt keine Attribute!");
         }
     }
@@ -644,7 +652,7 @@ public class JManager {
             } else if (nodeName == "instance") {
                 processInstanceNode(childNode);
             } else {
-                System.out.println("Unbekanntes Element innerhalb des " +
+                errorMessage("Unbekanntes Element innerhalb des " +
                                    "project-Knotens der XML-Datei: " +
                                    nodeName + " = " + childNode.getNodeValue());
             }
@@ -667,7 +675,7 @@ public class JManager {
                     projectNameNodeFound = false;
 
                 } else { // kein name-Knoten vor diesem Text gefunden
-                    System.out.println("Unbekannter Text gefunden: " +
+                    errorMessage("Unbekannter Text gefunden: " +
                                        nodeName + " = " + nodeValue);
                 }
                 projectNameNodeFound = false;
@@ -676,7 +684,7 @@ public class JManager {
 
         default:
             // Unbekannter Knoten im project-Knoten
-            System.out.println("Unbekannter Knoten im project-Knoten gefunden: "
+            errorMessage("Unbekannter Knoten im project-Knoten gefunden: "
                                + nodeName + " = " + childNode.getNodeValue());
             break;
         }
@@ -698,14 +706,14 @@ public class JManager {
                 } else if (itemName == "version") {
                     project.setVersion(nodeMap.item(nodeIdx).getNodeValue());
                 } else {
-                    System.out.println("Unbekanntes Attribut des project-" +
+                    errorMessage("Unbekanntes Attribut des project-" +
                                        "Knotens gefunden: " + itemName + " = " +
                                        nodeMap.item(nodeIdx).getNodeValue());
                 }
 
             }
         } else {
-            System.out.println("Der project-Knoten in der XML-Datei ist leer!");
+            errorMessage("Der project-Knoten in der XML-Datei ist leer!");
         }
 
         if (projectNode.hasChildNodes()) {
@@ -736,12 +744,12 @@ public class JManager {
                     projectNodeFound = true;
                     processProjectNode(docChild);
                 } else {
-                    System.out.println(
+                    errorMessage(
                     "In der XML-Datei wurden mehrere project-Knoten gefunden!");
                 }
 
             } else {
-                System.out.println("Unbekanntes Element in der XML-Datei: " +
+                errorMessage("Unbekanntes Element in der XML-Datei: " +
                                    nodeName + " = " + docChild.getNodeValue());
             }
 
@@ -752,7 +760,7 @@ public class JManager {
             if (nodeName.equalsIgnoreCase("project")) {
                 // !DOCTYPE project ... // gibt verwendetes DTD an
             } else {
-                System.out.println("Unbekannter Knoten in der XML-Datei: " +
+                errorMessage("Unbekannter Knoten in der XML-Datei: " +
                                    nodeName + " = " + docChild.getNodeValue());
             }
         }
@@ -769,14 +777,15 @@ public class JManager {
             }
 
         } else {
-            System.out.println(
-            "Es befinden sich keine Elemente in der XML-Datei!");
+            errorMessage("Es befinden sich keine Elemente in der XML-Datei!");
         }
 
     } // end of processDocument
 
-    public void loadProject(String fileName) {
+    public boolean loadProject(String fileName) {
         // läd das Projekt aus der angegebenen XML-Datei
+
+        boolean retValue = true;
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -801,9 +810,11 @@ public class JManager {
             processDocument(document);
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            retValue = false;
+            errorMessage(e.getMessage());
         }
 
+        return retValue;
     }
 
     private String getColorInXML(int color) {
@@ -822,7 +833,7 @@ public class JManager {
     // daher wird hier der Monat + 1 abgespeichert
 
         return "date=\"" + c.get(Calendar.DATE) +
-                "\" month=\"" + c.get(Calendar.MONTH + MONTHINC) +
+                "\" month=\"" + (c.get(Calendar.MONTH) + MONTHINC) +
                 "\" year=\"" + c.get(Calendar.YEAR) + "\"";
     }
 
@@ -884,8 +895,10 @@ public class JManager {
         pWriter.println("\t</instance>");
     }
 
-    public void saveProject(String fileName) {
+    public boolean saveProject(String fileName) {
         // speichert das Projekt unter dem angegebenen Dateinamen
+
+        boolean retValue = true;
 
         try {
 
@@ -919,9 +932,11 @@ public class JManager {
             pWriter.close();
 
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            retValue = false;
+            errorMessage(e.getMessage());
         }
 
+        return retValue;
     }
 
     public void newProject() {
@@ -1037,9 +1052,4 @@ public class JManager {
 	//loadProject("test.xml");
     }
 
-/*
-Handbuch
-Klassendiagramm / Entwurf vergleichen
-
-*/
 }
