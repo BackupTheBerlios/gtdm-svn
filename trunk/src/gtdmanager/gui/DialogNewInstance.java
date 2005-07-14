@@ -269,7 +269,7 @@ public class DialogNewInstance extends JDialog {
         if (strInstanceName.length() == 0) {
 
             javax.swing.JOptionPane.showMessageDialog(this,
-            "Bitte füllen Sie alle Felder aus.", "Falsche Eingabe", 2);
+            "Bitte fuellen Sie alle Felder aus.", "Falsche Eingabe", 2);
 
             return;
         }

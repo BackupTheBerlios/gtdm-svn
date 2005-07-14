@@ -191,7 +191,7 @@ public class DialogEditActivity extends JDialog {
         this.setSize(458, 452);
         btnCreate.setBounds(new Rectangle(8, 392, 170, 25));
         btnCreate.setSelected(true);
-        btnCreate.setText("Änderungen speichern");
+        btnCreate.setText("Aenderungen speichern");
         btnCreate.addActionListener(new DialogEditActivity_btnCreate_actionAdapter(this));
         btnCancel.setBounds(new Rectangle(336, 392, 104, 25));
         btnCancel.setText("Abbrechen");
@@ -289,7 +289,7 @@ public class DialogEditActivity extends JDialog {
             tabSettings.setSelectedIndex(0);
 
             javax.swing.JOptionPane.showMessageDialog(this,
-            "Bitte füllen Sie alle Textfelder aus.", "Falsche Eingabe", 2);
+            "Bitte fuellen Sie alle Textfelder aus.", "Falsche Eingabe", 2);
 
             return;
         }

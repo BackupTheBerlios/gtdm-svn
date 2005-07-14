@@ -233,7 +233,7 @@ public class DialogNewActivity extends JDialog {
         jLabel4.setMaximumSize(new Dimension(34, 21));
         jLabel4.setMinimumSize(new Dimension(34, 21));
         jLabel4.setPreferredSize(new Dimension(34, 21));
-        jLabel4.setText("Einfügen nach:");
+        jLabel4.setText("Einfuegen nach:");
         jLabel4.setBounds(new Rectangle(20, 270, 89, 22));
         cmbInsertAfter.setModel(mdlInsertAfter);
         cmbInsertAfter.setBounds(new Rectangle(122, 270, 168, 22));
@@ -277,8 +277,8 @@ public class DialogNewActivity extends JDialog {
     JColorChooser Farbe = new JColorChooser();
     ButtonGroup groupDependencies = new ButtonGroup();
 
-    DefaultListModel mdlActivities = new DefaultListModel();
-    DefaultListModel mdlSelected = new DefaultListModel();
+    //DefaultListModel mdlActivities = new DefaultListModel();
+    //DefaultListModel mdlSelected = new DefaultListModel();
     DefaultComboBoxModel mdlInsertAfter = new DefaultComboBoxModel();
 
     public JInstance currentInstance = null;
@@ -300,7 +300,7 @@ public class DialogNewActivity extends JDialog {
             tabSettings.setSelectedIndex(0);
 
             javax.swing.JOptionPane.showMessageDialog(this,
-            "Bitte füllen Sie alle Textfelder aus.", "Falsche Eingabe", 2);
+            "Bitte fuellen Sie alle Textfelder aus.", "Falsche Eingabe", 2);
 
             return;
         }

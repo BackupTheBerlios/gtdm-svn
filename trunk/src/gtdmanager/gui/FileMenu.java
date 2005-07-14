@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
  *
  * <p>Copyright: Copyright (c) 2005</p>
  *
- * @author Tomislav ViljetiÄ‡
+ * @author Tomislav Viljetiae‡
  * @version 1.0
  * {{{ FileMenu */
 public class FileMenu extends JMenu {
@@ -55,7 +55,7 @@ public class FileMenu extends JMenu {
  *
  * <p>Copyright: Copyright (c) 2005</p>
  *
- * @author Tomislav ViljetiÄ‡
+ * @author Tomislav Viljetiae‡
  * @version 1.0
  * {{{ FileMenuAction */
 class FileMenuAction extends AbstractAction {
@@ -78,6 +78,7 @@ class FileMenuAction extends AbstractAction {
         if (name == newProject) {
             DialogNewProject pDlg = new DialogNewProject(this.parent, "Neues Projekt erstellen", true);
             pDlg.setLocationRelativeTo(null);
+            pDlg.setResizable(false);
             pDlg.setModal(true);
             pDlg.show();
         }

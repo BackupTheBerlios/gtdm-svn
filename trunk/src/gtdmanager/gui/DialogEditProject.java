@@ -189,7 +189,7 @@ public class DialogEditProject extends JDialog {
         this.setSize(371, 120);
         btnCreate.setBounds(new Rectangle(9, 61, 173, 25));
         btnCreate.setSelected(true);
-        btnCreate.setText("Änderungen speichern");
+        btnCreate.setText("Aenderungen speichern");
         btnCreate.addActionListener(new DialogEditProject_btnCreate_actionAdapter(this));
         btnCancel.setBounds(new Rectangle(249, 61, 104, 25));
         btnCancel.setText("Abbrechen");
@@ -233,7 +233,7 @@ public class DialogEditProject extends JDialog {
         if (strProjectName.length() == 0) {
 
             javax.swing.JOptionPane.showMessageDialog(this,
-            "Bitte füllen Sie alle Felder aus.", "Falsche Eingabe", 2);
+            "Bitte fuellen Sie alle Felder aus.", "Falsche Eingabe", 2);
 
             return;
         }
