@@ -36,7 +36,7 @@ public class MainWindow {
 
     // list of all views
     ArrayList views = new ArrayList();
-    JComponent diagramView = null;
+    DiagramView diagramView = null;
 
     Object selection = null;
 
@@ -48,7 +48,7 @@ public class MainWindow {
         return selection;
     }
 
-    public JComponent getDiagramView() {
+    public DiagramView getDiagramView() {
         return diagramView;
     }
 
@@ -62,7 +62,7 @@ public class MainWindow {
 
         // add views to array
         views.add(new TreeView(this));
-        views.add(diagramView = (JComponent)new DiagramView(this));
+        views.add(diagramView = new DiagramView(this));
 
         // add the two views to the frame via splitpane
         JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
@@ -74,7 +74,7 @@ public class MainWindow {
 
         // setup the mainwindow frame
         frame.getContentPane().add(panel);
-        frame.setSize(800, 440);
+        frame.setSize(720, 512);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

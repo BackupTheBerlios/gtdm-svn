@@ -51,8 +51,11 @@ public class TreeView extends JTree implements View, TreeSelectionListener {
     public void valueChanged(TreeSelectionEvent e) {
         DefaultMutableTreeNode n = (DefaultMutableTreeNode)
             e.getPath().getLastPathComponent();
-        if (n != null)
+        if (n != null) {
             parent.setSelection(n.getUserObject());
+            // highlight dependencies:
+            parent.getDiagramView().repaint();
+        }
         //System.out.println("selected: " + parent.getSelection());
         //System.out.println("id: "+((JActivity)parent.getSelection()).getId());
     }

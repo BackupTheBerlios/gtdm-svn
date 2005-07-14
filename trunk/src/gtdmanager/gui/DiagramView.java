@@ -203,6 +203,7 @@ public class DiagramView extends JComponent
     }
 
     public void mousePressed (MouseEvent e) {
+
     }
 
     public void mouseReleased (MouseEvent e) {
@@ -327,6 +328,16 @@ public class DiagramView extends JComponent
             ganttPaintActivities(currentInstance.getActivities());
 
             ganttPaintDependencies(currentInstance.getActivities());
+            try {
+                // highlight, if marked (selected)
+                //int inf = 1 / 0;
+                JActivity sel = ((JActivity)parent.getSelection());
+                
+                // this does and should throw an except. if not JActivity
+                if (sel.getId() >= 0)
+                    ganttPaintDependencies(sel, true);
+
+            } catch (Exception e) {}
         }
         else {
             //dimension.setSize(0, 0);
@@ -591,7 +602,7 @@ public class DiagramView extends JComponent
         // init geometry
         gridRect = new Rectangle(
             -1,
-            padding,
+            0, //padding,
             getWidth() + 1,
             //getHeight() - 2 * padding
 
@@ -616,8 +627,8 @@ public class DiagramView extends JComponent
         }
 
         // draw message (outside the clipping area)
-        g.setColor(Color.gray);
-        g.drawString(message, gridRect.x + 2, gridRect.y - 2);
+        //g.setColor(Color.gray);
+        //g.drawString(message, gridRect.x + 2, gridRect.y - 2);
 
         // set clip rect, so that nothing can be drawn outside
         g.clip(gridRect);
@@ -798,6 +809,10 @@ public class DiagramView extends JComponent
             );
         }
 
+        // border:
+        g.setColor(Color.darkGray);
+        g.drawRect(r.x, r.y, r.width, r.height);
+
         // draw all subactivities
         ganttPaintActivities(a.getActivities());
 
@@ -810,14 +825,15 @@ public class DiagramView extends JComponent
         // this method is meant to be called recursive
         // TODO: the core needs: getAllActivities(PREORDER|POSTORDER|INORDER)
         ListIterator i = a.listIterator();
-        while (i.hasNext()) ganttPaintDependencies((JActivity)i.next());
+        while (i.hasNext()) ganttPaintDependencies((JActivity)i.next(), false);
     }//}}}
 
-    private void ganttPaintDependencies(JActivity from) {//{{{
+    private void ganttPaintDependencies(JActivity from, boolean highlight)
+    {//{{{
         Rectangle fromRect = (Rectangle)actRects.get(from);
 
-        g.setColor(Color.darkGray);
-        g.drawRect(fromRect.x, fromRect.y, fromRect.width, fromRect.height);
+        //g.setColor(Color.darkGray);
+        //g.drawRect(fromRect.x, fromRect.y, fromRect.width, fromRect.height);
 
         ListIterator i = from.getDependencies().listIterator();
         while (i.hasNext()) {
@@ -831,43 +847,43 @@ public class DiagramView extends JComponent
             int u = barWidth / ud; // unit
             int uh = u + barWidth / 2; // unit height
 
-            /*try {
-                if (((JActivity)parent.getSelection()).getId() == from.getId())
-                    g.setColor(new Color(0xFFFFFF));
-            } catch (Exception e) {
+
+            if (highlight)
+                g.setColor(new Color(from.getColor()));
+            else
                 g.setColor(new Color(0x424242));
-            }*/
 
             if (d.getDependencyType() == JDependency.BEGINBEGIN) {//{{{
                     f = new Point(
-                        fromRect.x - 1,
-                        fromRect.y + fromRect.height / 2
+                        fromRect.x - 1 - (highlight?1:0),
+                        fromRect.y + fromRect.height / 2 - (highlight?1:0)
                     );
-                    t = new Point(toRect.x - 1, toRect.y + toRect.height / 2);
+                    t = new Point(toRect.x - 1 - (highlight?1:0), 
+                            toRect.y + toRect.height / 2 - (highlight?1:0));
 
                     if (f.x < t.x)
                     {
-                        g.drawLine(f.x, f.y, f.x - u, f.y);
+                        g.drawLine(f.x + 1, f.y, f.x - u, f.y);
                         g.drawLine(f.x - u, f.y, f.x - u, t.y);
-                        g.drawLine(f.x - u, t.y, t.x, t.y);
+                        g.drawLine(f.x - u, t.y, t.x + 1, t.y);
                     }
                     else
                     {
-                        g.drawLine(f.x, f.y, t.x - u, f.y);
+                        g.drawLine(f.x + 1, f.y, t.x - u, f.y);
                         g.drawLine(t.x - u, f.y, t.x - u, t.y);
-                        g.drawLine(t.x - u, t.y, t.x, t.y);
+                        g.drawLine(t.x - u, t.y, t.x + 1, t.y);
                     }
             }//}}}
             else if (d.getDependencyType() == JDependency.BEGINEND) {//{{{
-                    f = new Point(fromRect.x - 1,
-                        fromRect.y + fromRect.height / 2);
+                    f = new Point(fromRect.x - 1 - (highlight?1:0),
+                        fromRect.y + fromRect.height / 2 - (highlight?1:0));
                     t = new Point(
-                        toRect.x + toRect.width + 1,
-                        toRect.y + toRect.height / 2);
+                        toRect.x + toRect.width + 1 - (highlight?1:0),
+                        toRect.y + toRect.height / 2 - (highlight?1:0));
 
                     if (f.x < t.x)
                     {
-                        g.drawLine(f.x, f.y, f.x - u, f.y);
+                        g.drawLine(f.x + 1, f.y, f.x - u, f.y);
                         if (f.y < t.x)
                         {
                             g.drawLine(f.x - u, f.y, f.x - u, f.y + uh + u);
@@ -884,21 +900,23 @@ public class DiagramView extends JComponent
                     }
                     else
                     {
-                        g.drawLine(f.x, f.y, t.x + u, f.y);
+                        g.drawLine(f.x + 1, f.y, t.x + u, f.y);
                         g.drawLine(t.x + u, f.y, t.x + u, t.y);
                         g.drawLine(t.x + u, t.y, t.x, t.y);
                     }
             }//}}}
             else if (d.getDependencyType() == JDependency.ENDBEGIN) {//{{{
-                    f = new Point(fromRect.x + fromRect.width + 1,
-                        fromRect.y + fromRect.height / 2 );
-                    t = new Point(toRect.x - 1, toRect.y + toRect.height / 2 );
+                    f = new Point(fromRect.x + fromRect.width + 1 
+                            - (highlight?1:0),
+                        fromRect.y + fromRect.height / 2 - (highlight?1:0) );
+                    t = new Point(toRect.x - 1 - (highlight?1:0), 
+                            toRect.y + toRect.height / 2 - (highlight?1:0) );
 
                     if (f.x < t.x)
                     {
                         g.drawLine(f.x, f.y, t.x - u, f.y);
                         g.drawLine(t.x - u, f.y, t.x - u, t.y);
-                        g.drawLine(t.x - u, t.y, t.x, t.y);
+                        g.drawLine(t.x - u, t.y, t.x + 1, t.y);
                     }
                     else
                     {
@@ -915,14 +933,15 @@ public class DiagramView extends JComponent
                             g.drawLine(f.x + u, f.y - uh, t.x - u, f.y - uh);
                             g.drawLine(t.x - u, f.y - uh, t.x - u, t.y);
                         }
-                        g.drawLine(t.x - u, t.y, t.x, t.y);
+                        g.drawLine(t.x - u, t.y, t.x + 1, t.y);
                     }
             }//}}}
             else if (d.getDependencyType() == JDependency.ENDEND) {//{{{
-                    f = new Point(fromRect.x + fromRect.width + 1,
-                        fromRect.y + fromRect.height / 2 );
-                    t = new Point(toRect.x + toRect.width + 1,
-                        toRect.y + toRect.height / 2 );
+                    f = new Point(fromRect.x + fromRect.width + 1
+                            - (highlight?1:0),
+                        fromRect.y + fromRect.height / 2 - (highlight?1:0) );
+                    t = new Point(toRect.x + toRect.width + 1 - (highlight?1:0),
+                        toRect.y + toRect.height / 2 - (highlight?1:0) );
 
                     if (f.x < t.x)
                     {
