@@ -25,16 +25,25 @@ import java.util.*;
 public class TreeView extends JTree implements View, TreeSelectionListener {
 
     MainWindow parent = null;
-    DefaultMutableTreeNode top;
+    //DefaultMutableTreeNode top;
 
 //    JProject project = null;
 //    JInstance instance = null;
 
-    TreeView(DefaultMutableTreeNode t, MainWindow parent) {
+    TreeView(MainWindow parent) {
 //        DefaultMutableTreeNode t = new DefaultMutableTreeNode();
-        super(t);//new DefaultMutableTreeNode());
+        //super(t);//new DefaultMutableTreeNode());
         //parent = window;
-        top = t;
+        //top = t;
+        //setModel(new DefaultTreeModel(
+        //            top = new DefaultMutableTreeNode(), false));
+        setModel(null); // initialize empty tree
+        //setSelectionModel(EmptySelectionModel.sharedInstance());
+        //selectionModel.addTreeSelectionListener(selectionRedirector);
+        //setCellRenderer(new DefaultTreeCellRenderer());
+        //updateUI();
+        //this.userObject = top = new DefaultMutableTreeNode();
+        //this.allowsChildren = true;
         this.parent = parent;
         addTreeSelectionListener(this);
     }
@@ -44,7 +53,7 @@ public class TreeView extends JTree implements View, TreeSelectionListener {
             e.getPath().getLastPathComponent();
         if (n != null)
             parent.setSelection(n.getUserObject());
-        System.out.println("selected: " + parent.getSelection());
+        //System.out.println("selected: " + parent.getSelection());
         //System.out.println("id: "+((JActivity)parent.getSelection()).getId());
     }
 
@@ -52,7 +61,9 @@ public class TreeView extends JTree implements View, TreeSelectionListener {
 
         if (project == null) return; // nothing to do
 
-        top.removeAllChildren();
+        DefaultMutableTreeNode top = new DefaultMutableTreeNode();
+        setModel(new DefaultTreeModel(top, false));
+        //top.removeAllChildren();
         top.setUserObject(project);
 
         ListIterator l = project.getInstances().listIterator();
@@ -60,6 +71,8 @@ public class TreeView extends JTree implements View, TreeSelectionListener {
             JInstance i = (JInstance)l.next();
             DefaultMutableTreeNode n = new DefaultMutableTreeNode(i);
             top.add(n);
+        
+            //System.out.println("TreeView: " + i);
 
             ListIterator m = i.getActivities().listIterator();
             while (m.hasNext()) updateActivity(n, (JActivity)m.next());
@@ -75,6 +88,8 @@ public class TreeView extends JTree implements View, TreeSelectionListener {
     private void updateActivity(DefaultMutableTreeNode top, JActivity act) {
         DefaultMutableTreeNode n = new DefaultMutableTreeNode(act);
         top.add(n);
+
+        //System.out.println("TreeView:   " + act);
 
         /*try
         {

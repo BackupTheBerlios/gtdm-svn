@@ -61,10 +61,8 @@ public class MainWindow {
         panel.add(menuBar, BorderLayout.NORTH);
 
         // add views to array
-        diagramView = (JComponent)new DiagramView(this);
-        views.add(new TreeView(new javax.swing.tree.DefaultMutableTreeNode(),
-                    this));
-        views.add(diagramView);
+        views.add(new TreeView(this));
+        views.add(diagramView = (JComponent)new DiagramView(this));
 
         // add the two views to the frame via splitpane
         JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
