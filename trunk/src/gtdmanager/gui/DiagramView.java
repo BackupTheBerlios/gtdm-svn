@@ -261,7 +261,25 @@ public class DiagramView extends JComponent
             endDate = startDate + showDays;   // show 35 days
         }
 
+        // for scrollpane
+        dimension.setSize(0,
+                    + getTotalArrayListSize(currentInstance.getActivities())
+                        * (barWidth + padding * 4/3));
+
+        // trigger resize event
+        setSize(getWidth(), (int)dimension.getHeight());
+
         repaint();
+    }
+    private int getTotalArrayListSize(ArrayList a)
+    {
+        int size = a.size();
+        ListIterator i = a.listIterator();
+        while (i.hasNext()) try {
+            JActivity sub = (JActivity)i.next();
+            size += getTotalArrayListSize(sub.getActivities());
+        } catch (Exception e) { }
+        return size;
     }
     /* View Implementation }}} */
 
@@ -301,7 +319,7 @@ public class DiagramView extends JComponent
             ganttPaintGrid(g);
 
 
-            dimension.setSize(0, gridRect.getHeight());
+            //dimension.setSize(0, gridRect.getHeight());
 
             // set initial y position
             yActOffset = gridRect.y + padding;
@@ -311,7 +329,7 @@ public class DiagramView extends JComponent
             ganttPaintDependencies(currentInstance.getActivities());
         }
         else {
-            dimension.setSize(0, 0);
+            //dimension.setSize(0, 0);
 
             // init geometry
             gridRect = new Rectangle(

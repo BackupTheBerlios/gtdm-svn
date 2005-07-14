@@ -106,8 +106,8 @@ class DiagramMenuAction extends AbstractAction {
                 "Diagramm exportieren als...",
                 parent.getParentWindow().getDiagramView(),
                 "export" );
-            System.out.println("*** Alles ueber dieser Zeile sind keine"
-                    + " Fehler, dass gehoert so :-) ***");
+            /*System.out.println("*** Alles ueber dieser Zeile sind keine"
+                    + " Fehler, dass gehoert so :-) ***");*/
             //}
             //});
         }
