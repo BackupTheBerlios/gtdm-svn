@@ -323,12 +323,12 @@ public class DialogNewActivity extends JDialog {
             calStart = toCal(strStartDate);
             calEnd = toCal(strEndDate);
 
-            if (calEnd.before(calStart) || calEnd.equals(calStart)) {
+            if (calEnd.before(calStart)) { // || calEnd.equals(calStart)) {
 
                 tabSettings.setSelectedIndex(0);
 
                 javax.swing.JOptionPane.showMessageDialog(this,
-                "Das Enddatum darf nicht vor- oder auf dem Startdatum liegen.",
+                "Das Enddatum darf nicht vor dem Startdatum liegen.",
                 "Falsche Eingabe", 2);
                 return;
             }

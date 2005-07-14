@@ -1,5 +1,6 @@
 package gtdmanager.core;
 
+import java.text.*;
 import java.util.*;
 import java.io.*;
 import javax.xml.parsers.*;
@@ -157,8 +158,15 @@ public class JManager {
 
             if ((dateInt >= 0) && (monthInt >= 0) && (yearInt >= 0)) {
 
-                Calendar c = Calendar.getInstance();
-                c.set(yearInt, monthInt, dateInt);
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+		try { sdf.parse(""
+			+ (dateInt < 10 ? "0": "")  + dateInt + "."
+			+ (monthInt < 10 ? "0": "")  + monthInt + "."
+			+ yearInt);
+		} catch (Exception e) {}
+		    
+                Calendar c = sdf.getCalendar(); //Calendar.getInstance();
+                //c.set(yearInt, monthInt, dateInt);
 
                 if (nodeName.equalsIgnoreCase("start-date")) {
                     act.setStartDate(c);
@@ -437,8 +445,15 @@ public class JManager {
 
             if ((dateInt >= 0) && (monthInt >= 0) && (yearInt >= 0)) {
 
-                Calendar c = Calendar.getInstance();
-                c.set(yearInt, monthInt, dateInt);
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+		try { sdf.parse(""
+			+ (dateInt < 10 ? "0": "")  + dateInt + "."
+			+ (monthInt < 10 ? "0": "")  + monthInt + "."
+			+ yearInt);
+		} catch (Exception e) {}
+		    
+                Calendar c = sdf.getCalendar(); //Calendar.getInstance();
+                //c.set(yearInt, monthInt, dateInt);
 
                 if (nodeName.equalsIgnoreCase("creation-date")) {
                     destInst.setCreationDate(c);

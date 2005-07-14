@@ -212,12 +212,14 @@ public class JProject {
         return null;
     }
 
-    public void deleteInstance(int id) {
+    public boolean deleteInstance(int id) {
         // löscht die instanz mit der übergebenen id
         JInstance inst = getInstance(id);
         if (inst != null) {
-            this.instances.remove(inst);
+		return this.instances.remove(inst);
+	  
         }
+	return false;
     }
 
 }

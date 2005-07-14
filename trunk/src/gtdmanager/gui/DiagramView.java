@@ -160,7 +160,13 @@ public class DiagramView extends JComponent
         System.out.println("4  " + (d / 1000 / 60 / 60) % 24);
         System.out.println("5  " + (d / 1000 / 60 / 60 / 24));*/
 
+        /*cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.HOUR, 0);*/
+
         long l = cal.getTimeInMillis();
+
         // remove milliesecs
         l -= l % 1000;
         l /= 1000;
@@ -639,7 +645,7 @@ public class DiagramView extends JComponent
 
         // day grid
         for (int i = 0; i < gridRect.width; i += gridStep.x) {
-            int day = startDate + i/gridStep.x;
+            int day = startDate + i/gridStep.x - 1;
             int x = gridRect.x + i;
             int y = gridRect.y;
             int h = gridRect.height - 2;

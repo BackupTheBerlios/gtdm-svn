@@ -12,7 +12,7 @@
 		<name>Instanz1</name>
 		<creation-date date="1" month="6" year="2005" />
 		<start-date date="1" month="6" year="2005" />
-		<end-date date="30" month="6" year="2005" />
+		<end-date date="3" month="7" year="2005" />
 		<activity id="A0">
 			<name>Aktivi1</name>
 			<short-name>Akt1</short-name>

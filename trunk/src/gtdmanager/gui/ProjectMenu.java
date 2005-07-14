@@ -39,12 +39,11 @@ public class ProjectMenu extends JMenu {
 		setText("Projekt");
         add(new ProjectMenuAction(ProjectMenuAction.editProject, window));
         add(new ProjectMenuAction(ProjectMenuAction.newInstance, window));
+        add(new ProjectMenuAction(ProjectMenuAction.deleteInstance, window));
         add(new ProjectMenuAction(ProjectMenuAction.newActivity, window));
         add(new ProjectMenuAction(ProjectMenuAction.editActivity, window));
         add(new ProjectMenuAction(ProjectMenuAction.deleteActivity, window));
         add(new ProjectMenuAction(ProjectMenuAction.adminDependencies, window));
-
-        add(new ProjectMenuAction(ProjectMenuAction.diagramSettings, window));
 	}
 
     private void jbInit() throws Exception {
@@ -67,12 +66,11 @@ class ProjectMenuAction extends AbstractAction {
 
     public static String editProject = "Projekt bearbeiten...";
     public static String newInstance = "Neue Instanz erstellen...";
+    public static String deleteInstance = "Instanz loeschen";
     public static String newActivity = "Neue Aufgabe...";
     public static String editActivity = "Aufgabe bearbeiten...";
     public static String deleteActivity = "Aufgabe loeschen";
     public static String adminDependencies = "Abhaengigkeiten verwalten...";
-
-    public static String diagramSettings = "Diagrammeigenschaften";
 
     private static MainWindow parent = null;
 
@@ -172,6 +170,50 @@ class ProjectMenuAction extends AbstractAction {
             pDlg.setResizable(false);
             pDlg.setModal(true);
             pDlg.show();
+        }
+        else if (name == deleteInstance) {
+
+            if (parent.manager.getProject() == null) {
+                javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                "Sie haben noch kein Projekt geladen oder erstellt.", "Kein bestehendes Projekt vorhanden", 2);
+                return;
+            }
+
+            if (parent.manager.getProject().getInstances().size() <= 1) {
+                //parent.getSelection() == null || parent.getSelection().getClass() != JInstance.class) {
+                javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                "Einzige Instanz kann nicht geloescht werden.",
+                "Fehler beim Loeschen", 2);
+                return;
+            }
+
+            int nIndex = parent.manager.getProject().getInstances().size()-1;
+            JInstance currentInstance = (JInstance)parent.manager.getProject().getInstances().get(nIndex);
+
+            String [] optionen = {"Ja", "Nein"};
+            int wahl = javax.swing.JOptionPane.showOptionDialog(
+                       parent.frame,  "Sind Sie sicher, dass Sie die Instanz" +
+                       " \"" + currentInstance.getName() + "\" loeschen moechten?",
+                       "Instanz loeschen",
+                       javax.swing.JOptionPane.YES_NO_OPTION,
+                       javax.swing.JOptionPane.QUESTION_MESSAGE,
+                       null,
+                       optionen, optionen[0]);
+
+            if (wahl == javax.swing.JOptionPane.YES_OPTION) {
+
+                boolean bRet = parent.manager.getProject().deleteInstance(currentInstance.getId());
+
+                if (bRet == false) {
+                    javax.swing.JOptionPane.showMessageDialog(parent.frame,
+                    "Die Instanz \"" +
+                    currentInstance.getName() + "\" konnte nicht geloescht werden.",
+                    "Fehler beim Loeschen", 2);
+                    return;
+                }
+
+              parent.updateViews();
+            }
         }
         else if (name == newActivity) {
 
@@ -339,21 +381,6 @@ class ProjectMenuAction extends AbstractAction {
             pDlg.setLocationRelativeTo(null);
             pDlg.setResizable(false);
             pDlg.setModal(true);
-            pDlg.show();
-        }
-        else if (name == diagramSettings) {
-
-            if (parent.manager.getProject() == null || parent.manager.getProject().getInstances().size() == 0) {
-                javax.swing.JOptionPane.showMessageDialog(parent.frame,
-                "Sie haben noch kein Projekt geladen oder erstellt.",
-                "Kein bestehendes Projekt vorhanden", 2);
-                return;
-            }
-
-            DialogViewSettings pDlg = new DialogViewSettings(this.parent, "Diagrammeinstellungen", true);
-            pDlg.setLocationRelativeTo(null);
-            pDlg.setModal(true);
-            pDlg.setResizable(false);
             pDlg.show();
         }
     }

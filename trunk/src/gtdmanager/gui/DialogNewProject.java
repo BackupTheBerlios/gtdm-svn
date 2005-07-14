@@ -326,9 +326,9 @@ public class DialogNewProject extends JDialog {
             calStart = toCal(strInstanceStartDate);
             calEnd = toCal(strInstanceEndDate);
 
-            if (calEnd.before(calStart) || calEnd.equals(calStart)) {
+            if (calEnd.before(calStart)) {// || calEnd.equals(calStart)) {
                 javax.swing.JOptionPane.showMessageDialog(this,
-                "Das Enddatum darf nicht vor- oder auf dem Startdatum liegen.",
+                "Das Enddatum darf nicht vor dem Startdatum liegen.",
                 "Falsche Eingabe", 2);
                 return;
             }
